@@ -1,0 +1,6 @@
+- colors
+- vim bindings in input
+- different categories
+- get rid of counter
+- redux architecture
+- click on points to change their visibility

@@ -7,7 +7,7 @@ function getPoints(store){
 }
 
 export default (store) => ({
-  path : 'points',
+  path : 'ml',
   /*  Async getComponent is only invoked when route matches   */
   getComponent (nextState, cb) {
     /*  Webpack - use 'require.ensure' to create a split point

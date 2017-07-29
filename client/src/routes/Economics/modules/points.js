@@ -16,13 +16,15 @@ export const IGNORE = 'IGNORE'
 export const submitPoint = (formData) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      var url = 'http://localhost:8000/points';
+      var url = 'http://localhost:8000/points/category/economics';
+      let body = formData;
+      body['category'] = 'economics';
       let requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(body)
       }
       fetch(url, requestOptions)
         .then((response)=> {
@@ -106,8 +108,7 @@ export function detectKeypress(event) {
 const handleMetaCommand = (state, action) => {
   let key = action.event.key;
   let sections = state.sections;
-  if (key === 'k' && sections.pointList.selected){
-    document.getElementById('question').focus();
+  if (key === 'i' && sections.pointList.selected){
     return {
       ...state,
       sections: {
@@ -122,7 +123,7 @@ const handleMetaCommand = (state, action) => {
         }
       }
     }
-  } else if (key === 'j' && sections.pointForm.selected){
+  } else if (key === 'i' && sections.pointForm.selected){
     document.getElementById('question').blur();
     document.getElementById('answer').blur();
     return {

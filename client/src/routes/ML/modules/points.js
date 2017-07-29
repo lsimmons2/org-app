@@ -16,13 +16,15 @@ export const IGNORE = 'IGNORE'
 export const submitPoint = (formData) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      var url = 'http://localhost:8000/points';
+      let url = 'http://localhost:8000/points/ml';
+      let body = formData;
+      body['category'] = 'ml';
       let requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(body)
       }
       fetch(url, requestOptions)
         .then((response)=> {
@@ -63,7 +65,7 @@ const clearForm = () => {
 export const getAll = () => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      var url = 'http://localhost:8000/points/category/machine_learning';
+      var url = 'http://localhost:8000/points/category/ml';
       fetch(url,{})
         .then((response)=> {
           var pointsPromise = response.json();
@@ -106,8 +108,7 @@ export function detectKeypress(event) {
 const handleMetaCommand = (state, action) => {
   let key = action.event.key;
   let sections = state.sections;
-  if (key === 'k' && sections.pointList.selected){
-    document.getElementById('question').focus();
+  if (key === 'i' && sections.pointList.selected){
     return {
       ...state,
       sections: {
@@ -122,7 +123,7 @@ const handleMetaCommand = (state, action) => {
         }
       }
     }
-  } else if (key === 'j' && sections.pointForm.selected){
+  } else if (key === 'i' && sections.pointForm.selected){
     document.getElementById('question').blur();
     document.getElementById('answer').blur();
     return {
@@ -156,16 +157,8 @@ const handleListCommand = (state, action) => {
   }
 }
 
-const findFocused = (points) => {
-  for (var i = 0; i < points.length; i++){
-    if (points[i].inFocus){
-      break;
-    }
-  }
-}
-
 const movePointFocus = (state, direction) => {
-  let newPoints = state.points.map(point => point);
+  let newPoints = state.points.map(point => point)
   for (var i = 0; i < newPoints.length; i++){
     let point = newPoints[i];
     if (point.inFocus){
@@ -188,7 +181,6 @@ const movePointFocus = (state, direction) => {
       }
     }
   }
-  findFocused(newPoints)
   return {
     ...state,
     points: newPoints

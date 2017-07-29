@@ -24,6 +24,7 @@ def get_points():
     points = [ point.serialize for point in point_instances ]
     return jsonify(points=points)
 
+
 @app.route('/points/category/<string:category>')
 def get_category_points(category):
     session = Session()
@@ -31,29 +32,18 @@ def get_category_points(category):
     points = [ point.serialize for point in point_instances ]
     return jsonify(points=points)
 
-@app.route('/points', methods=['POST'])
-def post_point():
+
+@app.route('/points/category/<string:category>', methods=['POST'])
+def post_point(category):
     new_point_data = request.json
+    new_point_data['category'] = category
     new_point = Point(**new_point_data)
     session = Session()
     session.add(new_point)
     session.commit()
-    point_instances = session.query(Point).all()
+    point_instances = session.query(Point).filter_by(category=category).all()
     points = [ point.serialize for point in point_instances ]
     return jsonify(points=points)
-
-
-# @app.route('/points/', methods=['POST'])
-# def post_point():
-    # new_point_data = request.json
-    # print new_point_data
-    # new_point = Point(**new_point_data)
-    # session = Session()
-    # session.add(new_point)
-    # session.commit()
-    # point_instances = session.query(Point).all()
-    # points = [ point.serialize for point in point_instances ]
-    # return jsonify(points=points)
 
 
 @app.route('/points/<int:point_id>')

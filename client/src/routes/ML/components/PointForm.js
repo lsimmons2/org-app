@@ -15,6 +15,10 @@ class PointForm extends React.Component {
     this.props.submitPoint(formData);
   }
 
+  componentDidMount(e){
+    document.getElementById('question').focus();
+  }
+
   render(){
     let classes = classNames(this.props.classes);
     return (
