@@ -63,7 +63,7 @@ const clearForm = () => {
 export const getAll = () => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      var url = 'http://localhost:8000/points/category/machine_learning';
+      var url = 'http://localhost:8000/points/category/economics';
       fetch(url,{})
         .then((response)=> {
           var pointsPromise = response.json();

@@ -10,8 +10,12 @@ class Points extends React.Component {
   //}
 
   componentWillMount(){
-    this.props.getAll()
+    this.props.getAll();
     document.addEventListener('keydown', this.props.detectKeypress)
+  }
+
+  componentWillUnmount(){
+    document.removeEventListener('keydown', this.props.detectKeypress)
   }
 
   getCssClasses(){

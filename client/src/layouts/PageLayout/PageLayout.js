@@ -6,7 +6,7 @@ import './PageLayout.scss'
 export const PageLayout = ({ children }) => (
   <div className='container text-center'>
     <h1>STUDY</h1>
-    <IndexLink to='/points' activeClassName='page-layout__nav-item--active'>Points</IndexLink>
+    <IndexLink to='/points' activeClassName='page-layout__nav-item--active'>Machine Learning</IndexLink>
     {' · '}
     <IndexLink to='/economics' activeClassName='page-layout__nav-item--active'>Economics</IndexLink>
     <div className='page-layout__viewport'>
@@ -19,6 +19,3 @@ PageLayout.propTypes = {
 }
 
 export default PageLayout
-
-    //{' · '}
-    //<Link to='/counter' activeClassName='page-layout__nav-item--active'>Counter</Link>

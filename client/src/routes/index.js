@@ -2,7 +2,7 @@
 import CoreLayout from '../layouts/PageLayout/PageLayout'
 import Home from './Home'
 import CounterRoute from './Counter'
-import PointsRoute from './Points'
+import MLRoute from './ML'
 import EconomicsRoute from './Economics'
 
 /*  Note: Instead of using JSX, we recommend using react-router
@@ -14,7 +14,7 @@ export const createRoutes = (store) => ({
   indexRoute  : Home,
   childRoutes : [
     CounterRoute(store),
-    PointsRoute(store),
+    MLRoute(store),
     EconomicsRoute(store)
   ]
 })
