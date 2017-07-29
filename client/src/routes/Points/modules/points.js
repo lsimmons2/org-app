@@ -3,7 +3,6 @@ import initialState from '../initial-state'
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const POINTS_INCREMENT = 'POINTS_INCREMENT'
 export const POINTS_DOUBLE_ASYNC = 'POINTS_DOUBLE_ASYNC'
 export const POINTS_GET_ALL = 'POINTS_GET_ALL'
 export const KEY_PRESS = 'KEY_PRESS'
@@ -42,6 +41,7 @@ export const submitPoint = (formData) => {
               type    : POINTS_GET_ALL,
               payload : points
             })
+            clearForm();
             resolve();
           })
         })
@@ -54,10 +54,16 @@ export const submitPoint = (formData) => {
   }
 }
 
+const clearForm = () => {
+  console.log('in clear form');
+  document.getElementById('question').focus();
+  document.getElementById('point-form').reset();
+}
+
 export const getAll = () => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      var url = 'http://localhost:8000/points';
+      var url = 'http://localhost:8000/points/category/machine_learning';
       fetch(url,{})
         .then((response)=> {
           var pointsPromise = response.json();
@@ -118,6 +124,7 @@ const handleMetaCommand = (state, action) => {
     }
   } else if (key === 'j' && sections.pointForm.selected){
     document.getElementById('question').blur();
+    document.getElementById('answer').blur();
     return {
       ...state,
       sections: {
@@ -179,7 +186,7 @@ const movePointFocus = (state, direction) => {
   };
 }
 
-const toggleAnswerVisibility = (state) => {
+export const toggleAnswerVisibility = (state) => {
   let newPoints = [];
   for (var i = 0; i < state.points.length; i++){
     let point = state.points[i];
@@ -202,7 +209,6 @@ export const actions = {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [POINTS_INCREMENT]    : (state, action) => state + action.payload,
   [IGNORE]    : (state, action) => state,
   [POINTS_DOUBLE_ASYNC] : (state, action) => state * 2,
   [POINTS_GET_ALL] : (state, action) => {

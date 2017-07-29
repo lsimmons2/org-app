@@ -11,6 +11,7 @@ class Point(Base):
     point_id = Column(Integer, primary_key=True)
     question = Column(String(200))
     answer = Column(String(200))
+    category = Column(String(200))
 
     @property
     def serialize(self):

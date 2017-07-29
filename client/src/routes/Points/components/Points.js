@@ -26,8 +26,10 @@ class Points extends React.Component {
     };
     if (sections.pointList.selected){
       classes.pointList['section-in-focus'] = true; 
+      classes.pointForm['section-not-in-focus'] = true; 
     } else if (sections.pointForm.selected){
       classes.pointForm['section-in-focus'] = true; 
+      classes.pointList['section-not-in-focus'] = true; 
     }
     return classes;
   }
@@ -50,7 +52,7 @@ class Points extends React.Component {
     )
 
     return (
-      <div>
+      <div id="points-route">
         {pointForm}
         {pointList}
       </div>

@@ -19,15 +19,15 @@ class PointForm extends React.Component {
     let classes = classNames(this.props.classes);
     return (
       <div className={classes}>
-        <form onSubmit={this.submitPoint.bind(this)}>
-          <div className="form-group">
-            <input ref="question" type="text" className="form-control" id="question" placeholder="Question"/>
+        <form id="point-form" onSubmit={this.submitPoint.bind(this)}>
+          <div>
+            <input ref="question" type="text" id="question" placeholder="Question"/>
           </div>
-          <div className="form-group">
-            <input ref="answer" type="text" className="form-control" id="answer" placeholder="Password"/>
+          <div >
+            <textarea ref="answer" type="text" id="answer" placeholder="Answer"/>
           </div>
-          <div className="form-group">
-            <input type="submit" className="form-control"/>
+          <div>
+            <input type="submit"/>
           </div>
         </form>
       </div>

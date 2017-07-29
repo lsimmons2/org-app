@@ -18,4 +18,6 @@ body {
 *:before,
 *:after {
   box-sizing: inherit;
+  background-color: $bgGrey;
+  color: #abb2bf;
 }

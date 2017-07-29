@@ -8,7 +8,7 @@ export const PageLayout = ({ children }) => (
     <h1>STUDY</h1>
     <IndexLink to='/points' activeClassName='page-layout__nav-item--active'>Points</IndexLink>
     {' · '}
-    <Link to='/counter' activeClassName='page-layout__nav-item--active'>Counter</Link>
+    <IndexLink to='/economics' activeClassName='page-layout__nav-item--active'>Economics</IndexLink>
     <div className='page-layout__viewport'>
       {children}
     </div>
@@ -19,3 +19,6 @@ PageLayout.propTypes = {
 }
 
 export default PageLayout
+
+    //{' · '}
+    //<Link to='/counter' activeClassName='page-layout__nav-item--active'>Counter</Link>

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { increment, doubleAsync, getAll, toggleAnswerVisibility, submitPoint, detectKeypress } from '../modules/points'
+import { getAll, toggleAnswerVisibility, submitPoint, detectKeypress } from '../modules/points'
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
@@ -13,8 +13,6 @@ import Points from '../components/Points'
     implementing our wrapper around increment; the component doesn't care   */
 
 const mapDispatchToProps = {
-  increment : () => increment(1),
-  doubleAsync,
   getAll,
   toggleAnswerVisibility,
   submitPoint,

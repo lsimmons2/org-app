@@ -1,8 +1,41 @@
-
 .point-in-focus {
-  border: solid 1px red;
+  border: solid 1px #c678dd;
 }
 
 .section-in-focus {
-  border: solid 1px blue;
+  padding:20px;
+  border-width: 5px !important;
+}
+
+.section-not-in-focus {
+  padding:25px;
+  //border-width: 5px !important;
+}
+
+.section {
+  //padding: 15px;
+  border: 1px solid #98c379;
+  margin: 15px;
+}
+
+.point_container {
+  //background-color: $bgGrey;
+}
+
+input, textarea {
+  width: 100%;
+  //border-color: red;
+  //border-color: #abb2bf;
+}
+
+#question {
+  height: 100px;
+}
+
+#answer {
+  height: 100px;
+}
+
+.answer {
+  color: #61afef;
 }

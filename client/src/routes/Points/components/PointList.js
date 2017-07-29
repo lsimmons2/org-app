@@ -5,14 +5,6 @@ import classNames from 'classnames'
 
 class PointList extends React.Component {
 
-  //static propTypes = {
-    //points: PropTypes.object.isRequired
-  //}
-
-  //componentWillMount(){
-    //document.addEventListener('keydown', this.props.detectKeypress)
-  //}
-
   render() {
 
     let pointElements = this.props.points.map(point => {

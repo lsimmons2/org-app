@@ -15,7 +15,7 @@ class Point extends React.Component {
     let answer = null;
     let point = this.props.point;
     if (point.isVisible){
-      answer = <div>{point.answer}</div>
+      answer = <div className="answer">{point.answer}</div>
     }
     let classes = classNames({
       'point_container': true,
@@ -23,7 +23,7 @@ class Point extends React.Component {
     })
     return (
       <div className={classes} onClick={this.toggleAnswer.bind(this)}>
-        <button className="btn btn-default" type="submit">{point.question}</button>
+        <div>{point.question}</div>
         {answer}
       </div>
     )
