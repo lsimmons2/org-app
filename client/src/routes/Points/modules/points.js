@@ -109,6 +109,8 @@ const handleMetaCommand = (state, action) => {
   let key = action.event.key;
   let sections = state.sections;
   if (key === 'i' && sections.pointList.selected){
+    console.log('i and list selected');
+
     return {
       ...state,
       sections: {
@@ -127,26 +129,30 @@ const handleMetaCommand = (state, action) => {
         }
       }
     }
-    } else if (key === 'c' && sections.pointList.selected){
-      return {
-        ...state,
-        sections: {
-          ...state.sections,
-          pointList: {
-            ...state.sections.pointList,
-            selected: false
-          },
-          pointForm: {
-            ...state.sections.pointForm,
-            selected: false
-          },
-          pointCategorySelector: {
-            ...state.sections.pointCategorySelector,
-            selected: true
-          }
+  } else if (key === 'c' && sections.pointList.selected){
+
+    console.log('c and list selected');
+    return {
+      ...state,
+      sections: {
+        ...state.sections,
+        pointList: {
+          ...state.sections.pointList,
+          selected: false
+        },
+        pointForm: {
+          ...state.sections.pointForm,
+          selected: false
+        },
+        pointCategorySelector: {
+          ...state.sections.pointCategorySelector,
+          selected: true
         }
       }
+    }
   } else if (key === 'i' && sections.pointForm.selected){
+
+    console.log('i and form selected');
     document.getElementById('question-input').blur();
     document.getElementById('answer-input').blur();
     return {
@@ -168,6 +174,8 @@ const handleMetaCommand = (state, action) => {
       }
     }
   } else if (key === 'c' && sections.pointCategorySelector.selected){
+
+    console.log('c and category selector selected');
     return {
       ...state,
       sections: {

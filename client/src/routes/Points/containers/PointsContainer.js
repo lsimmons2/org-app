@@ -12,9 +12,6 @@ const mapDispatchToProps = {
   detectKeypress
 }
 
-//const mapStateToProps = (state) => ({
-  //points : state.points.points
-//})
 const mapStateToProps = (globalState) => {
   return {
     points : globalState.points.points,

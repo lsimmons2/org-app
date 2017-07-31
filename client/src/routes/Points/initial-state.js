@@ -2,13 +2,13 @@ const initialState = {
   points: [],
   sections: {
     pointList: {
-      selected: true
+      selected: false
     },
     pointForm: {
       selected: false
     },
     pointCategorySelector: {
-      selected: false
+      selected: true
     }
   }
 }

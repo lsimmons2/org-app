@@ -19,23 +19,19 @@ class PointCategorySelector extends React.Component {
   //}
 
   render(){
-    return <div>Selector</div>
-    //let classes = classNames(this.props.classes);
-    //return (
-      //<div className={classes}>
-        //<form id="point-form" onSubmit={this.submitPoint.bind(this)}>
-          //<div>
-            //<input ref="question" type="text" id="question-input" placeholder="Question"/>
-          //</div>
-          //<div >
-            //<textarea ref="answer" type="text" id="answer-input" placeholder="Answer"/>
-          //</div>
-          //<div>
-            //<input type="submit"/>
-          //</div>
-        //</form>
-      //</div>
-    //)
+    let classes = classNames(this.props.classes);
+    return (
+      <div className={classes}>
+        <div id="point-category-selector">
+          <h4>Selector</h4>
+          <ul>
+           <li className="category-list-item">Economics</li>
+           {' · '}
+           <li className="category-list-item">Machine Learning</li>
+          </ul>
+        </div>
+      </div>
+    )
   }
 }
 

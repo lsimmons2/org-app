@@ -25,7 +25,10 @@ class Points extends React.Component {
         'section': true,
       },
       pointForm: {
-        'point-form-container': true
+        'my-modal': true
+      },
+      pointCategorySelector: {
+        'my-modal': true
       }
     };
     return classes;
@@ -38,18 +41,20 @@ class Points extends React.Component {
     let pointCategorySelector = null;
     if (this.props.sections.pointCategorySelector.selected){
       pointCategorySelector = (
-      <PointCategorySelector/>
+        <PointCategorySelector
+          classes={classes.pointCategorySelector}
+        />
     )
     }
 
     let pointForm = null;
     if (this.props.sections.pointForm.selected){
       pointForm = (
-      <PointForm
-        submitPoint={this.props.submitPoint}
-        classes={classes.pointForm}
-      />
-    )
+        <PointForm
+          submitPoint={this.props.submitPoint}
+          classes={classes.pointForm}
+        />
+      )
     }
 
     let pointList = (
