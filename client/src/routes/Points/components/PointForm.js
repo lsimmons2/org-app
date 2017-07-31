@@ -16,7 +16,7 @@ class PointForm extends React.Component {
   }
 
   componentDidMount(e){
-    document.getElementById('question').focus();
+    document.getElementById('question-input').focus();
   }
 
   render(){
@@ -25,10 +25,10 @@ class PointForm extends React.Component {
       <div className={classes}>
         <form id="point-form" onSubmit={this.submitPoint.bind(this)}>
           <div>
-            <input ref="question" type="text" id="question" placeholder="Question"/>
+            <input ref="question" type="text" id="question-input" placeholder="Question"/>
           </div>
           <div >
-            <textarea ref="answer" type="text" id="answer" placeholder="Answer"/>
+            <textarea ref="answer" type="text" id="answer-input" placeholder="Answer"/>
           </div>
           <div>
             <input type="submit"/>

@@ -16,9 +16,9 @@ export const IGNORE = 'IGNORE'
 export const submitPoint = (formData) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      let url = 'http://localhost:8000/points/ml';
+      var url = 'http://localhost:8000/points/category/economics';
       let body = formData;
-      body['category'] = 'ml';
+      body['category'] = 'economics';
       let requestOptions = {
         method: 'POST',
         headers: {
@@ -65,7 +65,7 @@ const clearForm = () => {
 export const getAll = () => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      var url = 'http://localhost:8000/points/category/ml';
+      var url = 'http://localhost:8000/points/category/economics';
       fetch(url,{})
         .then((response)=> {
           var pointsPromise = response.json();
@@ -120,12 +120,35 @@ const handleMetaCommand = (state, action) => {
         pointForm: {
           ...state.sections.pointForm,
           selected: true
+        },
+        pointCategorySelector: {
+          ...state.sections.pointCategorySelector,
+          selected: false
         }
       }
     }
+    } else if (key === 'c' && sections.pointList.selected){
+      return {
+        ...state,
+        sections: {
+          ...state.sections,
+          pointList: {
+            ...state.sections.pointList,
+            selected: false
+          },
+          pointForm: {
+            ...state.sections.pointForm,
+            selected: false
+          },
+          pointCategorySelector: {
+            ...state.sections.pointCategorySelector,
+            selected: true
+          }
+        }
+      }
   } else if (key === 'i' && sections.pointForm.selected){
-    document.getElementById('question').blur();
-    document.getElementById('answer').blur();
+    document.getElementById('question-input').blur();
+    document.getElementById('answer-input').blur();
     return {
       ...state,
       sections: {
@@ -136,6 +159,29 @@ const handleMetaCommand = (state, action) => {
         },
         pointForm: {
           ...state.sections.pointForm,
+          selected: false
+        },
+        pointCategorySelector: {
+          ...state.sections.pointCategorySelector,
+          selected: false
+        }
+      }
+    }
+  } else if (key === 'c' && sections.pointCategorySelector.selected){
+    return {
+      ...state,
+      sections: {
+        ...state.sections,
+        pointList: {
+          ...state.sections.pointList,
+          selected: true
+        },
+        pointForm: {
+          ...state.sections.pointForm,
+          selected: false
+        },
+        pointCategorySelector: {
+          ...state.sections.pointCategorySelector,
           selected: false
         }
       }
@@ -234,6 +280,5 @@ const ACTION_HANDLERS = {
 //const initialState = []
 export default function pointsReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
-
   return handler ? handler(state, action) : state
 }

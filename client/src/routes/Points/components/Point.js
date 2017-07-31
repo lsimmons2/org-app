@@ -12,8 +12,8 @@ class Point extends React.Component {
   }
 
   render(){
-    let answer = null;
     let point = this.props.point;
+    let answer = null;
     if (point.isVisible){
       answer = <div className="answer">{point.answer}</div>
     }
