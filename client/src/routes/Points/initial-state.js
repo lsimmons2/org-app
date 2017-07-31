@@ -1,4 +1,5 @@
-const initialState = {
+
+const ninitialState = {
   points: [],
   sections: {
     pointList: {
@@ -13,9 +14,8 @@ const initialState = {
   }
 }
 
-export default initialState
 
-const ninitialState = {
+const initialState = {
   domain: {
     points: []
   },
@@ -27,23 +27,11 @@ const ninitialState = {
       pointForm: {
         selected: false
       },
-      categories: [
-        {
-          ml: {
-            selected: true,
-            points: []
-          },
-          economics: {
-            selected: false,
-            points: []
-          },
-          front: {
-            selected: false,
-            points: []
-          }
-        }
-      ]
+      pointCategorySelector: {
+        selected: false
+      }
     }
   }
 }
 
+export default initialState

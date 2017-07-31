@@ -1,0 +1,7 @@
+
+export const POINTS_GET_ALL = 'POINTS_GET_ALL'
+export const KEY_PRESS = 'KEY_PRESS'
+export const IGNORE = 'IGNORE'
+export const NAVIGATE_LIST = 'NAVIGATE_LIST'
+export const TOGGLE_ANSWER_VISIBILITY = 'TOGGLE_ANSWER_VISIBILITY'
+

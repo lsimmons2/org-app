@@ -1,12 +1,12 @@
 import { connect } from 'react-redux'
-import { getAll, toggleAnswerVisibility, submitPoint, detectKeypress } from '../modules/points'
+import { populatePoints, toggleAnswerVisibility, submitPoint, detectKeypress } from '../modules'
 
 
 import Points from '../components/Points'
 
 
 const mapDispatchToProps = {
-  getAll,
+  populatePoints,
   toggleAnswerVisibility,
   submitPoint,
   detectKeypress
@@ -14,8 +14,8 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (globalState) => {
   return {
-    points : globalState.points.points,
-    sections: globalState.points.sections
+    points: globalState.points.domain.points,
+    sections: globalState.points.app.sections
   }
 }
 

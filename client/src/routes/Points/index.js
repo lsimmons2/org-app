@@ -11,7 +11,7 @@ export default (store) => ({
       /*  Webpack - use require callback to define
           dependencies for bundling   */
       const Points = require('./containers/PointsContainer').default
-      const reducer = require('./modules/points').default
+      const reducer = require('./modules').default
 
       /*  Add the reducer to the store on key 'counter'  */
       injectReducer(store, { key: 'points', reducer })

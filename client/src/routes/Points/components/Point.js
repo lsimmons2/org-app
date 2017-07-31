@@ -1,12 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { toggleAnswerVisibility } from '../modules/points'
+import { toggleAnswerVisibility } from '../modules'
 import classNames from 'classnames'
 
 
 
 class Point extends React.Component {
 
+  //TODO: this should be a prop
   toggleAnswer(){
     this.props.toggleAnswerVisibility(this.props.point.point_id)
   }
@@ -22,7 +23,7 @@ class Point extends React.Component {
       'point-in-focus': point.inFocus
     })
     return (
-      <div className={classes} onClick={this.toggleAnswer.bind(this)}>
+      <div className={classes}>
         <div>{point.question}</div>
         {answer}
       </div>

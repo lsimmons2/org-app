@@ -11,7 +11,7 @@ class Points extends React.Component {
   //}
 
   componentWillMount(){
-    this.props.getAll()
+    this.props.populatePoints()
     document.addEventListener('keydown', this.props.detectKeypress)
   }
 
