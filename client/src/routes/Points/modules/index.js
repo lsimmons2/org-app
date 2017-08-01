@@ -102,6 +102,21 @@ const toggleInsertMode = (state, action) => {
 }
 
 
+const toggleCategorySearcher = (state, action) => {
+  let isSearcherSelected = state.sections.pointCategorySelector.selected;
+  return {
+    ...state,
+    sections: {
+      ...state.sections,
+      pointCategorySelector: {
+        ...state.sections.pointCategorySelector,
+        selected: !isSearcherSelected
+      }
+    }
+  }
+}
+
+
 const toggleAnswerVisibility = (state, action) => {
   let newPoints = state.points.map(point => {
     if (point.inFocus){
@@ -124,6 +139,9 @@ const APP_ACTION_HANDLERS = {
   [IGNORE]    : (state, action) => state,
   [TOGGLE_INSERT_MODE]: (state, action) => {
     return toggleInsertMode(state, action)
+  },
+  [TOGGLE_CATEGORY_SEARCHER]: (state, action) => {
+    return toggleCategorySearcher(state, action)
   }
 }
 
