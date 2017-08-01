@@ -3,6 +3,17 @@ import 'whatwg-fetch'
 
 import { POINTS_GET_ALL } from './constants'
 
+//CATEGORY SEARCHER
+//{
+  //categories: [
+    //{
+      //name: 'economics',
+      //time_last_updated: Date,
+      //points: []
+    //}
+  //]
+//}
+
 export const populatePoints = () => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {

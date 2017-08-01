@@ -1,163 +1,12 @@
 import initialState from '../initial-state'
 export { populatePoints, submitPoint } from './api-callers'
 import { combineReducers } from 'redux';
-import { POINTS_GET_ALL, KEY_PRESS, IGNORE, NAVIGATE_LIST, TOGGLE_ANSWER_VISIBILITY } from './constants'
+import { POINTS_GET_ALL, KEY_PRESS, IGNORE, NAVIGATE_LIST, TOGGLE_ANSWER_VISIBILITY, TOGGLE_INSERT_MODE, TOGGLE_CATEGORY_SEARCHER } from './constants'
+
 
 // ------------------------------------
-// Actions
+// Actions and Helpers
 // ------------------------------------
-
-//const handleMetaCommand = (state, action) => {
-  //let key = action.event.key;
-  //let sections = state.sections;
-  //if (key === 'i' && sections.pointList.selected){
-
-    //return {
-      //...state,
-      //sections: {
-        //...state.sections,
-        //pointList: {
-          //...state.sections.pointList,
-          //selected: false
-        //},
-        //pointForm: {
-          //...state.sections.pointForm,
-          //selected: true
-        //},
-        //pointCategorySelector: {
-          //...state.sections.pointCategorySelector,
-          //selected: false
-        //}
-      //}
-    //}
-  //} else if (key === 'c' && sections.pointList.selected){
-
-    //return {
-      //...state,
-      //sections: {
-        //...state.sections,
-        //pointList: {
-          //...state.sections.pointList,
-          //selected: false
-        //},
-        //pointForm: {
-          //...state.sections.pointForm,
-          //selected: false
-        //},
-        //pointCategorySelector: {
-          //...state.sections.pointCategorySelector,
-          //selected: true
-        //}
-      //}
-    //}
-  //} else if (key === 'i' && sections.pointForm.selected){
-
-    //document.getElementById('question-input').blur();
-    //document.getElementById('answer-input').blur();
-    //return {
-      //...state,
-      //sections: {
-        //...state.sections,
-        //pointList: {
-          //...state.sections.pointList,
-          //selected: true
-        //},
-        //pointForm: {
-          //...state.sections.pointForm,
-          //selected: false
-        //},
-        //pointCategorySelector: {
-          //...state.sections.pointCategorySelector,
-          //selected: false
-        //}
-      //}
-    //}
-  //} else if (key === 'c' && sections.pointCategorySelector.selected){
-
-    //return {
-      //...state,
-      //sections: {
-        //...state.sections,
-        //pointList: {
-          //...state.sections.pointList,
-          //selected: true
-        //},
-        //pointForm: {
-          //...state.sections.pointForm,
-          //selected: false
-        //},
-        //pointCategorySelector: {
-          //...state.sections.pointCategorySelector,
-          //selected: false
-        //}
-      //}
-    //}
-  //}
-  //return state;
-//}
-
-//const handleListCommand = (state, action) => {
-  //let key = action.event.key;
-  //if (key === 'j'){
-    //return movePointFocus(state, 1)
-  //} else if (key === 'k'){
-    //return movePointFocus(state, -1)
-  //} else if (key === ' '){
-    //return toggleAnswerVisibility(state)
-  //} else {
-    //return state;
-  //}
-//}
-
-//const movePointFocus = (state, direction) => {
-  //let newPoints = state.domain.points.map(point => point)
-  //for (var i = 0; i < newPoints.length; i++){
-    //let point = newPoints[i];
-    //if (point.inFocus){
-      //if (direction === -1){
-        //if (i === 0){
-          //return state;
-        //} else {
-          //point.inFocus = false;
-          //newPoints[i-1].inFocus = true;
-          //break;
-        //}
-      //} else if (direction === 1){
-        //if (i === newPoints.length -1){
-          //return state;
-        //} else {
-          //point.inFocus = false;
-          //newPoints[i+1].inFocus = true;
-          //break;
-        //}
-      //}
-    //}
-  //}
-  //return {
-    //...state,
-    //domain: {
-      //...state.domain,
-      //points: newPoints
-    //}
-  //};
-//}
-
-//export const toggleAnswerVisibility = (state) => {
-  //let newPoints = [];
-  //for (var i = 0; i < state.domain.points.length; i++){
-    //let point = state.domain.points[i];
-    //if (point.inFocus){
-      //point.isVisible = !point.isVisible;
-    //}
-    //newPoints.push(point);
-  //}
-  //return {
-    //...state,
-    //domain: {
-      //points: newPoints
-    //}
-  //};
-//}
 
 export function detectKeypress(event) {
     if (event.metaKey){
@@ -166,95 +15,24 @@ export function detectKeypress(event) {
     return handleListCommand(event);
 }
 
+
 const handleMetaCommand = (event) => {
-
   let key = event.key;
-  let sections = state.sections;
-  if (key === 'i' && sections.pointList.selected){
-
+  if (key === 'i'){
     return {
-      ...state,
-      sections: {
-        ...state.sections,
-        pointList: {
-          ...state.sections.pointList,
-          selected: false
-        },
-        pointForm: {
-          ...state.sections.pointForm,
-          selected: true
-        },
-        pointCategorySelector: {
-          ...state.sections.pointCategorySelector,
-          selected: false
-        }
-      }
+      type: TOGGLE_INSERT_MODE
     }
-  } else if (key === 'c' && sections.pointList.selected){
-
+  } else if (key === 'c'){
     return {
-      ...state,
-      sections: {
-        ...state.sections,
-        pointList: {
-          ...state.sections.pointList,
-          selected: false
-        },
-        pointForm: {
-          ...state.sections.pointForm,
-          selected: false
-        },
-        pointCategorySelector: {
-          ...state.sections.pointCategorySelector,
-          selected: true
-        }
-      }
+      type: TOGGLE_CATEGORY_SEARCHER
     }
-  } else if (key === 'i' && sections.pointForm.selected){
-
-    document.getElementById('question-input').blur();
-    document.getElementById('answer-input').blur();
+  } else {
     return {
-      ...state,
-      sections: {
-        ...state.sections,
-        pointList: {
-          ...state.sections.pointList,
-          selected: true
-        },
-        pointForm: {
-          ...state.sections.pointForm,
-          selected: false
-        },
-        pointCategorySelector: {
-          ...state.sections.pointCategorySelector,
-          selected: false
-        }
-      }
-    }
-  } else if (key === 'c' && sections.pointCategorySelector.selected){
-
-    return {
-      ...state,
-      sections: {
-        ...state.sections,
-        pointList: {
-          ...state.sections.pointList,
-          selected: true
-        },
-        pointForm: {
-          ...state.sections.pointForm,
-          selected: false
-        },
-        pointCategorySelector: {
-          ...state.sections.pointCategorySelector,
-          selected: false
-        }
-      }
+      type: IGNORE
     }
   }
-  return state;
 }
+
 
 const handleListCommand = (event) => {
   let key = event.key;
@@ -275,36 +53,11 @@ const handleListCommand = (event) => {
   }
 }
 
-const movePointFocus = (direction) => {
-  //return {
-    //...state,
-    //domain: {
-      //...state.domain,
-      //points: newPoints
-    //}
-  //};
-}
 
-export const toggleAnswerVisibility = (state, action) => {
-  //let newPoints = [];
-  //for (var i = 0; i < state.domain.points.length; i++){
-    //let point = state.domain.points[i];
-    //if (point.inFocus){
-      //point.isVisible = !point.isVisible;
-    //}
-    //newPoints.push(point);
-  //}
-  let newPoints = state.points.map(point => {
-    if (point.inFocus){
-      point.isVisible = !point.isVisible;
-    }
-    return point
-  })
-  return {
-    ...state,
-    points: newPoints
-  };
-}
+
+// ------------------------------------
+// Reducer helpers
+// ------------------------------------
 
 const navigateList = (state, action) => {
   let direction = action.direction;
@@ -329,13 +82,51 @@ const navigateList = (state, action) => {
   };
 }
 
+
+const toggleInsertMode = (state, action) => {
+  let isFormSelected = state.sections.pointForm.selected;
+  if (isFormSelected){
+    document.getElementById('question-input').blur();
+    document.getElementById('answer-input').blur();
+  }
+  return {
+    ...state,
+    sections: {
+      ...state.sections,
+      pointForm: {
+        ...state.sections.pointForm,
+        selected: !isFormSelected
+      }
+    }
+  }
+}
+
+
+const toggleAnswerVisibility = (state, action) => {
+  let newPoints = state.points.map(point => {
+    if (point.inFocus){
+      point.isVisible = !point.isVisible;
+    }
+    return point
+  })
+  return {
+    ...state,
+    points: newPoints
+  };
+}
+
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 
 const APP_ACTION_HANDLERS = {
   [IGNORE]    : (state, action) => state,
+  [TOGGLE_INSERT_MODE]: (state, action) => {
+    return toggleInsertMode(state, action)
+  }
 }
+
 
 const DOMAIN_ACTION_HANDLERS = {
   [IGNORE]    : (state, action) => state,
@@ -352,6 +143,7 @@ const DOMAIN_ACTION_HANDLERS = {
     return toggleAnswerVisibility(state, action) 
   }
 }
+
 
 // ------------------------------------
 // Reducer
