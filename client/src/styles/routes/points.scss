@@ -1,9 +1,9 @@
 .point-in-focus {
-  border: solid 1px #c678dd;
+  border: solid 1px $app_purple;
 }
 
 .section {
-  border: 1px solid #98c379;
+  border: 1px solid $app_green;
   margin: 15px;
 }
 
@@ -20,7 +20,7 @@ input, textarea {
 }
 
 .answer {
-  color: #61afef;
+  color: $app_blue;
 }
 
 .my-modal {
@@ -37,18 +37,32 @@ input, textarea {
 
 #point-form {
     margin: 15% auto;
-    border: 10px solid #98c379;
+    border: 10px solid $app_green;
     width: 80%;
 }
 
 #point-category-selector {
     background-color: #272b33;
     margin: 15% auto;
-    border: 10px solid #98c379;
+    border: 10px solid $app_green;
     width: 80%;
 }
 
+.category-list {
+  padding: 0;
+}
+
 .category-list-item {
-  display: inline-block;
-  margin: 0 5px;
+  //display: inline-block;
+  //margin: 0 5px;
+  list-style-type: none;
+  padding: none;
+}
+
+.point-category-in-focus {
+  border: 1px solid $app_purple;
+}
+
+.point-category-is-selected {
+  color: $app_blue;
 }

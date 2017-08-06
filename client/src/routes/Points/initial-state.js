@@ -3,22 +3,19 @@ const ninitialState = {
   points: [],
   sections: {
     pointList: {
-      selected: false
+      is_selected: false
     },
     pointForm: {
-      selected: false
+      is_selected: false
     },
     pointCategorySelector: {
-      selected: true
+      is_selected: true
     }
   }
 }
 
 
 const initialState = {
-  //domain: {
-    //points: []
-  //},
   domain: {
     categories: [
       {
@@ -31,43 +28,45 @@ const initialState = {
   app: {
     sections: {
       pointList: {
-        selected: true
+        is_selected: true
       },
       pointForm: {
-        selected: false
+        is_selected: false
       },
       pointCategorySelector: {
-        selected: false
+        is_selected: false
       }
     },
     categories: [
       {
         name: 'economics',
         is_selected: true,
+        in_focus: true,
         time_last_updated: Date,
         points: [
           {
             id: 'blah',
-            selected: true
+            is_selected: true
           },
           {
             id: 'blah2',
-            selected: false
+            is_selected: false
           }
         ]
       },
       {
         name: 'ml',
         is_selected: false,
+        in_focus: false,
         time_last_updated: Date,
         points: [
           {
             id: 'blah',
-            selected: true
+            is_selected: true
           },
           {
             id: 'blah2',
-            selected: false
+            is_selected: false
           }
         ]
       }

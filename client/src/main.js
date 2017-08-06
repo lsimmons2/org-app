@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom'
 import createStore from './store/createStore'
 import './styles/main.scss'
 
+
 // Store Initialization
 // ------------------------------------
-const store = createStore(window.__INITIAL_STATE__, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+export const store = createStore(window.__INITIAL_STATE__, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 // Render Setup
 // ------------------------------------

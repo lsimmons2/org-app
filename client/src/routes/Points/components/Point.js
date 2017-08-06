@@ -20,7 +20,7 @@ class Point extends React.Component {
     }
     let classes = classNames({
       'point_container': true,
-      'point-in-focus': point.inFocus
+      'point-in-focus': point.in_focus
     })
     return (
       <div className={classes}>

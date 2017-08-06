@@ -1,7 +1,5 @@
 import initialState from '../initial-state'
-//export { populatePoints, submitPoint } from './api-callers'
 import { combineReducers } from 'redux';
-//import { POINTS_GET_ALL, KEY_PRESS, IGNORE, NAVIGATE_LIST, TOGGLE_ANSWER_VISIBILITY, TOGGLE_INSERT_MODE, TOGGLE_CATEGORY_SEARCHER, POPULATE_CATEGORIES } from './constants'
 export const POINTS_GET_ALL = 'POINTS_GET_ALL'
 export const KEY_PRESS = 'KEY_PRESS'
 export const IGNORE = 'IGNORE'
@@ -11,15 +9,28 @@ export const TOGGLE_INSERT_MODE = 'TOGGLE_INSERT_MODE'
 export const TOGGLE_CATEGORY_SEARCHER = 'TOGGLE_CATEGORY_SEARCHER'
 export const POPULATE_DOMAIN_CATEGORIES = 'POPULATE_DOMAIN_CATEGORIES'
 export const POPULATE_APP_CATEGORIES = 'POPULATE_APP_CATEGORIES'
+export const NAVIGATE_CATEGORY_SELECTOR = 'NAVIGATE_CATEGORY_SELECTOR'
+export const SELECT_CATEGORY = 'SELECT_CATEGORY'
+import store from '../../../main'
+import _ from 'underscore'
 
 
 
 
-const setPointsAppState = (pointsArr) => {
-  pointsArr[0].inFocus = true;
-  return pointsArr.map(point => {
-    point.isVisible = false;
-    return point
+const setCategoriesAppState = (categories) => {
+  //TODO: remove domain state data from categories and points
+  return categories.map((category, i) => {
+    let appPoints = category.points.map(point => {
+      point.isVisible = false;
+      return point;
+    })
+    if (i !== 0){
+      category.is_selected = false;
+    } else {
+      category.is_selected = true;
+    }
+    category.points = appPoints;
+    return category;
   })
 }
 
@@ -32,23 +43,15 @@ export const populatePoints = () => {
         .then((response) => {
           var pointsPromise = response.json();
           pointsPromise.then((pointsBody) => {
-            //let categoriesWithAppState = pointsBody.categories.map(category => );
-            //let appCategories = setPointsAppState(categories);
+            let appCategories = setCategoriesAppState(pointsBody.categories);
             let domainCategories = pointsBody.categories;
-            //console.log('appCategories');
-            //console.log(appCategories);
-            //console.log('domainCategories');
-            //console.log(domainCategories);
-            //categories = [
-              //{
-                //name: 'economics',
-                //time_last_updated: Date,
-                //points: []
-              //}
-            //]
             dispatch({
               type: POPULATE_DOMAIN_CATEGORIES,
               domainCategories: domainCategories
+            })
+            dispatch({
+              type: POPULATE_APP_CATEGORIES,
+              appCategories: appCategories
             })
             resolve();
           })
@@ -82,9 +85,9 @@ export const submitPoint = (formData) => {
           pointsPromise.then((pointsBody)=> {
             let points = pointsBody.points.map((point, index) => {
               if (index === 0){
-                point.inFocus = true;
+                point.in_focus = true;
               } else {
-                point.inFocus = false;
+                point.in_focus = false;
               }
               point.isVisible = false;
               return point;
@@ -110,11 +113,53 @@ export const submitPoint = (formData) => {
 // Actions and Helpers
 // ------------------------------------
 
-export function detectKeypress(event) {
-    if (event.metaKey){
-      return handleMetaCommand(event);
+//export function detectKeypress(event) {
+    //if (event.metaKey){
+      //return handleMetaCommand(event);
+    //}
+    //return handleCommand(event);
+//}
+
+ 
+
+export const detectKeypress = (event) => {
+  return (dispatch, getState) => {
+    let key = event.key;
+    if (key === 'c'){
+      return dispatch({
+        type: TOGGLE_CATEGORY_SEARCHER
+      })
+    } else if (event.metaKey && key === 'i'){
+      return dispatch({
+        type: TOGGLE_INSERT_MODE
+      })
     }
-    return handleListCommand(event);
+    let sections = getState().points.app.sections;
+    if (sections.pointCategorySelector.is_selected){
+      if (key === 'j'){
+        return dispatch({
+          type: NAVIGATE_CATEGORY_SELECTOR,
+          direction: 1
+        })
+      } else if (key === 'k'){
+        return dispatch({
+          type: NAVIGATE_CATEGORY_SELECTOR,
+          direction: -1
+        })
+      } else if (key === ' '){
+        //TODO: should be id field rather than name field
+        //let targetCategoryName = getState().points.app.sections;
+        let categories = getState().points.app.categories;
+        let targetCategoryName = _.find(categories, cat => {
+          return cat.in_focus;
+        }).name
+        return dispatch({
+          type: SELECT_CATEGORY,
+          name: targetCategoryName
+        })
+      }
+    }
+  }
 }
 
 
@@ -136,7 +181,7 @@ const handleMetaCommand = (event) => {
 }
 
 
-const handleListCommand = (event) => {
+const handleCommand = (event) => {
   let key = event.key;
   if (key === 'j'){
     return {
@@ -152,40 +197,80 @@ const handleListCommand = (event) => {
     return {
       type: TOGGLE_ANSWER_VISIBILITY
     }
+  } else {
+    return {
+      type: IGNORE
+    }
   }
 }
 
+const moveListFocus = (list, direction) => {
+  //let newList = list.map(item => item)
+  for (var i = 0; i < list.length; i++){
+    let item = list[i];
+    if (item.in_focus){
+      if (direction === -1 && i !== 0){
+        item.in_focus = false;
+        list[i-1].in_focus = true;
+        break;
+      } else if (direction === 1 && i !== list.length -1){
+        item.in_focus = false;
+        list[i+1].in_focus = true;
+        break;
+      }
+    }
+  }
+  return list
+}
 
 // ------------------------------------
 // Reducer helpers
 // ------------------------------------
 
-const navigateList = (state, action) => {
-  let direction = action.direction;
-  let newPoints = state.points.map(point => point)
-  for (var i = 0; i < newPoints.length; i++){
-    let point = newPoints[i];
-    if (point.inFocus){
-      if (direction === -1 && i !== 0){
-        point.inFocus = false;
-        newPoints[i-1].inFocus = true;
-        break;
-      } else if (direction === 1 && i !== newPoints.length -1){
-        point.inFocus = false;
-        newPoints[i+1].inFocus = true;
-        break;
-      }
-    }
-  }
+const navigateCategorySelector = (state, action) => {
+  let newCategories = state.categories.map(cat => cat);
+  moveListFocus(newCategories, action.direction)
   return {
     ...state,
-    points: newPoints
+    categories: newCategories
   };
 }
 
 
+const navigateList = (state, action) => {
+  let direction = action.direction;
+  if (state.sections.pointCategorySelector.is_selected){
+    let newCategories = moveListFocus(state.categories, direction)
+    return {
+      ...state,
+      categories: newCategories
+    };
+  } else {
+    let newPoints = state.points.map(point => point)
+    for (var i = 0; i < newPoints.length; i++){
+      let point = newPoints[i];
+      if (point.in_focus){
+        if (direction === -1 && i !== 0){
+          point.in_focus = false;
+          newPoints[i-1].in_focus = true;
+          break;
+        } else if (direction === 1 && i !== newPoints.length -1){
+          point.in_focus = false;
+          newPoints[i+1].in_focus = true;
+          break;
+        }
+      }
+    }
+    return {
+      ...state,
+      points: newPoints
+    };
+  }
+}
+
+
 const toggleInsertMode = (state, action) => {
-  let isFormSelected = state.sections.pointForm.selected;
+  let isFormSelected = state.sections.pointForm.is_selected;
   if (isFormSelected){
     document.getElementById('question-input').blur();
     document.getElementById('answer-input').blur();
@@ -196,7 +281,7 @@ const toggleInsertMode = (state, action) => {
       ...state.sections,
       pointForm: {
         ...state.sections.pointForm,
-        selected: !isFormSelected
+        is_selected: !isFormSelected
       }
     }
   }
@@ -204,14 +289,14 @@ const toggleInsertMode = (state, action) => {
 
 
 const toggleCategorySearcher = (state, action) => {
-  let isSearcherSelected = state.sections.pointCategorySelector.selected;
+  let isSearcherSelected = state.sections.pointCategorySelector.is_selected;
   return {
     ...state,
     sections: {
       ...state.sections,
       pointCategorySelector: {
         ...state.sections.pointCategorySelector,
-        selected: !isSearcherSelected
+        is_selected: !isSearcherSelected
       }
     }
   }
@@ -220,7 +305,7 @@ const toggleCategorySearcher = (state, action) => {
 
 const toggleAnswerVisibility = (state, action) => {
   let newPoints = state.points.map(point => {
-    if (point.inFocus){
+    if (point.in_focus){
       point.isVisible = !point.isVisible;
     }
     return point
@@ -240,37 +325,74 @@ const populateDomainCategories = (state, action) => {
   };
 }
 
+
+const populateAppCategories = (state, action) => {
+  return {
+    ...state,
+    categories: action.appCategories
+  };
+}
+
+const selectCategory = (state, action) => {
+  let newCategories = state.categories.map(cat => cat);
+  changeListSelection(newCategories, action.name);
+  return {
+    ...state,
+    categories: newCategories
+  };
+}
+
+const changeListSelection = (list, name) => {
+  for (var i = 0; i < list.length; i++){
+    if (list[i].name === name){
+      list[i].is_selected = true;
+    } else {
+      list[i].is_selected = false;
+    }
+  }
+}
+
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 
 const APP_ACTION_HANDLERS = {
-  [IGNORE]    : (state, action) => state,
+  [IGNORE]: (state, action) => state,
   [TOGGLE_INSERT_MODE]: (state, action) => {
     return toggleInsertMode(state, action)
   },
   [TOGGLE_CATEGORY_SEARCHER]: (state, action) => {
     return toggleCategorySearcher(state, action)
+  },
+  [NAVIGATE_CATEGORY_SELECTOR]: (state, action) => {
+    return navigateCategorySelector(state, action) 
+  },
+  [NAVIGATE_LIST]: (state, action) => {
+    return navigateList(state, action) 
+  },
+  [SELECT_CATEGORY]: (state, action) => {
+    return selectCategory(state, action) 
   }
 }
 
 
 const DOMAIN_ACTION_HANDLERS = {
-  [IGNORE]    : (state, action) => state,
-  [POINTS_GET_ALL] : (state, action) => {
+  [IGNORE]: (state, action) => state,
+  [POINTS_GET_ALL]: (state, action) => {
     return {
       ...state,
       points: action.payload
     }
-  },
-  [NAVIGATE_LIST]: (state, action) => {
-    return navigateList(state, action) 
   },
   [TOGGLE_ANSWER_VISIBILITY]: (state, action) => {
     return toggleAnswerVisibility(state, action) 
   },
   [POPULATE_DOMAIN_CATEGORIES]: (state, action) => {
     return populateDomainCategories(state, action) 
+  },
+  [POPULATE_APP_CATEGORIES]: (state, action) => {
+    return populateAppCategories(state, action) 
   }
 }
 

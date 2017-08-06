@@ -5,7 +5,7 @@ import 'whatwg-fetch'
 
 
 const setPointsAppState = (pointsArr) => {
-  pointsArr[0].inFocus = true;
+  pointsArr[0].in_focus = true;
   return pointsArr.map(point => {
     point.isVisible = false;
     return point
@@ -74,9 +74,9 @@ export const submitPoint = (formData) => {
           pointsPromise.then((pointsBody)=> {
             let points = pointsBody.points.map((point, index) => {
               if (index === 0){
-                point.inFocus = true;
+                point.in_focus = true;
               } else {
-                point.inFocus = false;
+                point.in_focus = false;
               }
               point.isVisible = false;
               return point;
