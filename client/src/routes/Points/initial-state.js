@@ -16,8 +16,17 @@ const ninitialState = {
 
 
 const initialState = {
+  //domain: {
+    //points: []
+  //},
   domain: {
-    points: []
+    categories: [
+      {
+        name: 'economics',
+        time_last_updated: Date,
+        points: []
+      }
+    ]
   },
   app: {
     sections: {
@@ -30,7 +39,40 @@ const initialState = {
       pointCategorySelector: {
         selected: false
       }
-    }
+    },
+    categories: [
+      {
+        name: 'economics',
+        is_selected: true,
+        time_last_updated: Date,
+        points: [
+          {
+            id: 'blah',
+            selected: true
+          },
+          {
+            id: 'blah2',
+            selected: false
+          }
+        ]
+      },
+      {
+        name: 'ml',
+        is_selected: false,
+        time_last_updated: Date,
+        points: [
+          {
+            id: 'blah',
+            selected: true
+          },
+          {
+            id: 'blah2',
+            selected: false
+          }
+        ]
+      }
+    ],
+    category_stack: []
   }
 }
 

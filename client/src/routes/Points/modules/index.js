@@ -1,8 +1,110 @@
 import initialState from '../initial-state'
-export { populatePoints, submitPoint } from './api-callers'
+//export { populatePoints, submitPoint } from './api-callers'
 import { combineReducers } from 'redux';
-import { POINTS_GET_ALL, KEY_PRESS, IGNORE, NAVIGATE_LIST, TOGGLE_ANSWER_VISIBILITY, TOGGLE_INSERT_MODE, TOGGLE_CATEGORY_SEARCHER } from './constants'
+//import { POINTS_GET_ALL, KEY_PRESS, IGNORE, NAVIGATE_LIST, TOGGLE_ANSWER_VISIBILITY, TOGGLE_INSERT_MODE, TOGGLE_CATEGORY_SEARCHER, POPULATE_CATEGORIES } from './constants'
+export const POINTS_GET_ALL = 'POINTS_GET_ALL'
+export const KEY_PRESS = 'KEY_PRESS'
+export const IGNORE = 'IGNORE'
+export const NAVIGATE_LIST = 'NAVIGATE_LIST'
+export const TOGGLE_ANSWER_VISIBILITY = 'TOGGLE_ANSWER_VISIBILITY'
+export const TOGGLE_INSERT_MODE = 'TOGGLE_INSERT_MODE'
+export const TOGGLE_CATEGORY_SEARCHER = 'TOGGLE_CATEGORY_SEARCHER'
+export const POPULATE_DOMAIN_CATEGORIES = 'POPULATE_DOMAIN_CATEGORIES'
+export const POPULATE_APP_CATEGORIES = 'POPULATE_APP_CATEGORIES'
 
+
+
+
+const setPointsAppState = (pointsArr) => {
+  pointsArr[0].inFocus = true;
+  return pointsArr.map(point => {
+    point.isVisible = false;
+    return point
+  })
+}
+
+
+export const populatePoints = () => {
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      var url = 'http://localhost:8000/points/populate';
+      fetch(url,{})
+        .then((response) => {
+          var pointsPromise = response.json();
+          pointsPromise.then((pointsBody) => {
+            //let categoriesWithAppState = pointsBody.categories.map(category => );
+            //let appCategories = setPointsAppState(categories);
+            let domainCategories = pointsBody.categories;
+            //console.log('appCategories');
+            //console.log(appCategories);
+            //console.log('domainCategories');
+            //console.log(domainCategories);
+            //categories = [
+              //{
+                //name: 'economics',
+                //time_last_updated: Date,
+                //points: []
+              //}
+            //]
+            dispatch({
+              type: POPULATE_DOMAIN_CATEGORIES,
+              domainCategories: domainCategories
+            })
+            resolve();
+          })
+        })
+        .catch((error)=> {
+          console.log('errrrrrrrr');
+          console.log(error)
+          resolve();
+        });
+    })
+  }
+}
+
+
+export const submitPoint = (formData) => {
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      var url = 'http://localhost:8000/points/category/economics';
+      let body = formData;
+      body['category'] = 'economics';
+      let requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      }
+      fetch(url, requestOptions)
+        .then((response)=> {
+          var pointsPromise = response.json();
+          pointsPromise.then((pointsBody)=> {
+            let points = pointsBody.points.map((point, index) => {
+              if (index === 0){
+                point.inFocus = true;
+              } else {
+                point.inFocus = false;
+              }
+              point.isVisible = false;
+              return point;
+            })
+            dispatch({
+              type    : POINTS_GET_ALL,
+              payload : points
+            })
+            clearForm();
+            resolve();
+          })
+        })
+        .catch((error)=> {
+          console.log('errrrrrrrr');
+          console.log(error)
+          resolve();
+        });
+    })
+  }
+}
 
 // ------------------------------------
 // Actions and Helpers
@@ -52,7 +154,6 @@ const handleListCommand = (event) => {
     }
   }
 }
-
 
 
 // ------------------------------------
@@ -131,6 +232,14 @@ const toggleAnswerVisibility = (state, action) => {
 }
 
 
+
+const populateDomainCategories = (state, action) => {
+  return {
+    ...state,
+    categories: action.domainCategories
+  };
+}
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
@@ -159,6 +268,9 @@ const DOMAIN_ACTION_HANDLERS = {
   },
   [TOGGLE_ANSWER_VISIBILITY]: (state, action) => {
     return toggleAnswerVisibility(state, action) 
+  },
+  [POPULATE_DOMAIN_CATEGORIES]: (state, action) => {
+    return populateDomainCategories(state, action) 
   }
 }
 

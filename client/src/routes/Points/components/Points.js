@@ -34,18 +34,23 @@ class Points extends React.Component {
     return classes;
   }
 
+  getPointCategorySelector(){
+    let classes = this.getCssClasses();
+    if (this.props.sections.pointCategorySelector.selected){
+      return (
+        <PointCategorySelector
+          classes={classes.pointCategorySelector}
+          categories={this.props.categories}
+        />
+      )
+    }
+  }
+
   render() {
 
     let classes = this.getCssClasses();
 
-    let pointCategorySelector = null;
-    if (this.props.sections.pointCategorySelector.selected){
-      pointCategorySelector = (
-        <PointCategorySelector
-          classes={classes.pointCategorySelector}
-        />
-    )
-    }
+    let pointCategorySelector = this.getPointCategorySelector();
 
     let pointForm = null;
     if (this.props.sections.pointForm.selected){

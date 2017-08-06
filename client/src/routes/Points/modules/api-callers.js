@@ -1,39 +1,46 @@
 
 import 'whatwg-fetch'
 
-import { POINTS_GET_ALL } from './constants'
+//import { POPULATE_CATEGORIES } from './constants'
 
-//CATEGORY SEARCHER
-//{
-  //categories: [
-    //{
-      //name: 'economics',
-      //time_last_updated: Date,
-      //points: []
-    //}
-  //]
-//}
+
+const setPointsAppState = (pointsArr) => {
+  pointsArr[0].inFocus = true;
+  return pointsArr.map(point => {
+    point.isVisible = false;
+    return point
+  })
+}
+
 
 export const populatePoints = () => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      var url = 'http://localhost:8000/points/category/economics';
+      var url = 'http://localhost:8000/points/populate';
       fetch(url,{})
-        .then((response)=> {
+        .then((response) => {
           var pointsPromise = response.json();
-          pointsPromise.then((pointsBody)=> {
-            let points = pointsBody.points.map((point, index) => {
-              if (index === 0){
-                point.inFocus = true;
-              } else {
-                point.inFocus = false;
-              }
-              point.isVisible = false;
-              return point;
-            })
+          pointsPromise.then((pointsBody) => {
+            console.log('pointsBody');
+            console.log(pointsBody);
+            //let categoriesWithAppState = pointsBody.categories.map(category => );
+            //let appCategories = setPointsAppState(categories);
+            let domainCategories = pointsBody.categories;
+            //console.log('appCategories');
+            //console.log(appCategories);
+            console.log('domainCategories');
+            console.log(domainCategories);
+            //categories = [
+              //{
+                //name: 'economics',
+                //time_last_updated: Date,
+                //points: []
+              //}
+            //]
             dispatch({
-              type    : POINTS_GET_ALL,
-              payload : points
+              type: POPULATE_CATEGORIES,
+              appCategories: appCategories,
+              domainCategories: domainCategories
             })
             resolve();
           })
@@ -46,6 +53,7 @@ export const populatePoints = () => {
     })
   }
 }
+
 
 export const submitPoint = (formData) => {
   return (dispatch, getState) => {
