@@ -18,11 +18,11 @@ const ninitialState = {
 const initialState = {
   domain: {
     categories: [
-      {
-        name: 'economics',
-        time_last_updated: Date,
-        points: []
-      }
+      //{
+        //name: 'economics',
+        //time_last_updated: Date,
+        //points: []
+      //}
     ]
   },
   app: {
@@ -38,38 +38,38 @@ const initialState = {
       }
     },
     categories: [
-      {
-        name: 'economics',
-        is_selected: true,
-        in_focus: true,
-        time_last_updated: Date,
-        points: [
-          {
-            id: 'blah',
-            is_selected: true
-          },
-          {
-            id: 'blah2',
-            is_selected: false
-          }
-        ]
-      },
-      {
-        name: 'ml',
-        is_selected: false,
-        in_focus: false,
-        time_last_updated: Date,
-        points: [
-          {
-            id: 'blah',
-            is_selected: true
-          },
-          {
-            id: 'blah2',
-            is_selected: false
-          }
-        ]
-      }
+      //{
+        //name: 'economics',
+        //is_selected: true,
+        //in_focus: true,
+        //time_last_updated: Date,
+        //points: [
+          //{
+            //id: 'blah',
+            //is_selected: true
+          //},
+          //{
+            //id: 'blah2',
+            //is_selected: false
+          //}
+        //]
+      //},
+      //{
+        //name: 'ml',
+        //is_selected: false,
+        //in_focus: false,
+        //time_last_updated: Date,
+        //points: [
+          //{
+            //id: 'blah',
+            //is_selected: true
+          //},
+          //{
+            //id: 'blah2',
+            //is_selected: false
+          //}
+        //]
+      //}
     ],
     category_stack: []
   }
