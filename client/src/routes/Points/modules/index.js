@@ -17,40 +17,10 @@ import _ from 'underscore'
 
 
 
-const getCategoriesAppState = (categories) => {
-  let appCategories = [];
-  for (var i = 0; i < categories.length; i++){
-    let domainCategory = categories[i];
-    let appCategory = {};
-    let appStateCatProps = ['name', 'in_focus', 'is_selected']
-    let appStatePointProps = ['point_id', 'in_focus', 'is_visible']
-    for (var prop in domainCategory){
-      if (appStateCatProps.indexOf(prop) > -1){
-        appCategory[prop] = domainCategory[prop]
-      }
-    }
-    //TODO: map was overwriting original instance - should have more elegant solution than my fix?
-    let appPoints = [];
-    for (var j = 0; j < domainCategory.points.length; j++){
-      let domainPoint = domainCategory.points[j];
-      let appPoint = {};
-      for (var prop in domainPoint){
-        if (appStatePointProps.indexOf(prop) > -1){
-          appPoint[prop] = domainPoint[prop]
-        }
-      }
-      appPoint.in_focus = j === 0 ? true : false;
-      appPoint.isVisible = false;
-      appPoints.push(appPoint)
-    }
-    appCategory.is_selected = i === 0 ? true: false;
-    appCategory.in_focus = i === 0 ? true: false;
-    appCategory.points = appPoints;
-    appCategories.push(appCategory);
-  }
-  return appCategories
-}
 
+// ------------------------------------
+// Actions and Helpers
+// ------------------------------------
 
 export const populatePoints = () => {
   return (dispatch, getState) => {
@@ -62,12 +32,6 @@ export const populatePoints = () => {
           pointsPromise.then(pointsBody => {
             let domainCategories = pointsBody.categories;
             let appCategories = getCategoriesAppState(pointsBody.categories);
-            //dispatch({
-              //type: POPULATE_CATEGORIES,
-              //appCategories: appCategories,
-              //domainCategories: domainCategories
-            //})
-            //TODO: make these separate actions
             dispatch({
               type: POPULATE_APP_CATEGORIES,
               appCategories: appCategories
@@ -123,9 +87,41 @@ export const submitPoint = (formData) => {
   }
 }
 
-// ------------------------------------
-// Actions and Helpers
-// ------------------------------------
+
+const getCategoriesAppState = (categories) => {
+  let appCategories = [];
+  for (var i = 0; i < categories.length; i++){
+    let domainCategory = categories[i];
+    let appCategory = {};
+    let appStateCatProps = ['name', 'in_focus', 'is_selected']
+    let appStatePointProps = ['point_id', 'in_focus', 'is_visible']
+    for (var prop in domainCategory){
+      if (appStateCatProps.indexOf(prop) > -1){
+        appCategory[prop] = domainCategory[prop]
+      }
+    }
+    //TODO: map was overwriting original instance - should have more elegant solution than my fix?
+    let appPoints = [];
+    for (var j = 0; j < domainCategory.points.length; j++){
+      let domainPoint = domainCategory.points[j];
+      let appPoint = {};
+      for (var prop in domainPoint){
+        if (appStatePointProps.indexOf(prop) > -1){
+          appPoint[prop] = domainPoint[prop]
+        }
+      }
+      appPoint.in_focus = j === 0 ? true : false;
+      appPoint.isVisible = false;
+      appPoints.push(appPoint)
+    }
+    appCategory.is_selected = i === 0 ? true: false;
+    appCategory.in_focus = i === 0 ? true: false;
+    appCategory.points = appPoints;
+    appCategories.push(appCategory);
+  }
+  return appCategories
+}
+
 
 export const detectKeypress = (event) => {
   return (dispatch, getState) => {
@@ -221,37 +217,42 @@ const navigateCategorySelector = (state, action) => {
 
 
 const navigatePointList = (state, action) => {
-  let direction = action.direction;
   let categories = state.categories;
   let targetCategory = _.find(categories, cat => {
     return cat.is_selected;
   });
   let newPoints = targetCategory.points.map(point => point)
-  for (var i = 0; i < newPoints.length; i++){
-    let point = newPoints[i];
-    if (point.in_focus){
-      if (direction === -1 && i !== 0){
-        point.in_focus = false;
-        newPoints[i-1].in_focus = true;
-        break;
-      } else if (direction === 1 && i !== newPoints.length -1){
-        point.in_focus = false;
-        newPoints[i+1].in_focus = true;
-        break;
-      }
-    }
-  }
+  moveListFocus(newPoints, action.direction)
+  //TODO: each category should have it's own reducer?
   let newAppCategories = state.categories.map(cat => {
     if (cat.name === targetCategory.name){
       cat.points = newPoints;
     }
     return cat
   })
-  //TODO: each category should have it's own reducer?
   return {
     ...state,
     categories: newAppCategories
   };
+}
+
+
+const moveListFocus = (list, direction) => {
+  for (var i = 0; i < list.length; i++){
+    let item = list[i];
+    if (item.in_focus){
+      if (direction === -1 && i !== 0){
+        item.in_focus = false;
+        list[i-1].in_focus = true;
+        break;
+      } else if (direction === 1 && i !== list.length -1){
+        item.in_focus = false;
+        list[i+1].in_focus = true;
+        break;
+      }
+    }
+  }
+  return list
 }
 
 
@@ -304,26 +305,6 @@ const toggleAnswerVisibility = (state, action) => {
     ...state,
     points: newPoints
   };
-}
-
-
-//HELPERS
-const moveListFocus = (list, direction) => {
-  for (var i = 0; i < list.length; i++){
-    let item = list[i];
-    if (item.in_focus){
-      if (direction === -1 && i !== 0){
-        item.in_focus = false;
-        list[i-1].in_focus = true;
-        break;
-      } else if (direction === 1 && i !== list.length -1){
-        item.in_focus = false;
-        list[i+1].in_focus = true;
-        break;
-      }
-    }
-  }
-  return list
 }
 
 
