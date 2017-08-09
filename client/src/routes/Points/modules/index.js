@@ -1,6 +1,5 @@
 import initialState from '../initial-state'
 import { combineReducers } from 'redux';
-export const POINTS_GET_ALL = 'POINTS_GET_ALL'
 export const KEY_PRESS = 'KEY_PRESS'
 export const IGNORE = 'IGNORE'
 export const NAVIGATE_POINT_LIST = 'NAVIGATE_POINT_LIST'
@@ -11,6 +10,7 @@ export const POPULATE_DOMAIN_CATEGORIES = 'POPULATE_DOMAIN_CATEGORIES'
 export const POPULATE_APP_CATEGORIES = 'POPULATE_APP_CATEGORIES'
 export const NAVIGATE_CATEGORY_SELECTOR = 'NAVIGATE_CATEGORY_SELECTOR'
 export const SELECT_CATEGORY = 'SELECT_CATEGORY'
+export const ADD_POINT_SUCCESS = 'ADD_POINT_SUCCESS'
 import store from '../../../main'
 import _ from 'underscore'
 
@@ -62,18 +62,21 @@ export const submitPoint = (formData) => {
         return cat.in_focus;
       }).name
       var url = 'http://localhost:8000/points/category/' + targetCategoryName;
-      let body = formData;
       let requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(formData)
       }
       fetch(url, requestOptions)
         .then((response)=> {
           var pointsPromise = response.json();
           pointsPromise.then(pointsBody => {
+            dispatch({
+              type: ADD_POINT_SUCCESS,
+              added_point: pointsBody.added_point
+            })
             clearForm();
             resolve();
           })
@@ -88,10 +91,10 @@ export const submitPoint = (formData) => {
 }
 
 
-const getCategoriesAppState = (categories) => {
+const getCategoriesAppState = (domainCategories) => {
   let appCategories = [];
-  for (var i = 0; i < categories.length; i++){
-    let domainCategory = categories[i];
+  for (var i = 0; i < domainCategories.length; i++){
+    let domainCategory = domainCategories[i];
     let appCategory = {};
     let appStateCatProps = ['name', 'in_focus', 'is_selected']
     let appStatePointProps = ['point_id', 'in_focus', 'is_visible']
@@ -100,7 +103,7 @@ const getCategoriesAppState = (categories) => {
         appCategory[prop] = domainCategory[prop]
       }
     }
-    //TODO: map was overwriting original instance - should have more elegant solution than my fix?
+    //TODO: map was overwriting original instance - should have more elegant solution than this?
     let appPoints = [];
     for (var j = 0; j < domainCategory.points.length; j++){
       let domainPoint = domainCategory.points[j];
@@ -291,8 +294,7 @@ const toggleCategorySearcher = (state, action) => {
 
 
 const toggleAnswerVisibility = (state, action) => {
-  let categories = state.categories;
-  let targetCategoryPoints = _.find(categories, cat => {
+  let targetCategoryPoints = _.find(state.categories, cat => {
     return cat.is_selected;
   }).points;
   let newPoints = targetCategoryPoints.map(point => {
@@ -349,6 +351,26 @@ const changeListSelection = (list, name) => {
 }
 
 
+const addPoint = (state, action) => {
+  let selectedCategoryName = action.added_point.category;
+  let selectedCategoryPoints = _.find(state.categories, cat => {
+    return cat.name === selectedCategoryName;
+  }).points;
+  let newPoints = selectedCategoryPoints.map(point => point )
+  newPoints.push(action.added_point)
+  let newDomainCategories = state.categories.map(cat => {
+    if (cat.name === selectedCategoryName){
+      cat.points = newPoints;
+    }
+    return cat
+  })
+  return {
+    ...state,
+    categories: newDomainCategories
+  };
+}
+
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
@@ -381,14 +403,11 @@ const APP_ACTION_HANDLERS = {
 
 const DOMAIN_ACTION_HANDLERS = {
   [IGNORE]: (state, action) => state,
-  [POINTS_GET_ALL]: (state, action) => {
-    return {
-      ...state,
-      points: action.payload
-    }
-  },
   [POPULATE_DOMAIN_CATEGORIES]: (state, action) => {
     return populateDomainCategories(state, action) 
+  },
+  [ADD_POINT_SUCCESS]: (state, action) => {
+    return addPoint(state, action)
   }
 }
 
