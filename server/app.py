@@ -25,6 +25,26 @@ def get_points():
     return jsonify(points=points)
 
 
+@app.route('/points/populate')
+def populate_points():
+    session = Session()
+    ml_point_instances = session.query(Point).filter_by(category='ml').all()
+    ml_points = [ point.serialize for point in ml_point_instances ]
+    economics_point_instances = session.query(Point).filter_by(category='economics').all()
+    economics_points = [ point.serialize for point in economics_point_instances ]
+    categories = [
+        {
+            'name': 'ml',
+            'points': ml_points
+        },
+        {
+            'name': 'economics',
+            'points': economics_points
+        }
+    ]
+    return jsonify(categories=categories)
+
+
 @app.route('/points/category/<string:category>')
 def get_category_points(category):
     session = Session()
@@ -41,9 +61,9 @@ def post_point(category):
     session = Session()
     session.add(new_point)
     session.commit()
-    point_instances = session.query(Point).filter_by(category=category).all()
-    points = [ point.serialize for point in point_instances ]
-    return jsonify(points=points)
+    # TODO: should check that the point was successfully added
+    added_point = new_point.serialize
+    return jsonify(added_point=added_point)
 
 
 @app.route('/points/<int:point_id>')
