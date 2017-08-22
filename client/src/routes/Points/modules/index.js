@@ -133,7 +133,7 @@ export const detectKeypress = (event) => {
       return dispatch({
         type: TOGGLE_CATEGORY_SEARCHER
       })
-    } else if (event.metaKey && key === 'i'){
+    } else if (event.ctrlKey && key === 'i'){
       return dispatch({
         type: TOGGLE_INSERT_MODE
       })
