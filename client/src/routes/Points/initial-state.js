@@ -13,6 +13,9 @@ const initialState = {
       },
       pointCategorySelector: {
         is_selected: false
+      },
+      pointCategoryForm: {
+        is_selected: false
       }
     },
     categories: [],

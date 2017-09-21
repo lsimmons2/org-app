@@ -16,7 +16,7 @@ class PointCategory extends React.Component {
       'category-list-item': true
     })
     return (
-      <li key={pointCategory.name} className={classes}>{pointCategory.name}</li>
+      <li key={pointCategory.category_id} className={classes}>{pointCategory.name}</li>
     )
   }
 }

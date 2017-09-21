@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { populatePoints, submitPoint, detectKeypress } from '../modules'
+import { populatePoints, submitPoint, detectKeypress, submitCategory } from '../modules'
 import _ from 'underscore'
 
 import Points from '../components/Points'
@@ -13,7 +13,7 @@ const getPointsProps = (globalState) => {
     return cat.is_selected;
   })
   for (var i = 0; i < domainCategories.length; i++){
-    if (domainCategories[i].name == selectedCategory.name){
+    if (domainCategories[i].category_id == selectedCategory.category_id){
       return generateAppDomainPoints(domainCategories[i].points, selectedCategory.points)
     }
   }
@@ -40,16 +40,35 @@ const generateAppDomainPoints = (domainPoints, appPoints) => {
 }
 
 
+const combineArrays = (a, b) => {
+  let c = [];
+  //TODO: assert these arrays are same length?
+  for (var i = 0; i < a.length; i++){
+    let a_element = a[i];
+    let b_element = b[i];
+    let c_element = {};
+    for (var prop in a_element){
+      c_element[prop] = a_element[prop];
+    }
+    for (var prop in b_element){
+      c_element[prop] = b_element[prop];
+    }
+    c.push(c_element);
+  }
+  return c;
+}
+
+
 const getCategories = (globalState) => {
-  let appCategories = globalState.points.app.categories;
-  return appCategories;
+  return combineArrays(globalState.points.app.categories, globalState.points.domain.categories)
 }
 
 
 const mapDispatchToProps = {
   populatePoints,
   submitPoint,
-  detectKeypress
+  detectKeypress,
+  submitCategory
 }
 
 

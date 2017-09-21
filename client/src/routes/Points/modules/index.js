@@ -11,10 +11,12 @@ export const POPULATE_APP_CATEGORIES = 'POPULATE_APP_CATEGORIES'
 export const NAVIGATE_CATEGORY_SELECTOR = 'NAVIGATE_CATEGORY_SELECTOR'
 export const SELECT_CATEGORY = 'SELECT_CATEGORY'
 export const ADD_POINT_SUCCESS = 'ADD_POINT_SUCCESS'
+export const TOGGLE_CATEGORY_FORM = 'TOGGLE_CATEGORY_FORM'
+export const ADD_CATEGORY_SUCCESS_APP = 'ADD_CATEGORY_SUCCESS_APP'
+export const ADD_CATEGORY_SUCCESS_DOMAIN = 'ADD_CATEGORY_SUCCESS_DOMAIN'
+export const ADD_CATEGORY_SUCCESS = 'ADD_CATEGORY_SUCCESS'
 import store from '../../../main'
 import _ from 'underscore'
-
-
 
 
 
@@ -32,6 +34,7 @@ export const populatePoints = () => {
           pointsPromise.then(pointsBody => {
             let domainCategories = pointsBody.categories;
             let appCategories = getCategoriesAppState(pointsBody.categories);
+            //TODO: should I be dispatching an app state action heree, or should I just be updating domain state and letting function in container be creating app state?
             dispatch({
               type: POPULATE_APP_CATEGORIES,
               appCategories: appCategories
@@ -58,10 +61,10 @@ export const submitPoint = (formData) => {
     return new Promise((resolve, reject) => {
       //this should be it's own helper function, need it to be able to access state
       let categories = getState().points.app.categories;
-      let targetCategoryName = _.find(categories, cat => {
+      let targetCategoryId = _.find(categories, cat => {
         return cat.in_focus;
-      }).name
-      var url = 'http://localhost:8000/points/category/' + targetCategoryName;
+      }).category_id
+      var url = 'http://localhost:8000/points/category/' + targetCategoryId;
       let requestOptions = {
         method: 'POST',
         headers: {
@@ -75,7 +78,7 @@ export const submitPoint = (formData) => {
           pointsPromise.then(pointsBody => {
             dispatch({
               type: ADD_POINT_SUCCESS,
-              added_point: pointsBody.added_point
+              added_point: pointsBody.point
             })
             clearForm();
             resolve();
@@ -91,12 +94,62 @@ export const submitPoint = (formData) => {
 }
 
 
+export const submitCategory = (formData) => {
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      //this should be it's own helper function, need it to be able to access state
+      let categories = getState().points.app.categories;
+      var url = 'http://localhost:8000/category';
+      if ('category_name' in formData){
+        formData.name = formData.category_name;
+        delete formData.category_name;
+      }
+      let requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      }
+      fetch(url, requestOptions)
+        .then((response)=> {
+          var category_promise = response.json();
+          category_promise.then(category_body => {
+            dispatch({
+              type: ADD_CATEGORY_SUCCESS_APP,
+              added_category: getCategoriesAppState(category_body.added_category)
+            })
+            dispatch({
+              type: ADD_CATEGORY_SUCCESS_DOMAIN,
+              added_category: category_body.added_category
+            })
+            clearCategoryForm();
+            resolve(); })
+        })
+        .catch((error)=> {
+          console.log('errrrrrrrr');
+          console.log(error)
+          resolve();
+        });
+    })
+  }
+}
+
+
 const getCategoriesAppState = (domainCategories) => {
+  //TODO: returning an object if passed an object, and an array if passed
+  //an array. not sure if this is bad practice...
+  let passedSingleCat = false;
+  //TODO: this conditional is for when a single cat is passed: bad naming
+  if (!(domainCategories instanceof Array)){
+    domainCategories = [domainCategories]
+    passedSingleCat = true;
+  }
   let appCategories = [];
   for (var i = 0; i < domainCategories.length; i++){
     let domainCategory = domainCategories[i];
     let appCategory = {};
-    let appStateCatProps = ['name', 'in_focus', 'is_selected']
+    let appStateCatProps = ['name', 'in_focus', 'is_selected', 'category_id']
     let appStatePointProps = ['point_id', 'in_focus', 'is_visible']
     for (var prop in domainCategory){
       if (appStateCatProps.indexOf(prop) > -1){
@@ -105,22 +158,27 @@ const getCategoriesAppState = (domainCategories) => {
     }
     //TODO: map was overwriting original instance - should have more elegant solution than this?
     let appPoints = [];
-    for (var j = 0; j < domainCategory.points.length; j++){
-      let domainPoint = domainCategory.points[j];
-      let appPoint = {};
-      for (var prop in domainPoint){
-        if (appStatePointProps.indexOf(prop) > -1){
-          appPoint[prop] = domainPoint[prop]
+    if (domainCategory.hasOwnProperty('points') && domainCategory.points instanceof Array){
+      for (var j = 0; j < domainCategory.points.length; j++){
+        let domainPoint = domainCategory.points[j];
+        let appPoint = {};
+        for (var prop in domainPoint){
+          if (appStatePointProps.indexOf(prop) > -1){
+            appPoint[prop] = domainPoint[prop]
+          }
         }
+        appPoint.in_focus = j === 0 ? true : false;
+        appPoint.isVisible = false;
+        appPoints.push(appPoint)
       }
-      appPoint.in_focus = j === 0 ? true : false;
-      appPoint.isVisible = false;
-      appPoints.push(appPoint)
     }
     appCategory.is_selected = i === 0 ? true: false;
     appCategory.in_focus = i === 0 ? true: false;
     appCategory.points = appPoints;
     appCategories.push(appCategory);
+  }
+  if (passedSingleCat){
+    return appCategories[0]
   }
   return appCategories
 }
@@ -129,15 +187,6 @@ const getCategoriesAppState = (domainCategories) => {
 export const detectKeypress = (event) => {
   return (dispatch, getState) => {
     let key = event.key;
-    if (key === 'c'){
-      return dispatch({
-        type: TOGGLE_CATEGORY_SEARCHER
-      })
-    } else if (event.ctrlKey && key === 'i'){
-      return dispatch({
-        type: TOGGLE_INSERT_MODE
-      })
-    }
     let sections = getState().points.app.sections;
     if (sections.pointCategorySelector.is_selected){
       return handleCategoriesCommand(event, dispatch, getState)
@@ -150,7 +199,15 @@ export const detectKeypress = (event) => {
 
 const handleCategoriesCommand = (event, dispatch, getState) => {
   let key = event.key;
-  if (key === 'j'){
+  if (event.ctrlKey && key === 'c'){
+    return dispatch({
+      type: TOGGLE_CATEGORY_SEARCHER
+    })
+  } else if (event.ctrlKey && key === 'i'){
+    return dispatch({
+      type: TOGGLE_CATEGORY_FORM
+    })
+  } else if (key === 'j'){
     return dispatch({
       type: NAVIGATE_CATEGORY_SELECTOR,
       direction: 1
@@ -172,13 +229,25 @@ const handleCategoriesCommand = (event, dispatch, getState) => {
       type: SELECT_CATEGORY,
       name: targetCategoryName
     })
+  //} else if (event.ctrlKey && key === 'i'){
+    //return dispatch({
+      //type: TOGGLE_CATEGORY_FORM
+    //})
   }
 }
  
 
 const handleListCommand = (event, dispatch, getState) => {
   let key = event.key;
-  if (key === 'j'){
+  if (event.ctrlKey && key === 'c'){
+    return dispatch({
+      type: TOGGLE_CATEGORY_SEARCHER
+    })
+  } else if (event.ctrlKey && key === 'i'){
+    return dispatch({
+      type: TOGGLE_INSERT_MODE
+    })
+  } else if (key === 'j'){
     return dispatch({
       type: NAVIGATE_POINT_LIST,
       direction: 1
@@ -278,6 +347,24 @@ const toggleInsertMode = (state, action) => {
 }
 
 
+const toggleCategoryForm = (state, action) => {
+  let isFormSelected = state.sections.pointCategoryForm.is_selected;
+  //if (isFormSelected){
+    //document.getElementById('category-input').blur();
+  //}
+  return {
+    ...state,
+    sections: {
+      ...state.sections,
+      pointCategoryForm: {
+        ...state.sections.pointCategoryForm,
+        is_selected: !isFormSelected
+      }
+    }
+  }
+}
+
+
 const toggleCategorySearcher = (state, action) => {
   let isSearcherSelected = state.sections.pointCategorySelector.is_selected;
   return {
@@ -307,6 +394,11 @@ const toggleAnswerVisibility = (state, action) => {
     ...state,
     points: newPoints
   };
+}
+
+
+const clearCategoryForm = () => {
+  document.getElementById('category-input').value = '';
 }
 
 
@@ -352,14 +444,14 @@ const changeListSelection = (list, name) => {
 
 
 const addPoint = (state, action) => {
-  let selectedCategoryName = action.added_point.category;
+  let selectedCategoryId = action.added_point.category_id;
   let selectedCategoryPoints = _.find(state.categories, cat => {
-    return cat.name === selectedCategoryName;
+    return cat.category_id === selectedCategoryId;
   }).points;
   let newPoints = selectedCategoryPoints.map(point => point )
-  newPoints.push(action.added_point)
+  newPoints.push(action.added_point);
   let newDomainCategories = state.categories.map(cat => {
-    if (cat.name === selectedCategoryName){
+    if (cat.category_id === selectedCategoryId){
       cat.points = newPoints;
     }
     return cat
@@ -367,6 +459,17 @@ const addPoint = (state, action) => {
   return {
     ...state,
     categories: newDomainCategories
+  };
+}
+
+
+const addCategorySuccess = (state, action) => {
+  let newCategory = action.added_category;
+  let newCategories = state.categories.map(cat => cat )
+  newCategories.push(newCategory)
+  return {
+    ...state,
+    categories: newCategories
   };
 }
 
@@ -397,7 +500,16 @@ const APP_ACTION_HANDLERS = {
   },
   [TOGGLE_ANSWER_VISIBILITY]: (state, action) => {
     return toggleAnswerVisibility(state, action) 
-  }
+  },
+  [TOGGLE_CATEGORY_FORM]: (state, action) => {
+    return toggleCategoryForm(state, action) 
+  },
+  [ADD_CATEGORY_SUCCESS_APP]: (state, action) => {
+    return addCategorySuccess(state, action) 
+  },
+  [ADD_POINT_SUCCESS]: (state, action) => {
+    return addPoint(state, action)
+  },
 }
 
 
@@ -408,6 +520,9 @@ const DOMAIN_ACTION_HANDLERS = {
   },
   [ADD_POINT_SUCCESS]: (state, action) => {
     return addPoint(state, action)
+  },
+  [ADD_CATEGORY_SUCCESS_DOMAIN]: (state, action) => {
+    return addCategorySuccess(state, action) 
   }
 }
 

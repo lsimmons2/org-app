@@ -41,6 +41,8 @@ class Points extends React.Component {
         <PointCategorySelector
           classes={classes.pointCategorySelector}
           categories={this.props.categories}
+          is_category_form_selected={this.props.sections.pointCategoryForm.is_selected}
+          submitCategory={this.props.submitCategory}
         />
       )
     }
