@@ -29,7 +29,12 @@ class Tag(Base):
     tag_id = Column(Integer, primary_key=True)
     name = Column(String(200))
     time_updated = Column(TIMESTAMP, default=func.now(), onupdate=func.now(), server_default=text("CURRENT_TIMESTAMP"))
-
+    @property
+    def serialize(self):
+        return {
+            'tag_id': self.tag_id,
+            'name': self.name
+        }
 
 
 class PointTagCorrelation(Base):
@@ -41,18 +46,31 @@ class PointTagCorrelation(Base):
 
 
 
-class Schema(Base):
-    __tablename__ = 'schemas'
-    schema_id = Column(Integer, primary_key=True)
+class Collection(Base):
+    __tablename__ = 'collections'
+    collection_id = Column(Integer, primary_key=True)
     name = Column(String(200))
     time_added = Column(TIMESTAMP, default=func.now(), server_default=text("CURRENT_TIMESTAMP"))
     time_updated = Column(TIMESTAMP, default=func.now(), onupdate=func.now(), server_default=text("CURRENT_TIMESTAMP"))
+    @property
+    def serialize(self):
+        return {
+            'collection_id': self.collection_id,
+            'name': self.name
+        }
 
 
 
-class TagSchemaCorrelation(Base):
-    __tablename__ = 'tag_schema_correlations'
-    tag_schema_correlation_id = Column(Integer, primary_key=True)
+class TagCollectionCorrelation(Base):
+    __tablename__ = 'tag_collection_correlations'
+    tag_collection_correlation_id = Column(Integer, primary_key=True)
     tag_id = Column(Integer, ForeignKey('tags.tag_id'), nullable=False)
-    schema_id = Column(Integer, ForeignKey('schemas.schema_id'), nullable=False)
+    collection_id = Column(Integer, ForeignKey('collections.collection_id'), nullable=False)
     time_updated = Column(TIMESTAMP, default=func.now(), onupdate=func.now(), server_default=text("CURRENT_TIMESTAMP"))
+    @property
+    def serialize(self):
+        return {
+            'tag_collection_correlation_id': self.tag_collection_correlation_id,
+            'tag_id': self.tag_id,
+            'collection_id': self.collection_id
+        }
