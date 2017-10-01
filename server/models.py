@@ -1,12 +1,47 @@
 
-from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, ForeignKey, text
+from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, ForeignKey, text, Table
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import declarative_base
 
 from database import db_engine
 
+
+
 Base = declarative_base()
+
+
+
+point_tag_association_table = Table('point_tag_associations', Base.metadata,
+    Column('point_id', Integer, ForeignKey('points.point_id'), nullable=False),
+    Column('tag_id', Integer, ForeignKey('tags.tag_id'), nullable=False)
+)
+
+
+
+tag_collection_association_table = Table('tag_collection_associations', Base.metadata,
+    Column('tag_id', Integer, ForeignKey('tags.tag_id'), nullable=False),
+    Column('collection_id', Integer, ForeignKey('collections.collection_id'), nullable=False),
+)
+
+
+
+class Tag(Base):
+    __tablename__ = 'tags'
+    tag_id = Column(Integer, primary_key=True)
+    name = Column(String(200))
+    points = relationship('Point',
+        secondary=point_tag_association_table,
+        back_populates='tags'
+    )
+    time_updated = Column(TIMESTAMP, default=func.now(), onupdate=func.now(), server_default=text("CURRENT_TIMESTAMP"))
+    @property
+    def serialize(self):
+        return {
+            'tag_id': self.tag_id,
+            'name': self.name
+        }
+
 
 
 class Point(Base):
@@ -14,6 +49,10 @@ class Point(Base):
     point_id = Column(Integer, primary_key=True)
     question = Column(String(200))
     answer = Column(String(200))
+    tags = relationship('Tag',
+        secondary=point_tag_association_table,
+        back_populates='points'
+    )
     @property
     def serialize(self):
         return {
@@ -24,32 +63,11 @@ class Point(Base):
 
 
 
-class Tag(Base):
-    __tablename__ = 'tags'
-    tag_id = Column(Integer, primary_key=True)
-    name = Column(String(200))
-    time_updated = Column(TIMESTAMP, default=func.now(), onupdate=func.now(), server_default=text("CURRENT_TIMESTAMP"))
-    @property
-    def serialize(self):
-        return {
-            'tag_id': self.tag_id,
-            'name': self.name
-        }
-
-
-class PointTagCorrelation(Base):
-    __tablename__ = 'point_tag_correlations'
-    point_tag_correlation_id = Column(Integer, primary_key=True)
-    point_id = Column(Integer, ForeignKey('points.point_id'), nullable=False)
-    tag_id = Column(Integer, ForeignKey('tags.tag_id'), nullable=False)
-    time_updated = Column(TIMESTAMP, default=func.now(), onupdate=func.now(), server_default=text("CURRENT_TIMESTAMP"))
-
-
-
 class Collection(Base):
     __tablename__ = 'collections'
     collection_id = Column(Integer, primary_key=True)
     name = Column(String(200))
+    tags = relationship('Tag', secondary=tag_collection_association_table)
     time_added = Column(TIMESTAMP, default=func.now(), server_default=text("CURRENT_TIMESTAMP"))
     time_updated = Column(TIMESTAMP, default=func.now(), onupdate=func.now(), server_default=text("CURRENT_TIMESTAMP"))
     @property
@@ -57,20 +75,4 @@ class Collection(Base):
         return {
             'collection_id': self.collection_id,
             'name': self.name
-        }
-
-
-
-class TagCollectionCorrelation(Base):
-    __tablename__ = 'tag_collection_correlations'
-    tag_collection_correlation_id = Column(Integer, primary_key=True)
-    tag_id = Column(Integer, ForeignKey('tags.tag_id'), nullable=False)
-    collection_id = Column(Integer, ForeignKey('collections.collection_id'), nullable=False)
-    time_updated = Column(TIMESTAMP, default=func.now(), onupdate=func.now(), server_default=text("CURRENT_TIMESTAMP"))
-    @property
-    def serialize(self):
-        return {
-            'tag_collection_correlation_id': self.tag_collection_correlation_id,
-            'tag_id': self.tag_id,
-            'collection_id': self.collection_id
         }

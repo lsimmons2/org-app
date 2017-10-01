@@ -3,7 +3,8 @@ from flask import Flask, request, Response, send_from_directory
 from flask.json import jsonify
 from flask_cors import CORS
 from sqlalchemy.orm import sessionmaker
-from models import Point, Collection, Tag, TagCollectionCorrelation, PointTagCorrelation
+from models import Point, Collection, Tag
+# from models import Point, Collection, Tag, TagCollectionCorrelation, PointTagCorrelation
 from database import db_engine
 
 app = Flask(__name__)
@@ -30,23 +31,12 @@ def get_collection(collection_id):
     session = Session()
     collection_instance = session.query(Collection).filter_by(collection_id=collection_id).one()
     collection = collection_instance.serialize
-
-    correlation_instances = session.query(TagCollectionCorrelation).filter_by(collection_id=collection_id).all()
-    correlations = [ instance.serialize for instance in correlation_instances ]
-    collection_tags = []
-    for correlation in correlations:
-        tag = session.query(Tag).filter_by(tag_id=correlation['tag_id']).one()
-        collection_tags.append(tag.serialize)
+    collection_tags = [ tag.serialize for tag in collection_instance.tags ]
     collection['tags'] = collection_tags
-
-    collection_points = []
-    for tag in collection_tags:
-        pt_correlation = session.query(PointTagCorrelation).filter_by(tag_id=tag['tag_id']).one()
-        point_id = pt_correlation.point_id
-        point = session.query(Point).filter_by(point_id=point_id).one()
-        collection_points.append(point.serialize)
-    collection['points'] = collection_points
-
+    collection['points'] = []
+    for tag in collection_instance.tags:
+        tag_points = [ point.serialize for point in tag.points ]
+        collection['points'] = collection['points'] + tag_points
     return jsonify(collection=collection)
 
 

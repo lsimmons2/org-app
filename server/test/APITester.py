@@ -16,6 +16,7 @@ class APITester(unittest.TestCase):
 
 
     def setUp(self):
+        # return
         self._create_db()
         self._setup_db_Session()
         self.app = app.test_client()
