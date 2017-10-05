@@ -1,6 +1,7 @@
 
 import unittest
 import sys
+import time
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import MetaData
@@ -16,27 +17,29 @@ class APITester(unittest.TestCase):
 
 
     def setUp(self):
-        # return
-        self._create_db()
+        print
         self._setup_db_Session()
+        self._create_db()
         self.app = app.test_client()
 
 
     def tearDown(self):
-        return
         self._clear_db()
 
 
     def _create_db(self):
+        self.session.close()
         metadata = Base.metadata
         metadata.create_all(db_engine)
 
 
     def _setup_db_Session(self):
-        self.Session = sessionmaker(bind=db_engine)
+        Session = sessionmaker(bind=db_engine)
+        self.session = Session()
 
 
     def _clear_db(self):
+        self.session.close()
         metadata = Base.metadata
         metadata.drop_all(db_engine)
 

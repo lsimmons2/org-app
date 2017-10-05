@@ -27,6 +27,7 @@ class CollectionTests(APITester):
         returned_collection = json.loads(resp.get_data())['collection']
         correct_collection = {
           "collection_id": sah_brah_collection.collection_id, 
+          "name": "sah_brah", 
           "points": [
             {
               "answer": "sah", 
@@ -39,7 +40,6 @@ class CollectionTests(APITester):
               "question": "what is brah?"
             }
           ], 
-          "name": "sah_brah", 
           "tags": [
             {
               "name": "sah", 

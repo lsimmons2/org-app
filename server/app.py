@@ -4,8 +4,8 @@ from flask.json import jsonify
 from flask_cors import CORS
 from sqlalchemy.orm import sessionmaker
 from models import Point, Collection, Tag
-# from models import Point, Collection, Tag, TagCollectionCorrelation, PointTagCorrelation
 from database import db_engine
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -26,6 +26,21 @@ def get_points():
     return jsonify(points=points)
 
 
+@app.route('/points', methods=['POST'])
+def post_points():
+    session = Session()
+    new_point_data = json.loads(request.json)
+    new_point = Point(**new_point_data['point'])
+    for tag_id in new_point_data['tag_ids']:
+        tag = session.query(Tag).get(tag_id)
+        new_point.tags.append(tag)
+    session.add(new_point)
+    session.commit()
+    added_point = new_point.serialize
+    session.close()
+    return jsonify(added_point=added_point)
+
+
 @app.route('/collections/<int:collection_id>')
 def get_collection(collection_id):
     session = Session()
@@ -40,15 +55,21 @@ def get_collection(collection_id):
     return jsonify(collection=collection)
 
 
-# @app.route('/category', methods=['POST'])
-# def post_category():
-    # new_category_data = request.json
-    # new_category = Category(**new_category_data)
-    # session = Session()
-    # session.add(new_category)
-    # session.commit()
-    # added_category = new_category.serialize
-    # return jsonify(added_category=added_category)
+@app.route('/tags', methods=['POST'])
+def post_tag():
+    session = Session()
+    new_tag_data = json.loads(request.json)
+    new_tag = Tag(**new_tag_data['tag'])
+    try:
+        collection_id = new_tag_data['collection_id']
+        collection = session.query(Collection).get(collection_id)
+        collection.tags.append(new_tag)
+        session.add(collection)
+    except KeyError as e:
+        session.add(new_tag)
+    session.commit()
+    added_tag = new_tag.serialize
+    return jsonify(added_tag=added_tag)
 
 
 # @app.route('/points/populate')
