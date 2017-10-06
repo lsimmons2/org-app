@@ -20,9 +20,20 @@ def home():
 
 @app.route('/points')
 def get_points():
+    collection_mode = request.args.get('collection_mode', 'inclusive')
+    tag_ids = request.args.getlist('tag_id')
     session = Session()
-    point_instances = session.query(Point).all()
-    points = [ point.serialize for point in point_instances ]
+    if collection_mode == 'inclusive':
+        tag_instances = session.query(Tag)\
+            .filter(Tag.tag_id.in_(tag_ids)).all()
+        points = []
+        for tag in tag_instances:
+            tag_points = [ point.serialize for point in tag.points  ]
+            points = points + tag_points
+    if collection_mode == 'exclusive':
+        # where tag_ids all in Point.tags
+        # point_instances = session.query(Point).filter(tag_ids.in_Point.tags)
+    session.commit()
     return jsonify(points=points)
 
 
