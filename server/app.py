@@ -72,7 +72,29 @@ def get_collection(collection_id):
     for tag in collection_instance.tags:
         tag_points = [ point.serialize for point in tag.points ]
         collection['points'] = collection['points'] + tag_points
+    session.commit()
     return jsonify(collection=collection)
+
+
+@app.route('/collections', methods=['POST'])
+def post_collection():
+    session = Session()
+    session.query(Collection).all()
+    post_data = json.loads(request.json)
+    new_collection_data = post_data['collection']
+    new_collection = Collection(**new_collection_data)
+    try:
+        tag_instances = session.query(Tag)\
+            .filter(Tag.tag_id.in_(post_data['tag_ids']))\
+            .all()
+        new_collection.tags = new_collection.tags + tag_instances
+    except KeyError:
+        pass
+    session.add(new_collection)
+    session.flush()
+    added_collection = new_collection.serialize
+    session.commit()
+    return jsonify(added_collection=added_collection)
 
 
 @app.route('/tags', methods=['POST'])
@@ -89,6 +111,7 @@ def post_tag():
         session.add(new_tag)
     session.commit()
     added_tag = new_tag.serialize
+    session.commit()
     return jsonify(added_tag=added_tag)
 
 
