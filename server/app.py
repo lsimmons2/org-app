@@ -20,7 +20,7 @@ def home():
 
 @app.route('/points')
 def get_points():
-    collection_mode = request.args.get('collection_mode', 'inclusive')
+    collection_mode = request.args.get('collection_mode', None)
     tag_ids = request.args.getlist('tag_id')
     session = Session()
     if collection_mode == 'inclusive':
@@ -30,9 +30,15 @@ def get_points():
         for tag in tag_instances:
             tag_points = [ point.serialize for point in tag.points  ]
             points = points + tag_points
-    if collection_mode == 'exclusive':
-        # where tag_ids all in Point.tags
-        # point_instances = session.query(Point).filter(tag_ids.in_Point.tags)
+    elif collection_mode == 'exclusive':
+        all_point_instances = session.query(Point).all()
+        points = []
+        for point in all_point_instances:
+            point_tag_ids = [str(tag.tag_id) for tag in point.tags ]
+            if set(tag_ids).issubset(point_tag_ids):
+                points.append(point.serialize)
+    else:
+        points = [ point.serialize for point in session.query(Point).all() ]
     session.commit()
     return jsonify(points=points)
 
@@ -42,9 +48,12 @@ def post_points():
     session = Session()
     new_point_data = json.loads(request.json)
     new_point = Point(**new_point_data['point'])
-    for tag_id in new_point_data['tag_ids']:
-        tag = session.query(Tag).get(tag_id)
-        new_point.tags.append(tag)
+    try:
+        for tag_id in new_point_data['tag_ids']:
+            tag = session.query(Tag).get(tag_id)
+            new_point.tags.append(tag)
+    except KeyError:
+        pass
     session.add(new_point)
     session.commit()
     added_point = new_point.serialize
