@@ -1,3 +1,35 @@
+
+
+#tab_bar {
+
+  border-width: 0px 0px 2px 0px;
+  border-style: solid;
+  border-color: $app_grey;
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+  }
+
+  li {
+    display: inline-block;
+  }
+
+  .tab_marker {
+    margin: 0px 5px 0px 5px;
+    border-width: 2px 2px 0px 2px;
+    border-color: $app_grey;
+    border-style: solid;
+    padding: 3px 10px;
+  }
+
+  .tab_marker_in_focus {
+    border-color: $app_green;
+  }
+
+}
+
+
 .point-in-focus {
   border: solid 1px $app_purple;
 }

@@ -74,9 +74,10 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (globalState) => {
   return {
-    points: getPointsProps(globalState),
-    categories: getCategories(globalState),
-    sections: globalState.points.app.sections
+    collections: globalState.points.collections
+    //points: getPointsProps(globalState),
+    //categories: getCategories(globalState),
+    //sections: globalState.points.app.sections
   }
 }
 

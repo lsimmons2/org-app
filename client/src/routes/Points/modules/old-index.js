@@ -528,22 +528,17 @@ const DOMAIN_ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 
-export default function domainReducer (state = initialState, action) {
+function domainReducer (state = initialState.domain, action) {
   const handler = DOMAIN_ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }
 
-//function domainReducer (state = initialState.domain, action) {
-  //const handler = DOMAIN_ACTION_HANDLERS[action.type]
-  //return handler ? handler(state, action) : state
-//}
+function appReducer (state = initialState.app, action) {
+  const handler = APP_ACTION_HANDLERS[action.type]
+  return handler ? handler(state, action) : state
+}
 
-//function appReducer (state = initialState.app, action) {
-  //const handler = APP_ACTION_HANDLERS[action.type]
-  //return handler ? handler(state, action) : state
-//}
-
-//export default combineReducers({
-  //domain: domainReducer,
-  //app: appReducer
-//});
+export default combineReducers({
+  domain: domainReducer,
+  app: appReducer
+});
