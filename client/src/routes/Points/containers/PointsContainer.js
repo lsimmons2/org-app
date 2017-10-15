@@ -1,5 +1,9 @@
 import { connect } from 'react-redux'
-import { populatePoints, submitPoint, detectKeypress, submitCategory } from '../modules'
+import {
+  update_collection_name,
+  add_new_collection
+} from '../modules'
+
 import _ from 'underscore'
 
 import Points from '../components/Points'
@@ -65,19 +69,14 @@ const getCategories = (globalState) => {
 
 
 const mapDispatchToProps = {
-  populatePoints,
-  submitPoint,
-  detectKeypress,
-  submitCategory
+  update_collection_name,
+  add_new_collection
 }
 
 
 const mapStateToProps = (globalState) => {
   return {
     collections: globalState.points.collections
-    //points: getPointsProps(globalState),
-    //categories: getCategories(globalState),
-    //sections: globalState.points.app.sections
   }
 }
 

@@ -97,6 +97,20 @@ def post_collection():
     return jsonify(added_collection=added_collection)
 
 
+@app.route('/collections/new')
+def get_new_collection():
+    session = Session()
+    session.query(Collection).all()
+    new_collection_data = {'name': 'new_collection'}
+    new_collection = Collection(**new_collection_data)
+    session.add(new_collection)
+    session.flush()
+    added_collection = new_collection.serialize
+    added_collection['points'] = []
+    session.commit()
+    return jsonify(new_collection=added_collection)
+
+
 @app.route('/tags', methods=['POST'])
 def post_tag():
     session = Session()

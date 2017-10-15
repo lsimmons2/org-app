@@ -74,5 +74,6 @@ class Collection(Base):
     def serialize(self):
         return {
             'collection_id': self.collection_id,
-            'name': self.name
+            'name': self.name,
+            'tags': self.tags
         }
