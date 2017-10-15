@@ -24,9 +24,19 @@
   }
 
   .tab_marker_in_focus {
-    border-color: $app_green;
+    background-color: $app_grey;
   }
 
+}
+
+.big_section {
+  border: 1px solid $app_purple;
+  padding: 20px;
+  margin: 20px;
+}
+
+.big_section_in_focus {
+  border-width: 6px;
 }
 
 

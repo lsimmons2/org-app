@@ -77,7 +77,7 @@ def get_collection(collection_id):
 
 
 @app.route('/collections', methods=['POST'])
-def post_collection():
+def add_collection():
     session = Session()
     session.query(Collection).all()
     post_data = json.loads(request.json)
@@ -95,6 +95,22 @@ def post_collection():
     added_collection = new_collection.serialize
     session.commit()
     return jsonify(added_collection=added_collection)
+
+
+@app.route('/collections/<int:collection_id>', methods=['PUT'])
+def update_collection(collection_id):
+    session = Session()
+    collection = session.query(Collection).get(collection_id)
+    if collection is None:
+        return 'Collection not found', 404
+    put_data = request.json
+    for field in put_data:
+        setattr(collection, field, put_data[field])
+    session.add(collection)
+    session.flush()
+    updated_collection = collection.serialize
+    session.commit()
+    return jsonify(collection=updated_collection)
 
 
 @app.route('/collections/new')
@@ -127,46 +143,6 @@ def post_tag():
     added_tag = new_tag.serialize
     session.commit()
     return jsonify(added_tag=added_tag)
-
-
-# @app.route('/points/populate')
-# def populate_points():
-    # session = Session()
-    # category_instances = session.query(Category).all()
-    # categories = []
-    # for category_instance in category_instances:
-        # category = category_instance.serialize
-        # category_id = category_instance.category_id
-        # point_instances = session.query(Point).filter_by(category_id=category_id).all()
-        # points = [ point.serialize for point in point_instances ]
-        # category['points'] = points
-        # categories.append(category)
-    # return jsonify(categories=categories)
-
-
-# @app.route('/points/category/<string:category>')
-# def get_category_points(category):
-    # session = Session()
-    # point_instances = session.query(Point).filter_by(category=category).all()
-    # points = [ point.serialize for point in point_instances ]
-    # return jsonify(points=points)
-
-
-# @app.route('/points/category/<int:category_id>', methods=['POST'])
-# def post_point(category_id):
-    # new_point_data = request.json
-    # new_point_data['category_id'] = category_id
-    # new_point = Point(**new_point_data)
-    # session = Session()
-    # session.add(new_point)
-    # session.commit()
-    # # TODO: should check that the point was successfully added
-    # return jsonify(point=new_point.serialize)
-
-
-# @app.route('/points/<int:point_id>')
-# def get_point(point_id):
-    # return 'sah' + str(point_id)
 
 
 if __name__ == '__main__':

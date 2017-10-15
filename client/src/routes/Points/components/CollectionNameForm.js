@@ -17,8 +17,14 @@ class CollectionNameForm extends React.Component {
   }
 
   render(){
+
+    let classes = classNames({
+      'big_section': true,
+      'big_section_in_focus': this.props.in_focus
+    });
+
     return (
-      <div>
+      <div className={classes}>
         <form onSubmit={this.update_name.bind(this)}>
           <div>
             <input id="sahhh" ref="name" type="text"/>
