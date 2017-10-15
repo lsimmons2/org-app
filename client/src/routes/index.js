@@ -8,10 +8,7 @@ import PointsRoute from './Points'
 export const createRoutes = (store) => ({
   path        : '/',
   component   : CoreLayout,
-  indexRoute  : PointsRoute,
-  childRoutes : [
-    PointsRoute(store)
-  ]
+  indexRoute  : PointsRoute(store)
 })
 
 /*  Note: childRoutes can be chunked or otherwise loaded programmatically
