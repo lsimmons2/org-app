@@ -18,6 +18,7 @@ export const ADD_CATEGORY_SUCCESS = 'ADD_CATEGORY_SUCCESS'
 export const ADD_NEW_COLLECTION = 'ADD_NEW_COLLECTION'
 export const UPDATE_COLLECTION = 'UPDATE_COLLECTION'
 export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
+export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
 import store from '../../../main'
 import _ from 'underscore'
 const base_url = 'http://localhost:8000'
@@ -92,37 +93,60 @@ export const update_collection_name = (new_name) => {
   }
 }
 
-export const add_new_collection = () => {
-  return (dispatch, getState) => {
-    return new Promise((resolve, reject) => {
-      var url = base_url + '/collections/new';
-      fetch(url,{})
-        .then((response) => {
-          var promise = response.json();
-          promise.then(resp_body => {
-            let collection = resp_body.new_collection;
-            dispatch({
-              type: ADD_NEW_COLLECTION,
-              collection: collection
-            })
-            resolve();
+export const add_new_collection = (dispatch) => {
+  return new Promise((resolve, reject) => {
+    var url = base_url + '/collections/new';
+    fetch(url,{})
+      .then((response) => {
+        var promise = response.json();
+        promise.then(resp_body => {
+          let collection = resp_body.new_collection;
+          dispatch({
+            type: ADD_NEW_COLLECTION,
+            collection: collection
           })
-        })
-        .catch((error)=> {
-          console.log('errrrrrrrr');
-          console.log(error)
           resolve();
-        });
-    })
-  }
+        })
+      })
+      .catch((error)=> {
+        console.log('errrrrrrrr');
+        console.log(error)
+        resolve();
+      });
+  })
 }
 
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
+
+    if (event.altKey && event.key == 't'){
+      add_new_collection(dispatch)
+    }
+
+    if (event.altKey && event.key == '['){
+      dispatch({
+        type: MOVE_TAB_FOCUS,
+        direction: -1
+      })
+    }
+
+    if (event.altKey && event.key == ']'){
+      dispatch({
+        type: MOVE_TAB_FOCUS,
+        direction: 1
+      })
+    }
+
     let collection_index = get_focused_collection_index(getState());
+    if (collection_index < 0){
+      return dispatch({
+        type: IGNORE
+      })
+    }
     let key = event.key;
     let views = get_focused_collection(getState()).app.views;
     let sections;
+
     if (views.new_collection.in_focus){
       sections = views.new_collection.sections;
       if (event.altKey){
@@ -143,6 +167,25 @@ export const detect_keypress = (event) => {
   }
 }
 
+const move_array_focus = (arr, direction) => {
+  for (let i = 0; i < arr.length; i++){
+    let item_app = arr[i].app;
+    if (item_app.in_focus){
+      if (direction === -1 && i !== 0){
+        item_app.in_focus = false;
+        arr[i-1].app.in_focus = true;
+        break;
+      } else if (direction === 1 && i !== arr.length -1){
+        item_app.in_focus = false;
+        arr[i+1].app.in_focus = true;
+        break;
+      }
+    }
+  }
+  return arr
+}
+
+
 //
 // ------------------------------------
 // Action Handlers
@@ -150,11 +193,22 @@ export const detect_keypress = (event) => {
 const ACTION_HANDLERS = {
   [IGNORE]: (state, action) => state,
   [ADD_NEW_COLLECTION]: (state, action) => {
+    let new_collections = state.collections.map(collection => {
+      collection.app.in_focus = false;
+      return collection
+    })
     let new_collection = action.collection;
     new_collection.app = default_collection.app;
+    new_collections.push(new_collection);
     return {
       ...state,
-      collections: [...state.collections, new_collection]
+      collections: new_collections
+    };
+  },
+  [MOVE_TAB_FOCUS]: (state, action) => {
+    return {
+      ...state,
+      collections: move_array_focus(state.collections, action.direction)
     };
   },
   [UPDATE_COLLECTION]: (state, action) => {
