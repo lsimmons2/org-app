@@ -121,16 +121,17 @@ export const detect_keypress = (event) => {
   return (dispatch, getState) => {
     let collection_index = get_focused_collection_index(getState());
     let key = event.key;
-    let sections = get_focused_collection(getState()).app.sections;
-    if (sections.new_collection.in_focus){
-      let sub_sections = sections.new_collection.sub_sections;
+    let views = get_focused_collection(getState()).app.views;
+    let sections;
+    if (views.new_collection.in_focus){
+      sections = views.new_collection.sections;
       if (event.altKey){
-        if (sub_sections.collection_name_form.in_focus && event.key == 'j'){
-          sub_sections.collection_name_form.in_focus = false;
-          sub_sections.collection_search.in_focus = true;
-        } else if (sub_sections.collection_search.in_focus && event.key == 'k'){
-          sub_sections.collection_name_form.in_focus = true;
-          sub_sections.collection_search.in_focus = false;
+        if (sections.collection_name_form.in_focus && event.key == 'j'){
+          sections.collection_name_form.in_focus = false;
+          sections.collection_search.in_focus = true;
+        } else if (sections.collection_search.in_focus && event.key == 'k'){
+          sections.collection_name_form.in_focus = true;
+          sections.collection_search.in_focus = false;
         }
       }
     }

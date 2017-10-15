@@ -17,19 +17,18 @@ class NewCollectionView extends React.Component {
       return <div>waiting for new colleccc</div>;
     }
 
-    let form_in_focus = collection.app.sections.new_collection.sub_sections.collection_name_form.in_focus;
-    let search_in_focus = collection.app.sections.new_collection.sub_sections.collection_search.in_focus;
+    let sections = collection.app.views.new_collection.sections;
+    let form_in_focus = sections.collection_name_form.in_focus;
+    let search_in_focus = sections.collection_search.in_focus;
 
     return (
       <div>
-        New collectionnnnnnnnnn
         <CollectionNameForm
           name={collection.name}
           update_collection_name={this.props.update_collection_name}
           in_focus={form_in_focus}
         />
         <CollectionSearch
-          section={collection.app.sections.collection_search}
           in_focus={search_in_focus}
         />
       </div>

@@ -20,28 +20,36 @@ Notation:
                     * collection.name
                     * collection.app.mode
                     * collection.app.is_saved
+                - NewCollection
+                    * collection
+                    + update_collection_name
                 - PointList
                     * collection.points
                     [
                         - Point
-                            - PointEditor
-                                - EditPointForm
-                                    + edit_point
-                                - NewTagForm
-                                    + submit_new_tag
-                                - TagSearch
-                                    * point.searching_tags
-                                    + search_tags
-                                    + add_point_tag
-                                - RemoveTags
-                                    * point.associated_tags
-                                    + remove_tag_from_collection
-                            - PointCard
-                                    + _toggle_point_visibility
+                          + _toggle_point_visibility
                     ]
                     - PointSearch
                 - PointForm
                     + submit_new_point
+                    - NewTagForm
+                        + submit_new_tag
+                    - TagSearch
+                        * point.searching_tags
+                        + search_tags
+                        + add_point_tag
+                - PointEditor
+                    - EditPointForm
+                        + edit_point
+                    - NewTagForm
+                        + submit_new_tag
+                    - TagSearch
+                        * point.searching_tags
+                        + search_tags
+                        + add_point_tag
+                    - RemoveTags
+                        * point.associated_tags
+                        + remove_tag_from_collection
                 - CollectionEditor
                     * collection.app
                     * collection.tags
@@ -51,7 +59,6 @@ Notation:
                     - RemoveTags
                     - ModeRadios
                     - FilterForm
-                - NewCollection
         ]
 
     client/docs/component_tree.md
