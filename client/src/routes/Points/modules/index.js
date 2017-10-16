@@ -22,7 +22,7 @@ export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
 import store from '../../../main'
 import _ from 'underscore'
 const base_url = 'http://localhost:8000'
-import { default_collection } from '../initial-state'
+import { default_collection, default_new_collection } from '../initial-state'
 
 
 
@@ -93,62 +93,82 @@ export const update_collection_name = (new_name) => {
   }
 }
 
-export const add_new_collection = (dispatch) => {
-  return new Promise((resolve, reject) => {
-    var url = base_url + '/collections/new';
-    fetch(url,{})
-      .then((response) => {
-        var promise = response.json();
-        promise.then(resp_body => {
-          let collection = resp_body.new_collection;
-          dispatch({
-            type: ADD_NEW_COLLECTION,
-            collection: collection
-          })
-          resolve();
-        })
-      })
-      .catch((error)=> {
-        console.log('errrrrrrrr');
-        console.log(error)
-        resolve();
-      });
-  })
-}
+//export const add_new_collection = (dispatch) => {
+  //return new Promise((resolve, reject) => {
+    //var url = base_url + '/collections/new';
+    //fetch(url,{})
+      //.then((response) => {
+        //var promise = response.json();
+        //promise.then(resp_body => {
+          //let collection = resp_body.new_collection;
+          //dispatch({
+            //type: ADD_NEW_COLLECTION,
+            //collection: collection
+          //})
+          //resolve();
+        //})
+      //})
+      //.catch((error)=> {
+        //console.log('errrrrrrrr');
+        //console.log(error)
+        //resolve();
+      //});
+  //})
+//}
 
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
 
-    if (event.altKey && event.key == 't'){
-      add_new_collection(dispatch)
-    }
-
-    if (event.altKey && event.key == '['){
-      dispatch({
-        type: MOVE_TAB_FOCUS,
-        direction: -1
-      })
-    }
-
-    if (event.altKey && event.key == ']'){
-      dispatch({
-        type: MOVE_TAB_FOCUS,
-        direction: 1
-      })
-    }
-
+    let key = event.key;
     let collection_index = get_focused_collection_index(getState());
+    let focused_collection = get_focused_collection(getState());
+
+    if (event.altKey && key == 't'){
+      let new_collection = {
+        name: 'new_collection',
+        app: {
+          in_focus: true,
+          is_new: true,
+          sections: {
+            collection_name_form: {
+              in_focus: true
+            },
+            collection_search: {
+              in_focus: false
+            }
+          }
+        }
+      }
+
+      return dispatch({
+        type: ADD_NEW_COLLECTION,
+        collection: new_collection
+      })
+    }
+
     if (collection_index < 0){
       return dispatch({
         type: IGNORE
       })
     }
-    let key = event.key;
-    let views = get_focused_collection(getState()).app.views;
-    let sections;
 
-    if (views.new_collection.in_focus){
-      sections = views.new_collection.sections;
+    if (event.altKey && key == '['){
+      return dispatch({
+        type: MOVE_TAB_FOCUS,
+        direction: -1
+      })
+    }
+
+    if (event.altKey && key == ']'){
+      return dispatch({
+        type: MOVE_TAB_FOCUS,
+        direction: 1
+      })
+    }
+
+
+    if (focused_collection.app.is_new){
+      let sections = focused_collection.app.sections;
       if (event.altKey){
         if (sections.collection_name_form.in_focus && event.key == 'j'){
           sections.collection_name_form.in_focus = false;
@@ -156,33 +176,40 @@ export const detect_keypress = (event) => {
         } else if (sections.collection_search.in_focus && event.key == 'k'){
           sections.collection_name_form.in_focus = true;
           sections.collection_search.in_focus = false;
+        } else {
+          return dispatch({
+            type: IGNORE
+          })
         }
       }
+      return dispatch({
+        type: UPDATE_APP_SECTION_STATE,
+        new_section_state: sections,
+        collection_index: collection_index
+      })
     }
-    dispatch({
-      type: UPDATE_APP_SECTION_STATE,
-      new_section_state: sections,
-      collection_index: collection_index
-    })
+
+
   }
 }
 
 const move_array_focus = (arr, direction) => {
-  for (let i = 0; i < arr.length; i++){
-    let item_app = arr[i].app;
+  let new_arr = arr.slice();
+  for (let i = 0; i < new_arr.length; i++){
+    let item_app = new_arr[i].app;
     if (item_app.in_focus){
       if (direction === -1 && i !== 0){
         item_app.in_focus = false;
-        arr[i-1].app.in_focus = true;
+        new_arr[i-1].app.in_focus = true;
         break;
-      } else if (direction === 1 && i !== arr.length -1){
+      } else if (direction === 1 && i !== new_arr.length -1){
         item_app.in_focus = false;
-        arr[i+1].app.in_focus = true;
+        new_arr[i+1].app.in_focus = true;
         break;
       }
     }
   }
-  return arr
+  return new_arr
 }
 
 
@@ -197,9 +224,7 @@ const ACTION_HANDLERS = {
       collection.app.in_focus = false;
       return collection
     })
-    let new_collection = action.collection;
-    new_collection.app = default_collection.app;
-    new_collections.push(new_collection);
+    new_collections.push(action.collection);
     return {
       ...state,
       collections: new_collections

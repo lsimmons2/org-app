@@ -4,27 +4,10 @@ const initialState = {
     most_recent_tags: [],
     most_recent_collections: []
   },
-  collections: [
-
-  //{
-      //name: 'sah111111111',
-      //collection_id: 'blah1',
-      //app: {
-        //in_focus: true
-      //}
-    //},
-
-    //{
-      //name: 'sah2222222',
-      //collection_id: 'blah22',
-      //app: {
-        //in_focus: false
-      //}
-    //}
-
-
-  ]
+  collections: []
 }
+
+
 
 export const default_collection = {
   name: 'new_collection',
@@ -55,18 +38,6 @@ export const default_collection = {
       time_added: false
     },
     views: {
-
-      new_collection: {
-        in_focus: true,
-        sections: {
-          collection_name_form: {
-            in_focus: true
-          },
-          collection_search: {
-            in_focus: false
-          }
-        }
-      },
 
       point_list: {
         in_focus: true

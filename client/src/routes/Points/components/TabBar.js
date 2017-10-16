@@ -15,8 +15,9 @@ class TabBar extends React.Component {
       <ul>
         {
           this.props.collections.map(collection => {
+            let key = collection.collection_id || Math.random();
             return (
-              <li key={collection.collection_id} >
+              <li key={key} >
                 <TabMarker collection={collection}/>
               </li>
             )
