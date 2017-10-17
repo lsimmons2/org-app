@@ -7,10 +7,6 @@ import classNames from 'classnames'
 
 class CollectionNameForm extends React.Component {
 
-  componentDidMount(e){
-    document.getElementById('sahhh').value = this.props.name;
-  }
-
   save_collection(e){
     e.preventDefault();
     this.props.post_collection({name:this.refs.name.value});
@@ -22,12 +18,13 @@ class CollectionNameForm extends React.Component {
       'big_section': true,
       'big_section_in_focus': this.props.in_focus
     });
+    let placeholder = 'Enter collection name';
 
     return (
       <div className={classes}>
         <form onSubmit={this.save_collection.bind(this)}>
           <div>
-            <input id="sahhh" ref="name" type="text"/>
+            <input id="new_collection_name_input" ref="name" type="text" placeholder={placeholder}/>
           </div>
           <div>
             <input type="submit"/>

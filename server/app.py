@@ -127,6 +127,16 @@ def get_new_collection():
     return jsonify(new_collection=added_collection)
 
 
+@app.route('/collections/search/<string:value>')
+def search_collections(value):
+    session = Session()
+    suggested_collections = session.query(Collection)\
+        .filter(Collection.name.ilike('%'+value+'%')).all()
+    suggestions = [ { 'collection_id': c.collection_id, 'name': c.name } for c in suggested_collections ]
+    session.commit()
+    return jsonify(suggestions=suggestions)
+
+
 @app.route('/tags', methods=['POST'])
 def post_tag():
     session = Session()

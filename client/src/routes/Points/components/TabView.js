@@ -24,6 +24,7 @@ class TabView extends React.Component {
         <NewCollection
           post_collection={this.props.post_collection}
           collection={collection}
+          search_collection={this.props.search_collection}
         />
       )
     }

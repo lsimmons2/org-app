@@ -21,6 +21,7 @@ export const UPDATE_COLLECTION = 'UPDATE_COLLECTION'
 export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
 export const TOGGLE_POINT_FORM_VISIBILITY = 'TOGGLE_POINT_FORM_VISIBILITY'
+export const NEW_COLLECTION_SEARCH_SUGGESTIONS = 'NEW_COLLECTION_SEARCH_SUGGESTIONS'
 import store from '../../../main'
 import _ from 'underscore'
 const base_url = 'http://localhost:8000'
@@ -100,6 +101,37 @@ export const post_collection = (tag_data) => {
   }
 }
 
+export const search_collection = (search_value) => {
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      let url = base_url + '/collections/search/' + search_value;
+      fetch(url, {})
+        .then((response) => {
+          let promise = response.json();
+          promise.then(resp_body => {
+            let suggestions = resp_body.suggestions;
+            let state = getState();
+            let collection = get_focused_collection(state);
+            if (collection.app.is_new){
+              collection.app.sections.collection_search.search_suggestions = suggestions;
+            }
+            dispatch({
+              type: UPDATE_COLLECTION,
+              collection: collection,
+              collection_index: get_focused_collection_index(state)
+            });
+            resolve();
+          })
+        })
+        .catch((error)=> {
+          console.log('errrrrrrrr');
+          console.log(error)
+          resolve();
+        });
+    })
+  }
+}
+
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
 
@@ -143,9 +175,11 @@ export const detect_keypress = (event) => {
         if (sections.collection_name_form.in_focus && event.key == 'j'){
           sections.collection_name_form.in_focus = false;
           sections.collection_search.in_focus = true;
+          document.getElementById('new_collection_search').focus();
         } else if (sections.collection_search.in_focus && event.key == 'k'){
           sections.collection_name_form.in_focus = true;
           sections.collection_search.in_focus = false;
+          document.getElementById('new_collection_name_input').focus();
         } else {
           return dispatch({
             type: IGNORE
@@ -213,6 +247,22 @@ const ACTION_HANDLERS = {
       ...state,
       collections: move_array_focus(state.collections, action.direction)
     };
+  },
+  [NEW_COLLECTION_SEARCH_SUGGESTIONS]: (state, action) => {
+    let index = action.collection_index;
+    return state
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        action.collection,
+        ...state.collections.slice(index + 1),
+      ]
+    };
+    //return {
+      //...state,
+      //collections: move_array_focus(state.collections, action.direction)
+    //};
   },
   [TOGGLE_POINT_FORM_VISIBILITY]: (state, action) => {
     let collection = action.collection;

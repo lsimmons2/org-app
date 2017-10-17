@@ -9,6 +9,10 @@ import CollectionSearch from './CollectionSearch'
 
 class NewCollectionView extends React.Component {
 
+  componentDidMount(e){
+    document.getElementById('new_collection_name_input').focus();
+  }
+
   render(){
 
     let collection = this.props.collection;
@@ -30,6 +34,8 @@ class NewCollectionView extends React.Component {
         />
         <CollectionSearch
           in_focus={search_in_focus}
+          search_collection={this.props.search_collection}
+          app={sections.collection_search}
         />
       </div>
     )

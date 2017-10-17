@@ -18,7 +18,8 @@ export const get_new_collection = () => ({
         in_focus: true
       },
       collection_search: {
-        in_focus: false
+        in_focus: false,
+        search_suggestions: []
       }
     }
   }
