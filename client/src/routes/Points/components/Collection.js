@@ -3,14 +3,25 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
+import PointList from './PointList'
+import PointForm from './PointForm'
+
 
 
 class Collection extends React.Component {
 
   render(){
+
+    let collection = this.props.collection;
+
     return (
       <div>
-        Collectionnnnnnnnnn
+        <PointList
+          points={collection.points}
+        />
+        <PointForm
+          app={collection.app.views.point_form}
+        />
       </div>
     )
   }

@@ -8,6 +8,21 @@ const initialState = {
 }
 
 
+export const get_new_collection = () => ({
+  name: 'new_collection',
+  app: {
+    in_focus: true,
+    is_new: true,
+    sections: {
+      collection_name_form: {
+        in_focus: true
+      },
+      collection_search: {
+        in_focus: false
+      }
+    }
+  }
+})
 
 export const get_default_collection = () => ({
   name: 'new_collection',

@@ -15,14 +15,19 @@ export const TOGGLE_CATEGORY_FORM = 'TOGGLE_CATEGORY_FORM'
 export const ADD_CATEGORY_SUCCESS_APP = 'ADD_CATEGORY_SUCCESS_APP'
 export const ADD_CATEGORY_SUCCESS_DOMAIN = 'ADD_CATEGORY_SUCCESS_DOMAIN'
 export const ADD_CATEGORY_SUCCESS = 'ADD_CATEGORY_SUCCESS'
+
 export const ADD_NEW_COLLECTION = 'ADD_NEW_COLLECTION'
 export const UPDATE_COLLECTION = 'UPDATE_COLLECTION'
 export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
+export const TOGGLE_POINT_FORM_VISIBILITY = 'TOGGLE_POINT_FORM_VISIBILITY'
 import store from '../../../main'
 import _ from 'underscore'
 const base_url = 'http://localhost:8000'
-import { get_default_collection, default_new_collection } from '../initial-state'
+import { 
+  get_default_collection,
+  get_new_collection
+} from '../initial-state'
 
 
 
@@ -72,6 +77,12 @@ export const post_collection = (tag_data) => {
           promise.then(resp_body => {
             let collection = resp_body.collection;
             collection.app = get_default_collection().app;
+            collection.points = [
+              {point_id: 1, question:'sah?', answer:'sah'},
+              {point_id: 2, question:'sahh?', answer:'sahh'},
+              {point_id: 3, question:'sahhh?', answer:'sahhh'}
+            ];
+            collection.tags = [];
             dispatch({
               type: UPDATE_COLLECTION,
               collection: collection,
@@ -97,21 +108,7 @@ export const detect_keypress = (event) => {
     let focused_collection = get_focused_collection(getState());
 
     if (event.altKey && key == 't'){
-      let new_collection = {
-        name: 'new_collection',
-        app: {
-          in_focus: true,
-          is_new: true,
-          sections: {
-            collection_name_form: {
-              in_focus: true
-            },
-            collection_search: {
-              in_focus: false
-            }
-          }
-        }
-      }
+      let new_collection = get_new_collection();
 
       return dispatch({
         type: ADD_NEW_COLLECTION,
@@ -162,6 +159,14 @@ export const detect_keypress = (event) => {
       })
     }
 
+    if (event.altKey && event.key === 'a'){
+      return dispatch({
+        type: TOGGLE_POINT_FORM_VISIBILITY,
+        collection: focused_collection,
+        collection_index
+      })
+    }
+
 
   }
 }
@@ -207,6 +212,19 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       collections: move_array_focus(state.collections, action.direction)
+    };
+  },
+  [TOGGLE_POINT_FORM_VISIBILITY]: (state, action) => {
+    let collection = action.collection;
+    collection.app.views.point_form.in_focus = !collection.app.views.point_form.in_focus;
+    let index = action.collection_index;
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        action.collection,
+        ...state.collections.slice(index + 1),
+      ]
     };
   },
   [UPDATE_COLLECTION]: (state, action) => {
