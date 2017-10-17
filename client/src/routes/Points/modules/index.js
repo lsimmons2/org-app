@@ -22,7 +22,7 @@ export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
 import store from '../../../main'
 import _ from 'underscore'
 const base_url = 'http://localhost:8000'
-import { default_collection, default_new_collection } from '../initial-state'
+import { get_default_collection, default_new_collection } from '../initial-state'
 
 
 
@@ -52,34 +52,30 @@ const update_properties = (obj_to_update, new_values) => {
   }
 }
 
-//NEWWWWWWW
-export const update_collection_name = (new_name) => {
+
+export const post_collection = (tag_data) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      let state = getState();
-      let collection = get_focused_collection(state);
-      let collection_index = get_focused_collection_index(state);
-      let url = base_url + '/collections/' + collection.collection_id;
+      let url = base_url + '/collections';
+      let post_body = JSON.stringify({collection:tag_data});
       let req_options = {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({name:new_name})
+        body: post_body
       };
       fetch(url, req_options)
         .then((response) => {
-          var promise = response.json();
+          let promise = response.json();
+          let collection_index = get_focused_collection_index(getState());
           promise.then(resp_body => {
-            let app_state = collection.app;
-            let points = collection.points;
-            let updated_collection = resp_body.collection;
-            updated_collection.app = app_state;
-            updated_collection.points = points;
+            let collection = resp_body.collection;
+            collection.app = get_default_collection().app;
             dispatch({
               type: UPDATE_COLLECTION,
-              updated_collection: updated_collection,
-              collection_index: collection_index
+              collection: collection,
+              collection_index
             })
             resolve();
           })
@@ -92,29 +88,6 @@ export const update_collection_name = (new_name) => {
     })
   }
 }
-
-//export const add_new_collection = (dispatch) => {
-  //return new Promise((resolve, reject) => {
-    //var url = base_url + '/collections/new';
-    //fetch(url,{})
-      //.then((response) => {
-        //var promise = response.json();
-        //promise.then(resp_body => {
-          //let collection = resp_body.new_collection;
-          //dispatch({
-            //type: ADD_NEW_COLLECTION,
-            //collection: collection
-          //})
-          //resolve();
-        //})
-      //})
-      //.catch((error)=> {
-        //console.log('errrrrrrrr');
-        //console.log(error)
-        //resolve();
-      //});
-  //})
-//}
 
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
@@ -240,7 +213,7 @@ const ACTION_HANDLERS = {
     let index = action.collection_index;
     let new_collections = [
       ...state.collections.slice(0, index),
-      action.updated_collection,
+      action.collection,
       ...state.collections.slice(index + 1),
     ];
     return {

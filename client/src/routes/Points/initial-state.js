@@ -9,7 +9,7 @@ const initialState = {
 
 
 
-export const default_collection = {
+export const get_default_collection = () => ({
   name: 'new_collection',
   collection_id: 1,
   points: [],
@@ -100,9 +100,8 @@ export const default_collection = {
         }
       }
 
-
     }
   }
-}
+})
 
 export default initialState

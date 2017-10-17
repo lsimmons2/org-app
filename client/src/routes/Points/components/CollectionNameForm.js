@@ -11,9 +11,9 @@ class CollectionNameForm extends React.Component {
     document.getElementById('sahhh').value = this.props.name;
   }
 
-  update_name(e){
+  save_collection(e){
     e.preventDefault();
-    this.props.update_collection_name(this.refs.name.value);
+    this.props.post_collection({name:this.refs.name.value});
   }
 
   render(){
@@ -25,7 +25,7 @@ class CollectionNameForm extends React.Component {
 
     return (
       <div className={classes}>
-        <form onSubmit={this.update_name.bind(this)}>
+        <form onSubmit={this.save_collection.bind(this)}>
           <div>
             <input id="sahhh" ref="name" type="text"/>
           </div>

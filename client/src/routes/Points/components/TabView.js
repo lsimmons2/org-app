@@ -30,7 +30,7 @@ class TabView extends React.Component {
     if (this.props.collection.app.is_new){
       return (
         <NewCollectionView
-          update_collection_name={this.props.update_collection_name}
+          post_collection={this.props.post_collection}
           collection={this.props.collection}
         />
       )

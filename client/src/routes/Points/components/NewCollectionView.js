@@ -25,7 +25,7 @@ class NewCollectionView extends React.Component {
       <div>
         <CollectionNameForm
           name={collection.name}
-          update_collection_name={this.props.update_collection_name}
+          post_collection={this.props.post_collection}
           in_focus={form_in_focus}
         />
         <CollectionSearch

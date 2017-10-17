@@ -21,7 +21,6 @@ class Points extends React.Component {
   }
 
   render(){
-    console.log('rendering');
 
     return (
       <div id="app-container">
@@ -30,7 +29,7 @@ class Points extends React.Component {
         />
         <TabView
           collection={this.get_collection_in_focus()}
-          update_collection_name={this.props.update_collection_name}
+          post_collection={this.props.post_collection}
         />
       </div>
     )

@@ -80,7 +80,7 @@ def get_collection(collection_id):
 def add_collection():
     session = Session()
     session.query(Collection).all()
-    post_data = json.loads(request.json)
+    post_data = request.json
     new_collection_data = post_data['collection']
     new_collection = Collection(**new_collection_data)
     try:
@@ -94,7 +94,7 @@ def add_collection():
     session.flush()
     added_collection = new_collection.serialize
     session.commit()
-    return jsonify(added_collection=added_collection)
+    return jsonify(collection=added_collection)
 
 
 @app.route('/collections/<int:collection_id>', methods=['PUT'])
