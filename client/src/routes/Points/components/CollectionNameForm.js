@@ -9,7 +9,10 @@ class CollectionNameForm extends React.Component {
 
   save_collection(e){
     e.preventDefault();
-    this.props.post_collection({name:this.refs.name.value});
+    let name = this.refs.name.value;
+    if (name.length){
+      this.props.post_collection({name:name});
+    }
   }
 
   render(){
