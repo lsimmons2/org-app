@@ -33,6 +33,7 @@ class CollectionSearch extends React.Component {
         <SearchSuggestion
           key={i}
           name={suggestion.name}
+          in_focus={suggestion.app.in_focus}
         />
       )
     })
