@@ -166,22 +166,20 @@ export const detect_keypress = (event) => {
       //will eventually be ctrl+j/n/k/p when I figure out
       //how to disable these chrome key shortcuts
       else if (sections.collection_search.in_focus){
-        if (key === 'ArrowDown' || key === 'ArrowUp'){
-          if (key === 'ArrowDown'){
-            return dispatch({
-              type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
-              direction: 1,
-              collection_index,
-              collection: focused_collection
-            });
-          } else if (key === 'ArrowUp'){
-            return dispatch({
-              type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
-              direction: -1,
-              collection_index,
-              collection: focused_collection
-            });
-          }
+        if (event.ctrlKey && key === 'j'){
+          return dispatch({
+            type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
+            direction: 1,
+            collection_index,
+            collection: focused_collection
+          });
+        } else if (event.ctrlKey && key === 'k'){
+          return dispatch({
+            type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
+            direction: -1,
+            collection_index,
+            collection: focused_collection
+          });
         } else if (key === 'Enter'){
           let collection = get_focused_array_item(sections.collection_search.search_suggestions);
           return new Promise((resolve, reject) => {
