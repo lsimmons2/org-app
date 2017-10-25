@@ -9,14 +9,17 @@ class PointForm extends React.Component {
 
   submitPoint(e){
     e.preventDefault();
-    let formData = {};
+    let form_data = {};
     for (const field in this.refs){
-      formData[field] = this.refs[field].value;
+      form_data[field] = this.refs[field].value;
     }
-    this.props.submitPoint(formData);
+    this.props.post_point(form_data);
   }
 
   componentDidUpdate(e){
+    if (!this.props.app.in_focus){
+      return;
+    }
     let sections = this.props.app.sections;
     let question_section = _.find(sections, function(section){
       return section.name === 'point_question_input';

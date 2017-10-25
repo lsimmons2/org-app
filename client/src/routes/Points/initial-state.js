@@ -73,27 +73,15 @@ export const get_default_collection = () => ({
             app: {
               in_focus: false
             }
-          },
-          {
-            name: 'tags_list',
-            app: {
-              in_focus: false,
-              show_search: false
-            }
           }
-        ]
-        //sections: {
-          //point_question_input: {
-            //in_focus: true
-          //},
-          //point_answer_input: {
-            //in_focus: false
-          //},
-          //tags_list: {
-            //in_focus: false,
-            //show_search: false
+          //{
+            //name: 'tags_list',
+            //app: {
+              //in_focus: false,
+              //show_search: false
+            //}
           //}
-        //}
+        ]
       },
 
       point_editor: {

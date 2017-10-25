@@ -46,7 +46,7 @@ def get_points():
 @app.route('/points', methods=['POST'])
 def post_points():
     session = Session()
-    new_point_data = json.loads(request.json)
+    new_point_data = request.json
     new_point = Point(**new_point_data['point'])
     try:
         for tag_id in new_point_data['tag_ids']:
@@ -58,7 +58,7 @@ def post_points():
     session.commit()
     added_point = new_point.serialize
     session.close()
-    return jsonify(added_point=added_point)
+    return jsonify(point=added_point)
 
 
 @app.route('/collections/<int:collection_id>')

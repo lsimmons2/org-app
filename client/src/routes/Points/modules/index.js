@@ -19,12 +19,15 @@ export const NEW_COLLECTION_SEARCH_SUGGESTIONS = 'NEW_COLLECTION_SEARCH_SUGGESTI
 export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
 export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
 export const MOVE_POINT_FORM_SECTION_FOCUS = 'MOVE_POINT_FORM_SECTION_FOCUS'
+export const ADD_POINT = 'ADD_POINT'
+
 
 const base_url = 'http://localhost:8000'
 
 
 
 
+//TODO: rename tag_data
 export const post_collection = (tag_data) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
@@ -53,6 +56,48 @@ export const post_collection = (tag_data) => {
             dispatch({
               type: REPLACE_COLLECTION,
               collection: collection,
+              collection_index
+            })
+            resolve();
+          })
+        })
+        .catch((error)=> {
+          console.log('errrrrrrrr');
+          console.log(error)
+          resolve();
+        });
+    })
+  }
+}
+
+export const post_point = (form_data) => {
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      let url = base_url + '/points';
+      let post_body = JSON.stringify({point:form_data});
+      let req_options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: post_body
+      };
+      fetch(url, req_options)
+        .then((response) => {
+          let promise = response.json();
+          let collection_index = get_focused_array_index(getState().points.collections);
+          promise.then(resp_body => {
+            let point = resp_body.point;
+            //collection.app = get_default_collection().app;
+            //collection.points = [
+              //{point_id: 1, question:'sah?', answer:'sah'},
+              //{point_id: 2, question:'sahh?', answer:'sahh'},
+              //{point_id: 3, question:'sahhh?', answer:'sahhh'}
+            //];
+            //collection.tags = [];
+            dispatch({
+              type: ADD_POINT,
+              point: point,
               collection_index
             })
             resolve();
@@ -302,6 +347,19 @@ const get_focused_array_item = (arr) => {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [IGNORE]: (state, action) => state,
+  [ADD_POINT]: (state, action) => {
+    let index = action.collection_index;
+    let collection = state.collections[index];
+    collection.points.push(action.point);
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        collection,
+        ...state.collections.slice(index + 1),
+      ]
+    };
+  },
   [ADD_NEW_COLLECTION]: (state, action) => {
     let new_collections = state.collections.map(collection => {
       collection.app.in_focus = false;

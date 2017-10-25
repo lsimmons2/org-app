@@ -31,6 +31,7 @@ class Points extends React.Component {
           collection={this.get_collection_in_focus()}
           post_collection={this.props.post_collection}
           search_collection={this.props.search_collection}
+          post_point={this.props.post_point}
         />
       </div>
     )
