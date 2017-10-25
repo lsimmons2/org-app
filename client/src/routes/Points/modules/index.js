@@ -1,21 +1,15 @@
-import initialState from '../initial-state'
-import { combineReducers } from 'redux';
-export const KEY_PRESS = 'KEY_PRESS'
-export const IGNORE = 'IGNORE'
-export const NAVIGATE_POINT_LIST = 'NAVIGATE_POINT_LIST'
-export const TOGGLE_ANSWER_VISIBILITY = 'TOGGLE_ANSWER_VISIBILITY'
-export const TOGGLE_INSERT_MODE = 'TOGGLE_INSERT_MODE'
-export const TOGGLE_CATEGORY_SEARCHER = 'TOGGLE_CATEGORY_SEARCHER'
-export const POPULATE_DOMAIN_CATEGORIES = 'POPULATE_DOMAIN_CATEGORIES'
-export const POPULATE_APP_CATEGORIES = 'POPULATE_APP_CATEGORIES'
-export const NAVIGATE_CATEGORY_SELECTOR = 'NAVIGATE_CATEGORY_SELECTOR'
-export const SELECT_CATEGORY = 'SELECT_CATEGORY'
-export const ADD_POINT_SUCCESS = 'ADD_POINT_SUCCESS'
-export const TOGGLE_CATEGORY_FORM = 'TOGGLE_CATEGORY_FORM'
-export const ADD_CATEGORY_SUCCESS_APP = 'ADD_CATEGORY_SUCCESS_APP'
-export const ADD_CATEGORY_SUCCESS_DOMAIN = 'ADD_CATEGORY_SUCCESS_DOMAIN'
-export const ADD_CATEGORY_SUCCESS = 'ADD_CATEGORY_SUCCESS'
 
+import { combineReducers } from 'redux';
+import _ from 'underscore'
+
+import initialState from '../initial-state'
+import store from '../../../main'
+import { 
+  get_default_collection,
+  get_new_collection
+} from '../initial-state'
+
+export const IGNORE = 'IGNORE'
 export const ADD_NEW_COLLECTION = 'ADD_NEW_COLLECTION'
 export const UPDATE_COLLECTION = 'UPDATE_COLLECTION'
 export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
@@ -25,50 +19,9 @@ export const NEW_COLLECTION_SEARCH_SUGGESTIONS = 'NEW_COLLECTION_SEARCH_SUGGESTI
 export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
 export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
 
-import store from '../../../main'
-import _ from 'underscore'
 const base_url = 'http://localhost:8000'
-import { 
-  get_default_collection,
-  get_new_collection
-} from '../initial-state'
 
 
-
-
-const get_focused_collection = (state) => {
-  let collections = state.points.collections;
-  let collection_in_focus = _.find(collections, function(collection){
-    return collection.app.in_focus;
-  })
-  return collection_in_focus
-}
-
-const get_focused_collection_index = (state) => {
-  let collections = state.points.collections;
-  let index = -1;
-  for (let i = 0; i < collections.length; i++){
-    if (collections[i].app.in_focus){
-      index = i;
-    }
-  }
-  return index;
-}
-
-const get_focused_array_item = (arr) => {
-  for (let i = 0; i < arr.length; i++){
-    if (arr[i].app.in_focus){
-      return arr[i]
-    }
-  }
-  return null;
-}
-
-const update_properties = (obj_to_update, new_values) => {
-  for (let prop in new_values){
-    obj_to_update[prop] = new_values[prop];
-  }
-}
 
 
 export const post_collection = (tag_data) => {
@@ -86,7 +39,7 @@ export const post_collection = (tag_data) => {
       fetch(url, req_options)
         .then((response) => {
           let promise = response.json();
-          let collection_index = get_focused_collection_index(getState());
+          let collection_index = get_focused_array_index(getState().points.collections);
           promise.then(resp_body => {
             let collection = resp_body.collection;
             collection.app = get_default_collection().app;
@@ -97,7 +50,7 @@ export const post_collection = (tag_data) => {
             ];
             collection.tags = [];
             dispatch({
-              type: UPDATE_COLLECTION,
+              type: REPLACE_COLLECTION,
               collection: collection,
               collection_index
             })
@@ -126,14 +79,14 @@ export const search_collection = (search_value) => {
               suggestion.app = {in_focus: false};
             });
             let state = getState();
-            let collection = get_focused_collection(state);
+            let collection = get_focused_array_item(state.points.collections);
             if (collection.app.is_new){
               collection.app.sections.collection_search.search_suggestions = suggestions;
             }
             dispatch({
               type: UPDATE_COLLECTION,
               collection: collection,
-              collection_index: get_focused_collection_index(state)
+              collection_index: get_focused_array_index(state.points.collections)
             });
             resolve();
           })
@@ -151,8 +104,8 @@ export const detect_keypress = (event) => {
   return (dispatch, getState) => {
 
     let key = event.key;
-    let collection_index = get_focused_collection_index(getState());
-    let focused_collection = get_focused_collection(getState());
+    let collection_index = get_focused_array_index(getState().points.collections);
+    let focused_collection = get_focused_array_item(getState().points.collections);
 
     //will probably call different functions from this function when
     //I know how I'll organize it
@@ -298,8 +251,25 @@ const move_array_focus = (arr, direction) => {
   return new_arr
 }
 
+const get_focused_array_index = (arr) => {
+  for (let i = 0; i < arr.length; i++){
+    if (arr[i].app.in_focus){
+      return i;
+    }
+  }
+  return -1;
+}
 
-//
+const get_focused_array_item = (arr) => {
+  for (let i = 0; i < arr.length; i++){
+    if (arr[i].app.in_focus){
+      return arr[i]
+    }
+  }
+  return null;
+}
+
+
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
@@ -377,14 +347,13 @@ const ACTION_HANDLERS = {
   },
   [UPDATE_COLLECTION]: (state, action) => {
     let index = action.collection_index;
-    let new_collections = [
-      ...state.collections.slice(0, index),
-      action.collection,
-      ...state.collections.slice(index + 1),
-    ];
     return {
       ...state,
-      collections: new_collections
+      collections: [
+        ...state.collections.slice(0, index),
+        action.collection,
+        ...state.collections.slice(index + 1),
+      ]
     };
   },
   [UPDATE_APP_SECTION_STATE]: (state, action) => {

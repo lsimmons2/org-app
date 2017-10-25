@@ -1,7 +1,5 @@
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import classNames from 'classnames'
 
 import PointList from './PointList'
 import PointForm from './PointForm'
