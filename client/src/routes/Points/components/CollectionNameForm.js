@@ -15,6 +15,12 @@ class CollectionNameForm extends React.Component {
     }
   }
 
+  componentDidMount(e){
+    if (this.props.in_focus){
+      document.getElementById('new_collection_name_input').focus();
+    }
+  }
+
   componentDidUpdate(e){
     if (this.props.in_focus){
       document.getElementById('new_collection_name_input').focus();

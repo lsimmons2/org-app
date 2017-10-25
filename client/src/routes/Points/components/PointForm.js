@@ -16,10 +16,19 @@ class PointForm extends React.Component {
     this.props.submitPoint(formData);
   }
 
-  componentDidMount(e){
-    let input = document.getElementById('question-input');
-    if (input){
-      input.focus()
+  componentDidUpdate(e){
+    let sections = this.props.app.sections;
+    let question_section = _.find(sections, function(section){
+      return section.name === 'point_question_input';
+    });
+    let answer_section = _.find(sections, function(section){
+      return section.name === 'point_answer_input';
+    });
+    if (question_section.app.in_focus){
+      document.getElementById('question_input').focus();
+    }
+    if (answer_section.app.in_focus){
+      document.getElementById('answer_input').focus();
     }
   }
 
@@ -52,10 +61,10 @@ class PointForm extends React.Component {
       <div>
         <form onSubmit={this.submitPoint.bind(this)}>
           <div className={question_classes}>
-            <input ref="question" type="text" id="question-input" placeholder="Question"/>
+            <input ref="question" type="text" id="question_input" placeholder="Question"/>
           </div>
           <div className={answer_classes}>
-            <textarea ref="answer" type="text" id="answer-input" placeholder="Answer"/>
+            <textarea ref="answer" type="text" id="answer_input" placeholder="Answer"/>
           </div>
           <div>
             <input type="submit"/>
