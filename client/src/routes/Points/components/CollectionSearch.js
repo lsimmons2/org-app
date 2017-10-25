@@ -39,6 +39,12 @@ class CollectionSearch extends React.Component {
     })
   }
 
+  componentDidUpdate(e){
+    if (this.props.in_focus){
+      document.getElementById('new_collection_search').focus();
+    }
+  }
+
   render(){
 
     let suggestions = this.get_suggestions();

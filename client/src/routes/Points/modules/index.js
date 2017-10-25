@@ -111,7 +111,6 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
         collection: focused_collection,
         direction: 1
       })
-      //document.getElementById('new_collection_search').focus();
     } else if (event.key == 'k'){
       return dispatch({
         type: MOVE_POINT_FORM_SECTION_FOCUS,
@@ -119,7 +118,6 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
         collection: focused_collection,
         direction: -1
       })
-      //document.getElementById('new_collection_name_input').focus();
     } else {
       return dispatch({
         type: IGNORE
@@ -173,14 +171,12 @@ export const detect_keypress = (event) => {
     if (focused_collection.app.is_new){
       let sections = focused_collection.app.sections;
       if (event.altKey){
-        if (sections.collection_name_form.in_focus && key == 'j'){
+        if (sections.collection_name_form.in_focus && key == 'k'){
           sections.collection_name_form.in_focus = false;
           sections.collection_search.in_focus = true;
-          document.getElementById('new_collection_search').focus();
-        } else if (sections.collection_search.in_focus && key == 'k'){
+        } else if (sections.collection_search.in_focus && key == 'j'){
           sections.collection_name_form.in_focus = true;
           sections.collection_search.in_focus = false;
-          document.getElementById('new_collection_name_input').focus();
         } else {
           return dispatch({
             type: IGNORE

@@ -9,10 +9,6 @@ import CollectionSearch from './CollectionSearch'
 
 class NewCollectionView extends React.Component {
 
-  componentDidMount(e){
-    document.getElementById('new_collection_search').focus();
-  }
-
   render(){
 
     let collection = this.props.collection;
