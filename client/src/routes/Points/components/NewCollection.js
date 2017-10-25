@@ -10,7 +10,7 @@ import CollectionSearch from './CollectionSearch'
 class NewCollectionView extends React.Component {
 
   componentDidMount(e){
-    document.getElementById('new_collection_name_input').focus();
+    document.getElementById('new_collection_search').focus();
   }
 
   render(){
@@ -27,15 +27,15 @@ class NewCollectionView extends React.Component {
 
     return (
       <div>
-        <CollectionNameForm
-          name={collection.name}
-          post_collection={this.props.post_collection}
-          in_focus={form_in_focus}
-        />
         <CollectionSearch
           in_focus={search_in_focus}
           search_collection={this.props.search_collection}
           app={sections.collection_search}
+        />
+        <CollectionNameForm
+          name={collection.name}
+          post_collection={this.props.post_collection}
+          in_focus={form_in_focus}
         />
       </div>
     )

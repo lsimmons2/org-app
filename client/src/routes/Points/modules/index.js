@@ -18,6 +18,7 @@ export const TOGGLE_POINT_FORM_VISIBILITY = 'TOGGLE_POINT_FORM_VISIBILITY'
 export const NEW_COLLECTION_SEARCH_SUGGESTIONS = 'NEW_COLLECTION_SEARCH_SUGGESTIONS'
 export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
 export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
+export const MOVE_POINT_FORM_SECTION_FOCUS = 'MOVE_POINT_FORM_SECTION_FOCUS'
 
 const base_url = 'http://localhost:8000'
 
@@ -78,15 +79,15 @@ export const search_collection = (search_value) => {
             _.each(suggestions, function(suggestion){
               suggestion.app = {in_focus: false};
             });
-            let state = getState();
-            let collection = get_focused_array_item(state.points.collections);
+            let collections = getState().points.collections;
+            let collection = get_focused_array_item(collections);
             if (collection.app.is_new){
               collection.app.sections.collection_search.search_suggestions = suggestions;
             }
             dispatch({
               type: UPDATE_COLLECTION,
               collection: collection,
-              collection_index: get_focused_array_index(state.points.collections)
+              collection_index: get_focused_array_index(collections)
             });
             resolve();
           })
@@ -100,12 +101,40 @@ export const search_collection = (search_value) => {
   }
 }
 
+const handle_point_form_command = (dispatch, collection_index, focused_collection, event) => {
+  let sections = focused_collection.app.views.point_form.sections;
+  if (event.altKey){
+    if (event.key == 'j'){
+      return dispatch({
+        type: MOVE_POINT_FORM_SECTION_FOCUS,
+        collection_index: collection_index,
+        collection: focused_collection,
+        direction: 1
+      })
+      //document.getElementById('new_collection_search').focus();
+    } else if (event.key == 'k'){
+      return dispatch({
+        type: MOVE_POINT_FORM_SECTION_FOCUS,
+        collection_index: collection_index,
+        collection: focused_collection,
+        direction: -1
+      })
+      //document.getElementById('new_collection_name_input').focus();
+    } else {
+      return dispatch({
+        type: IGNORE
+      })
+    }
+  }
+}
+
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
 
+    let collections = getState().points.collections;
+    let collection_index = get_focused_array_index(collections);
+    let focused_collection = get_focused_array_item(collections);
     let key = event.key;
-    let collection_index = get_focused_array_index(getState().points.collections);
-    let focused_collection = get_focused_array_item(getState().points.collections);
 
     //will probably call different functions from this function when
     //I know how I'll organize it
@@ -209,6 +238,10 @@ export const detect_keypress = (event) => {
       }
     }
 
+    if (focused_collection.app.views.point_form.in_focus){
+      handle_point_form_command(dispatch, collection_index, focused_collection, event);
+    }
+
     //OTHER VIEWS
     if (event.altKey && key === 'a'){
       return dispatch({
@@ -305,8 +338,22 @@ const ACTION_HANDLERS = {
   [MOVE_NEW_COLLECTION_SEARCH_FOCUS]: (state, action) => {
     let index = action.collection_index;
     let collection = action.collection;
-    let new_suggestions = move_array_focus(collection.app.sections.collection_search.search_suggestions, action.direction);
-    collection.app.sections.collection_search.search_suggestions = new_suggestions;
+    let suggestions = collection.app.sections.collection_search.search_suggestions
+    suggestions = move_array_focus(suggestions, action.direction);
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        collection,
+        ...state.collections.slice(index + 1),
+      ]
+    };
+  },
+  [MOVE_POINT_FORM_SECTION_FOCUS]: (state, action) => {
+    let index = action.collection_index;
+    let collection = action.collection;
+    let sections = collection.app.views.point_form.sections;
+    sections = move_array_focus(sections, action.direction);
     return {
       ...state,
       collections: [
