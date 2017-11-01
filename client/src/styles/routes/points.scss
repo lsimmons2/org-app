@@ -35,26 +35,44 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
 .big_section {
   border: 1px solid $app_purple;
   padding: 20px;
   margin: 20px;
 }
 
+
 .big_section_in_focus {
   border-width: 6px;
 }
+
+
+.tag {
+  border: 1px solid $app_green;
+  display: inline-block;
+  padding: 2px;
+  margin: 2px;
+}
+
+.tag_in_focus {
+  border: 3px solid $app_green;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 .point-in-focus {

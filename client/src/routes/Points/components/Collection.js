@@ -3,6 +3,7 @@ import React from 'react'
 
 import PointList from './PointList'
 import PointForm from './PointForm'
+import CollectionMeta from './CollectionMeta'
 
 
 
@@ -14,6 +15,9 @@ class Collection extends React.Component {
 
     return (
       <div>
+        <CollectionMeta
+          mode={collection.app.mode}
+        />
         <PointList
           points={collection.points}
         />

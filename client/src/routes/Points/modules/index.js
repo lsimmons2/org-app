@@ -20,6 +20,7 @@ export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCU
 export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
 export const MOVE_POINT_FORM_SECTION_FOCUS = 'MOVE_POINT_FORM_SECTION_FOCUS'
 export const ADD_POINT = 'ADD_POINT'
+export const MOVE_POINT_FORM_TAG_FOCUS = 'MOVE_POINT_FORM_TAG_FOCUS'
 
 
 const base_url = 'http://localhost:8000'
@@ -88,18 +89,13 @@ export const post_point = (form_data) => {
           let collection_index = get_focused_array_index(getState().points.collections);
           promise.then(resp_body => {
             let point = resp_body.point;
-            //collection.app = get_default_collection().app;
-            //collection.points = [
-              //{point_id: 1, question:'sah?', answer:'sah'},
-              //{point_id: 2, question:'sahh?', answer:'sahh'},
-              //{point_id: 3, question:'sahhh?', answer:'sahhh'}
-            //];
-            //collection.tags = [];
             dispatch({
               type: ADD_POINT,
               point: point,
               collection_index
             })
+            document.getElementById('question_input').value = '';
+            document.getElementById('answer_input').value = '';
             resolve();
           })
         })
@@ -148,15 +144,16 @@ export const search_collection = (search_value) => {
 
 const handle_point_form_command = (dispatch, collection_index, focused_collection, event) => {
   let sections = focused_collection.app.views.point_form.sections;
+  let key = event.key;
   if (event.altKey){
-    if (event.key == 'j'){
+    if (key === 'j'){
       return dispatch({
         type: MOVE_POINT_FORM_SECTION_FOCUS,
         collection_index: collection_index,
         collection: focused_collection,
         direction: 1
       })
-    } else if (event.key == 'k'){
+    } else if (key === 'k'){
       return dispatch({
         type: MOVE_POINT_FORM_SECTION_FOCUS,
         collection_index: collection_index,
@@ -166,6 +163,26 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
     } else {
       return dispatch({
         type: IGNORE
+      })
+    }
+  }
+  let focused_section = _.find(sections, function(section){
+      return section.app.in_focus;
+    });
+  if (focused_section.name === 'tags_list'){
+    if (key === 'h'){
+      return dispatch({
+        type: MOVE_POINT_FORM_TAG_FOCUS,
+        collection_index: collection_index,
+        collection: focused_collection,
+        direction: -1
+      })
+    } else if (key === 'l'){
+      return dispatch({
+        type: MOVE_POINT_FORM_TAG_FOCUS,
+        collection_index: collection_index,
+        collection: focused_collection,
+        direction: 1
       })
     }
   }
@@ -408,6 +425,22 @@ const ACTION_HANDLERS = {
     let collection = action.collection;
     let sections = collection.app.views.point_form.sections;
     sections = move_array_focus(sections, action.direction);
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        collection,
+        ...state.collections.slice(index + 1),
+      ]
+    };
+  },
+  [MOVE_POINT_FORM_TAG_FOCUS]: (state, action) => {
+    let index = action.collection_index;
+    let collection = action.collection;
+    let tags = _.find(collection.app.views.point_form.sections, section => {
+      return section.app.in_focus;
+    }).tags;
+    tags = move_array_focus(tags, action.direction);
     return {
       ...state,
       collections: [

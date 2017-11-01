@@ -1,13 +1,3 @@
-
-const initialState = {
-  global: {
-    most_recent_tags: [],
-    most_recent_collections: []
-  },
-  collections: []
-}
-
-
 export const get_new_collection = () => ({
   name: 'new_collection',
   app: {
@@ -25,6 +15,16 @@ export const get_new_collection = () => ({
   }
 })
 
+
+const initialState = {
+  global: {
+    most_recent_tags: [],
+    most_recent_collections: []
+  },
+  collections: [get_new_collection()]
+}
+
+
 export const get_default_collection = () => ({
   name: 'new_collection',
   collection_id: 1,
@@ -38,8 +38,8 @@ export const get_default_collection = () => ({
     is_saved: false,
     in_focus: true,
     mode: {
-      tags_exclusive: true,
-      tags_inclusive: false,
+      tags_exclusive: false,
+      tags_inclusive: true,
       select_points: false
     },
     filter: {
@@ -73,14 +73,37 @@ export const get_default_collection = () => ({
             app: {
               in_focus: false
             }
+          },
+          {
+            name: 'tags_list',
+            tags: [
+              {
+                name:'name1',
+                tag_id: 1,
+                app: {
+                  in_focus: true
+                }
+              },
+              {
+                name: 'name2',
+                tag_id: 2,
+                app: {
+                  in_focus: false
+                }
+              },
+              {
+                name: 'name3',
+                tag_id: 3,
+                app: {
+                  in_focus: false
+                }
+              }
+            ],
+            app: {
+              in_focus: false,
+              show_search: false
+            }
           }
-          //{
-            //name: 'tags_list',
-            //app: {
-              //in_focus: false,
-              //show_search: false
-            //}
-          //}
         ]
       },
 

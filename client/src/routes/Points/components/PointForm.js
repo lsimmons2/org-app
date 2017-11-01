@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import _ from 'underscore'
+import TagsList from './TagsList'
 
 
 class PointForm extends React.Component {
@@ -33,6 +34,10 @@ class PointForm extends React.Component {
     if (answer_section.app.in_focus){
       document.getElementById('answer_input').focus();
     }
+    else {
+      document.getElementById('question_input').blur();
+      document.getElementById('answer_input').blur();
+    }
   }
 
   render(){
@@ -59,6 +64,14 @@ class PointForm extends React.Component {
       'big_section': true,
       'big_section_in_focus': answer_section.app.in_focus
     });
+    
+    let tag_search_section = _.find(sections, function(section){
+      return section.name === 'tags_list';
+    });
+    let tag_search_classes = classNames({
+      'big_section': true,
+      'big_section_in_focus': tag_search_section.app.in_focus
+    });
 
     return (
       <div>
@@ -69,6 +82,10 @@ class PointForm extends React.Component {
           <div className={answer_classes}>
             <textarea ref="answer" type="text" id="answer_input" placeholder="Answer"/>
           </div>
+          <TagsList
+            app={tag_search_section}
+            classes={tag_search_classes}
+          />
           <div>
             <input type="submit"/>
           </div>
