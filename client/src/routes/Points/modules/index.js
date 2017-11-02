@@ -21,6 +21,7 @@ export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
 export const MOVE_POINT_FORM_SECTION_FOCUS = 'MOVE_POINT_FORM_SECTION_FOCUS'
 export const ADD_POINT = 'ADD_POINT'
 export const MOVE_POINT_FORM_TAG_FOCUS = 'MOVE_POINT_FORM_TAG_FOCUS'
+export const REMOVE_TAG_FROM_POINT_FORM = 'REMOVE_TAG_FROM_POINT_FORM'
 
 
 const base_url = 'http://localhost:8000'
@@ -168,7 +169,7 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
   }
   let focused_section = _.find(sections, function(section){
       return section.app.in_focus;
-    });
+  });
   if (focused_section.name === 'tags_list'){
     if (key === 'h'){
       return dispatch({
@@ -183,6 +184,14 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
         collection_index: collection_index,
         collection: focused_collection,
         direction: 1
+      })
+    } else if (key === 'x'){
+      let tag_index = get_focused_array_index(focused_section.tags);
+      return dispatch({
+        type: REMOVE_TAG_FROM_POINT_FORM,
+        collection_index: collection_index,
+        collection: focused_collection,
+        tag_index
       })
     }
   }
@@ -441,6 +450,30 @@ const ACTION_HANDLERS = {
       return section.app.in_focus;
     }).tags;
     tags = move_array_focus(tags, action.direction);
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        collection,
+        ...state.collections.slice(index + 1),
+      ]
+    };
+  },
+  [REMOVE_TAG_FROM_POINT_FORM]: (state, action) => {
+    let collection = action.collection;
+    let index = action.collection_index;
+    let tag_index = action.tag_index;
+    let tags_list = _.find(collection.app.views.point_form.sections, section => {
+      return section.name === 'tags_list';
+    }).tags;
+    if (tags_list.length > 1){
+      if (tag_index === 0){
+        tags_list[1].app.in_focus = true;
+      } else {
+        tags_list[tag_index-1].app.in_focus = true;
+      }
+    }
+    tags_list.splice(action.tag_index, 1);
     return {
       ...state,
       collections: [
