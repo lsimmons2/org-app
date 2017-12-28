@@ -3,17 +3,17 @@ import { combineReducers } from 'redux';
 import _ from 'underscore'
 
 import initialState from '../initial-state'
-import store from '../../../main'
 import { 
   get_default_collection,
   get_new_collection
 } from '../initial-state'
+//import { detect_keypress_global, global_reducer } from './global'
+import store from '../../../main'
 
 export const IGNORE = 'IGNORE'
 export const ADD_NEW_COLLECTION = 'ADD_NEW_COLLECTION'
 export const UPDATE_COLLECTION = 'UPDATE_COLLECTION'
 export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
-export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
 export const TOGGLE_POINT_FORM_VISIBILITY = 'TOGGLE_POINT_FORM_VISIBILITY'
 export const NEW_COLLECTION_SEARCH_SUGGESTIONS = 'NEW_COLLECTION_SEARCH_SUGGESTIONS'
 export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
@@ -24,9 +24,15 @@ export const MOVE_POINT_FORM_TAG_FOCUS = 'MOVE_POINT_FORM_TAG_FOCUS'
 export const REMOVE_TAG_FROM_POINT_FORM = 'REMOVE_TAG_FROM_POINT_FORM'
 
 
+export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
+
+
 const base_url = 'http://localhost:8000'
 
 
+//const get_points_state(globalState){
+  //return globalState.points
+//}
 
 
 //TODO: rename tag_data
@@ -64,8 +70,8 @@ export const post_collection = (tag_data) => {
           })
         })
         .catch((error)=> {
-          console.log('errrrrrrrr');
-          console.log(error)
+          console.error('errrrrrrrr');
+          console.error(error)
           resolve();
         });
     })
@@ -101,8 +107,8 @@ export const post_point = (form_data) => {
           })
         })
         .catch((error)=> {
-          console.log('errrrrrrrr');
-          console.log(error)
+          console.error('errrrrrrrr');
+          console.error(error)
           resolve();
         });
     })
@@ -135,8 +141,8 @@ export const search_collection = (search_value) => {
           })
         })
         .catch((error)=> {
-          console.log('errrrrrrrr');
-          console.log(error)
+          console.error('errrrrrrrr');
+          console.error(error)
           resolve();
         });
     })
@@ -208,35 +214,10 @@ export const detect_keypress = (event) => {
     //will probably call different functions from this function when
     //I know how I'll organize it
 
-    //TAB ACTIONS
-    if (event.altKey && key == 't'){
-      let new_collection = get_new_collection();
-      return dispatch({
-        type: ADD_NEW_COLLECTION,
-        collection: new_collection
-      })
+    let global_tab_keys = ['t', '[', ']'];
+    if (event.altKey && global_tab_keys.indexOf(key) > -1){
+      return detect_keypress_global(dispatch, event);
     }
-
-    if (collection_index < 0){
-      return dispatch({
-        type: IGNORE
-      })
-    }
-
-    if (event.altKey && key == '['){
-      return dispatch({
-        type: MOVE_TAB_FOCUS,
-        direction: -1
-      })
-    }
-
-    if (event.altKey && key == ']'){
-      return dispatch({
-        type: MOVE_TAB_FOCUS,
-        direction: 1
-      })
-    }
-
 
     // NEW COLLECTION
     if (focused_collection.app.is_new){
@@ -293,8 +274,8 @@ export const detect_keypress = (event) => {
                 })
               })
               .catch((error)=> {
-                console.log('errrrrrrrr');
-                console.log(error)
+                console.error('errrrrrrrr');
+                console.error(error)
                 resolve();
               });
           })
@@ -320,6 +301,40 @@ export const detect_keypress = (event) => {
 
   }
 }
+
+
+export const detect_keypress_global = (dispatch, event) => {
+  let key = event.key;
+    //TAB ACTIONS
+    if (event.altKey && key == 't'){
+      let new_collection = get_new_collection();
+      return dispatch({
+        type: ADD_NEW_COLLECTION,
+        collection: new_collection
+      })
+    }
+
+    //if (collection_index < 0){
+      //return dispatch({
+        //type: IGNORE
+      //})
+    //}
+
+    if (event.altKey && key == '['){
+      return dispatch({
+        type: MOVE_TAB_FOCUS,
+        direction: -1
+      })
+    }
+
+    if (event.altKey && key == ']'){
+      return dispatch({
+        type: MOVE_TAB_FOCUS,
+        direction: 1
+      })
+    }
+}
+
 
 const move_array_focus = (arr, direction) => {
   let new_arr = arr.slice();
@@ -372,7 +387,19 @@ const get_focused_array_item = (arr) => {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
+
   [IGNORE]: (state, action) => state,
+
+  //GLOBAL ACTIONS
+
+  [MOVE_TAB_FOCUS]: (state, action) => {
+    return {
+      ...state,
+      collections: move_array_focus(state.collections, action.direction)
+    };
+  },
+
+
   [ADD_POINT]: (state, action) => {
     let index = action.collection_index;
     let collection = state.collections[index];
@@ -386,6 +413,7 @@ const ACTION_HANDLERS = {
       ]
     };
   },
+
   [ADD_NEW_COLLECTION]: (state, action) => {
     let new_collections = state.collections.map(collection => {
       collection.app.in_focus = false;
@@ -397,12 +425,7 @@ const ACTION_HANDLERS = {
       collections: new_collections
     };
   },
-  [MOVE_TAB_FOCUS]: (state, action) => {
-    return {
-      ...state,
-      collections: move_array_focus(state.collections, action.direction)
-    };
-  },
+
   [NEW_COLLECTION_SEARCH_SUGGESTIONS]: (state, action) => {
     let index = action.collection_index;
     return state
@@ -415,6 +438,7 @@ const ACTION_HANDLERS = {
       ]
     };
   },
+
   [MOVE_NEW_COLLECTION_SEARCH_FOCUS]: (state, action) => {
     let index = action.collection_index;
     let collection = action.collection;
@@ -429,6 +453,7 @@ const ACTION_HANDLERS = {
       ]
     };
   },
+
   [MOVE_POINT_FORM_SECTION_FOCUS]: (state, action) => {
     let index = action.collection_index;
     let collection = action.collection;
@@ -443,6 +468,7 @@ const ACTION_HANDLERS = {
       ]
     };
   },
+
   [MOVE_POINT_FORM_TAG_FOCUS]: (state, action) => {
     let index = action.collection_index;
     let collection = action.collection;
@@ -459,6 +485,7 @@ const ACTION_HANDLERS = {
       ]
     };
   },
+
   [REMOVE_TAG_FROM_POINT_FORM]: (state, action) => {
     let collection = action.collection;
     let index = action.collection_index;
@@ -483,6 +510,7 @@ const ACTION_HANDLERS = {
       ]
     };
   },
+
   [REPLACE_COLLECTION]: (state, action) => {
     let collection = action.collection;
     let index = action.collection_index;
@@ -497,6 +525,7 @@ const ACTION_HANDLERS = {
       ]
     };
   },
+
   [TOGGLE_POINT_FORM_VISIBILITY]: (state, action) => {
     let collection = action.collection;
     collection.app.views.point_form.in_focus = !collection.app.views.point_form.in_focus;
@@ -510,6 +539,7 @@ const ACTION_HANDLERS = {
       ]
     };
   },
+
   [UPDATE_COLLECTION]: (state, action) => {
     let index = action.collection_index;
     return {
@@ -521,6 +551,7 @@ const ACTION_HANDLERS = {
       ]
     };
   },
+
   [UPDATE_APP_SECTION_STATE]: (state, action) => {
     let index = action.collection_index;
     let new_collections = [
@@ -532,7 +563,7 @@ const ACTION_HANDLERS = {
           sections: action.new_section_state
         }
       },
-      ...state.collections.slice(index + 1),
+      ...state.collections.slice(index + 1)
     ];
     return {
       ...state,
@@ -546,9 +577,15 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 
-export default function domainReducer (state = initialState, action) {
+const reducer = (state = initialState, action) => {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }
 
+export default reducer
+
+//export default combineReducers({
+  //focused_collection: focused_collection_reducer,
+  //global: global_reducer
+//});
 

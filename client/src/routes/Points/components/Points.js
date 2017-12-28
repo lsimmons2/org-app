@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 //import PointList from './PointList'
-import TabBar from './TabBar'
+//import TabBar from './TabBar'
+import TabBarContainer from '../containers/TabBarContainer'
 import TabView from './TabView'
 import _ from 'underscore'
 //import PointForm from './PointForm'
@@ -24,9 +25,7 @@ class Points extends React.Component {
 
     return (
       <div id="app-container">
-        <TabBar
-          collections={this.props.collections}
-        />
+        <TabBarContainer/>
         <TabView
           collection={this.get_collection_in_focus()}
           post_collection={this.props.post_collection}
@@ -35,6 +34,19 @@ class Points extends React.Component {
         />
       </div>
     )
+    //return (
+      //<div id="app-container">
+        //<TabBar
+          //collections={this.props.collections}
+        ///>
+      //</div>
+      //<TabView
+        //collection={this.get_collection_in_focus()}
+        //post_collection={this.props.post_collection}
+        //search_collection={this.props.search_collection}
+        //post_point={this.props.post_point}
+      ///>
+    //)
   }
 
 }
