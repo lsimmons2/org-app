@@ -7,7 +7,6 @@ import {
   get_default_collection,
   get_new_collection
 } from '../initial-state'
-//import { detect_keypress_global, global_reducer } from './global'
 import store from '../../../main'
 
 export const IGNORE = 'IGNORE'
@@ -27,20 +26,16 @@ export const REMOVE_TAG_FROM_POINT_FORM = 'REMOVE_TAG_FROM_POINT_FORM'
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
 
 
+//TODO: this should probs be stored somewhere else
 const base_url = 'http://localhost:8000'
 
 
-//const get_points_state(globalState){
-  //return globalState.points
-//}
 
-
-//TODO: rename tag_data
-export const post_collection = (tag_data) => {
+export const post_collection = (new_collection_data) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
       let url = base_url + '/collections';
-      let post_body = JSON.stringify({collection:tag_data});
+      let post_body = JSON.stringify({collection:new_collection_data});
       let req_options = {
         method: 'POST',
         headers: {
@@ -314,12 +309,6 @@ export const detect_keypress_global = (dispatch, event) => {
       })
     }
 
-    //if (collection_index < 0){
-      //return dispatch({
-        //type: IGNORE
-      //})
-    //}
-
     if (event.altKey && key == '['){
       return dispatch({
         type: MOVE_TAB_FOCUS,
@@ -583,9 +572,3 @@ const reducer = (state = initialState, action) => {
 }
 
 export default reducer
-
-//export default combineReducers({
-  //focused_collection: focused_collection_reducer,
-  //global: global_reducer
-//});
-
