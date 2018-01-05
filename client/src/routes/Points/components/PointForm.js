@@ -29,14 +29,12 @@ class PointForm extends React.Component {
       return section.name === 'point_answer_input';
     });
     if (question_section.app.in_focus){
-      document.getElementById('question_input').focus();
-    }
-    if (answer_section.app.in_focus){
-      document.getElementById('answer_input').focus();
-    }
-    else {
-      document.getElementById('question_input').blur();
-      document.getElementById('answer_input').blur();
+      this.refs['question'].focus();
+    } else if (answer_section.app.in_focus){
+      this.refs['answer'].focus();
+    } else {
+      this.refs['question'].blur();
+      this.refs['answer'].blur();
     }
   }
 

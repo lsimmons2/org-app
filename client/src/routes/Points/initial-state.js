@@ -15,6 +15,13 @@ export const get_new_collection = () => ({
   }
 })
 
+export const get_new_tag = () => ({
+  name:'name1',
+  tag_id: 1,
+  app: {
+    in_focus: true
+  }
+})
 
 const initialState = {
   global: {
@@ -39,8 +46,8 @@ export const get_default_collection = () => ({
     in_focus: true,
     mode: {
       tags_exclusive: false,
-      tags_inclusive: true,
-      select_points: false
+      tags_inclusive: false,
+      select_points: true
     },
     filter: {
       success_rate: 0,
@@ -55,10 +62,12 @@ export const get_default_collection = () => ({
     },
     views: {
 
+      //VIEW: POINT_LIST
       point_list: {
         in_focus: true
       },
 
+      //VIEW: POINT_FORM
       point_form: {
         in_focus: false,
         sections: [
@@ -77,27 +86,7 @@ export const get_default_collection = () => ({
           {
             name: 'tags_list',
             tags: [
-              {
-                name:'name1',
-                tag_id: 1,
-                app: {
-                  in_focus: true
-                }
-              },
-              {
-                name: 'name2',
-                tag_id: 2,
-                app: {
-                  in_focus: false
-                }
-              },
-              {
-                name: 'name3',
-                tag_id: 3,
-                app: {
-                  in_focus: false
-                }
-              }
+              get_new_tag()
             ],
             app: {
               in_focus: false,
@@ -107,6 +96,7 @@ export const get_default_collection = () => ({
         ]
       },
 
+      //VIEW: POINT_EDITOR
       point_editor: {
         in_focus: false,
         sections: {
@@ -123,6 +113,7 @@ export const get_default_collection = () => ({
         }
       },
 
+      //VIEW: COLLECTION_EDITOR
       collection_editor: {
         in_focus: false,
         sections: {

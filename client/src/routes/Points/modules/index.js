@@ -73,11 +73,28 @@ export const post_collection = (new_collection_data) => {
   }
 }
 
-export const post_point = (form_data) => {
+const get_point_form_tag_ids = (collection) => {
+
+  let tags = _.find(collection.app.views.point_form.sections, section => {
+  return section.name === 'tags_list'
+  }).tags;
+  console.log(tags);
+  return _.map(tags, tag => {
+    return tag.tag_id
+  })
+}
+
+export const post_point = (point_data) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
       let url = base_url + '/points';
-      let post_body = JSON.stringify({point:form_data});
+      let collections = getState().points.collections;
+      let focused_collection = get_focused_array_item(collections);
+      let tag_ids = [];
+      if (focused_collection.app.mode.select_points){
+        tag_ids = get_point_form_tag_ids(focused_collection)
+      }
+      let post_body = JSON.stringify({point:point_data, tag_ids:tag_ids});
       let req_options = {
         method: 'POST',
         headers: {
