@@ -1,3 +1,5 @@
+
+
 export const get_new_collection = () => ({
   name: 'new_collection',
   app: {
@@ -15,6 +17,7 @@ export const get_new_collection = () => ({
   }
 })
 
+
 export const get_new_tag = () => ({
   name:'name1',
   tag_id: 1,
@@ -22,6 +25,7 @@ export const get_new_tag = () => ({
     in_focus: true
   }
 })
+
 
 const initialState = {
   global: {
@@ -85,12 +89,22 @@ export const get_default_collection = () => ({
           },
           {
             name: 'tags_list',
-            tags: [
-              get_new_tag()
-            ],
+            tags: [],
             app: {
-              in_focus: false,
-              show_search: false
+              in_focus: false
+            }
+          },
+          {
+            name: 'tag_form',
+            app: {
+              in_focus: false
+            }
+          },
+          {
+            name: 'tags_search',
+            search_suggestions: [],
+            app: {
+              in_focus: false
             }
           }
         ]

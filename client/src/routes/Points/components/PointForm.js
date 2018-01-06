@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import _ from 'underscore'
 import TagsList from './TagsList'
+import TagForm from './TagForm'
+import TagSearch from './TagSearch'
 
 
 class PointForm extends React.Component {
@@ -63,8 +65,24 @@ class PointForm extends React.Component {
       'big_section_in_focus': answer_section.app.in_focus
     });
     
-    let tag_search_section = _.find(sections, function(section){
+    let tags_list_section = _.find(sections, function(section){
       return section.name === 'tags_list';
+    });
+    let tags_list_classes = classNames({
+      'big_section': true,
+      'big_section_in_focus': tags_list_section.app.in_focus
+    });
+
+    let tag_form_section = _.find(sections, function(section){
+      return section.name === 'tag_form';
+    });
+    let tag_form_classes = classNames({
+      'big_section': true,
+      'big_section_in_focus': tag_form_section.app.in_focus
+    });
+
+    let tag_search_section = _.find(sections, function(section){
+      return section.name === 'tags_search';
     });
     let tag_search_classes = classNames({
       'big_section': true,
@@ -81,6 +99,14 @@ class PointForm extends React.Component {
             <textarea ref="answer" type="text" id="answer_input" placeholder="Answer"/>
           </div>
           <TagsList
+            app={tags_list_section}
+            classes={tags_list_classes}
+          />
+          <TagForm
+            app={tag_form_section}
+            classes={tag_form_classes}
+          />
+          <TagSearch
             app={tag_search_section}
             classes={tag_search_classes}
           />

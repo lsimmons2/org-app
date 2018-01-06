@@ -21,6 +21,8 @@ export const MOVE_POINT_FORM_SECTION_FOCUS = 'MOVE_POINT_FORM_SECTION_FOCUS'
 export const ADD_POINT = 'ADD_POINT'
 export const MOVE_POINT_FORM_TAG_FOCUS = 'MOVE_POINT_FORM_TAG_FOCUS'
 export const REMOVE_TAG_FROM_POINT_FORM = 'REMOVE_TAG_FROM_POINT_FORM'
+export const SHOW_TAGS_LIST_FORM = 'SHOW_TAGS_LIST_FORM'
+export const SHOW_TAGS_LIST_SEARCH = 'SHOW_TAGS_LIST_SEARCH'
 
 
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
@@ -210,6 +212,18 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
         collection_index: collection_index,
         collection: focused_collection,
         tag_index
+      })
+    } else if (key === 'a'){
+      return dispatch({
+        type: SHOW_TAGS_LIST_FORM,
+        collection_index: collection_index,
+        collection: focused_collection
+      })
+    } else if (key === '/'){
+      return dispatch({
+        type: SHOW_TAGS_LIST_SEARCH,
+        collection_index: collection_index,
+        collection: focused_collection
       })
     }
   }
@@ -522,6 +536,42 @@ const ACTION_HANDLERS = {
     let index = action.collection_index;
     collection.app = get_default_collection().app;
     collection.app.in_focus = true;
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        collection,
+        ...state.collections.slice(index + 1),
+      ]
+    };
+  },
+
+  [SHOW_TAGS_LIST_FORM]: (state, action) => {
+    let collection = action.collection;
+    let index = action.collection_index;
+    let point_form_sections = collection.app.views.point_form.sections;
+    let tags_list = _.find(point_form_sections, section => {
+      return section.name == 'tags_list';
+    });
+    tags_list.app.show_form = !tags_list.app.show_form;
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        collection,
+        ...state.collections.slice(index + 1),
+      ]
+    };
+  },
+
+  [SHOW_TAGS_LIST_SEARCH]: (state, action) => {
+    let collection = action.collection;
+    let index = action.collection_index;
+    let point_form_sections = collection.app.views.point_form.sections;
+    let tags_list = _.find(point_form_sections, section => {
+      return section.name == 'tags_list';
+    });
+    tags_list.app.show_search = !tags_list.app.show_search;
     return {
       ...state,
       collections: [

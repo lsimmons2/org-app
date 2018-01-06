@@ -17,8 +17,10 @@ class TagsList extends React.Component {
 
   render(){
     return (
-      <div className={this.props.classes}>
-        {this.get_tag_list()}
+      <div>
+        <div className={this.props.classes}>
+          {this.get_tag_list()}
+        </div>
       </div>
     )
   }
