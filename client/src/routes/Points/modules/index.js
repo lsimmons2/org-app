@@ -169,6 +169,11 @@ export const post_point = (point_data) => {
 
 
 export const search = (search_type, search_value) => {
+  if (search_value.length < 1){
+    return dispatch({
+      type: IGNORE
+    })
+  }
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
       let url = base_url + '/' + search_type + '/search/' + search_value;
@@ -443,7 +448,7 @@ const get_focused_array_index = (arr) => {
   return -1;
 }
 
-const get_focused_array_item = (arr) => {
+export const get_focused_array_item = (arr) => {
   for (let i = 0; i < arr.length; i++){
     if (arr[i].app.in_focus){
       return arr[i]
@@ -518,6 +523,7 @@ const ACTION_HANDLERS = {
     let collection = action.collection;
     let suggestions = collection.app.sections.collection_search.search_suggestions
     suggestions = move_array_focus(suggestions, action.direction);
+    collection.app.sections.collection_search.search_suggestions = suggestions;
     return {
       ...state,
       collections: [
@@ -532,10 +538,12 @@ const ACTION_HANDLERS = {
     let index = action.collection_index;
     let collection = action.collection;
     let sections = collection.app.views.point_form.sections;
-    let suggestions = _.find(sections, section => {
+    let tags_search = _.find(sections, section => {
       return section.name === 'tags_search';
-    }).search_suggestions;
+    });
+    let suggestions = tags_search.search_suggestions;
     suggestions = move_array_focus(suggestions, action.direction);
+    tags_search.search_suggestions = suggestions;
     return {
       ...state,
       collections: [

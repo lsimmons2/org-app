@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import _ from 'underscore'
 import TagsList from './TagsList'
 import TagForm from './TagForm'
-import TagSearch from './TagSearch'
+import TagSearchContainer from '../containers/TagSearchContainer'
 
 
 class PointForm extends React.Component {
@@ -81,14 +81,6 @@ class PointForm extends React.Component {
       'big_section_in_focus': tag_form_section.app.in_focus
     });
 
-    let tag_search_section = _.find(sections, function(section){
-      return section.name === 'tags_search';
-    });
-    let tag_search_classes = classNames({
-      'big_section': true,
-      'big_section_in_focus': tag_search_section.app.in_focus
-    });
-
     return (
       <div>
         <form onSubmit={this.submitPoint.bind(this)}>
@@ -108,11 +100,7 @@ class PointForm extends React.Component {
           classes={tag_form_classes}
           post_tag={this.props.post_tag}
         />
-        <TagSearch
-          app={tag_search_section}
-          classes={tag_search_classes}
-          search={this.props.search}
-        />
+        <TagSearchContainer/>
       </div>
     )
   }

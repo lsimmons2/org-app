@@ -3,7 +3,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import CollectionNameForm from './CollectionNameForm'
-import CollectionSearch from './CollectionSearch'
+import CollectionSearchContainer from '../containers/CollectionSearchContainer'
 
 
 
@@ -23,11 +23,7 @@ class NewCollectionView extends React.Component {
 
     return (
       <div>
-        <CollectionSearch
-          in_focus={search_in_focus}
-          search={this.props.search}
-          app={sections.collection_search}
-        />
+        <CollectionSearchContainer/>
         <CollectionNameForm
           name={collection.name}
           post_collection={this.props.post_collection}
