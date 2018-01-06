@@ -114,7 +114,7 @@ class PointForm extends React.Component {
         <TagSearch
           app={tag_search_section}
           classes={tag_search_classes}
-          search_tag={this.props.search_tag}
+          search={this.props.search}
         />
       </div>
     )

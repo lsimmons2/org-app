@@ -25,7 +25,7 @@ class NewCollectionView extends React.Component {
       <div>
         <CollectionSearch
           in_focus={search_in_focus}
-          search_collection={this.props.search_collection}
+          search={this.props.search}
           app={sections.collection_search}
         />
         <CollectionNameForm

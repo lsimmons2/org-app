@@ -14,7 +14,6 @@ export const ADD_NEW_COLLECTION = 'ADD_NEW_COLLECTION'
 export const UPDATE_COLLECTION = 'UPDATE_COLLECTION'
 export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
 export const TOGGLE_POINT_FORM_VISIBILITY = 'TOGGLE_POINT_FORM_VISIBILITY'
-export const NEW_COLLECTION_SEARCH_SUGGESTIONS = 'NEW_COLLECTION_SEARCH_SUGGESTIONS'
 export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
 export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
 export const MOVE_POINT_FORM_SECTION_FOCUS = 'MOVE_POINT_FORM_SECTION_FOCUS'
@@ -25,6 +24,7 @@ export const SHOW_TAGS_LIST_FORM = 'SHOW_TAGS_LIST_FORM'
 export const SHOW_TAGS_LIST_SEARCH = 'SHOW_TAGS_LIST_SEARCH'
 export const ADD_TAG_TO_POINT_FORM = 'ADD_TAG_TO_POINT_FORM'
 export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
+export const UPDATE_SEARCH_SUGGESTIONS = 'UPDATE_SEARCH_SUGGESTIONS'
 
 
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
@@ -76,42 +76,6 @@ export const post_collection = (new_collection_data) => {
     })
   }
 }
-
-export const search_tag = (search_value) => {
-  return (dispatch, getState) => {
-    return new Promise((resolve, reject) => {
-      let url = base_url + '/tags/search/' + search_value;
-      fetch(url, {})
-        .then((response) => {
-          let promise = response.json();
-          promise.then(resp_body => {
-            let suggestions = resp_body.suggestions;
-            _.each(suggestions, function(suggestion){
-              suggestion.app = {in_focus: false};
-            });
-            let collections = getState().points.collections;
-            let collection = get_focused_array_item(collections);
-            let sections = collection.app.views.point_form.sections;
-            let tag_search = _.find(sections, section => {
-              section.search_suggestions = suggestions;
-            })
-            dispatch({
-              type: UPDATE_COLLECTION,
-              collection: collection,
-              collection_index: get_focused_array_index(collections)
-            });
-            resolve();
-          })
-        })
-        .catch((error)=> {
-          console.error('errrrrrrrr');
-          console.error(error)
-          resolve();
-        });
-    })
-  }
-}
-
 
 export const post_tag = (new_tag_data) => {
   return (dispatch, getState) => {
@@ -203,10 +167,11 @@ export const post_point = (point_data) => {
   }
 }
 
-export const search_collection = (search_value) => {
+
+export const search = (search_type, search_value) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
-      let url = base_url + '/collections/search/' + search_value;
+      let url = base_url + '/' + search_type + '/search/' + search_value;
       fetch(url, {})
         .then((response) => {
           let promise = response.json();
@@ -217,13 +182,10 @@ export const search_collection = (search_value) => {
             });
             let collections = getState().points.collections;
             let collection = get_focused_array_item(collections);
-            if (collection.app.is_new){
-              collection.app.sections.collection_search.search_suggestions = suggestions;
-            }
             dispatch({
-              type: UPDATE_COLLECTION,
-              collection: collection,
-              collection_index: get_focused_array_index(collections)
+              type: UPDATE_SEARCH_SUGGESTIONS,
+              collection_index: get_focused_array_index(collections),
+              suggestions
             });
             resolve();
           })
@@ -236,6 +198,7 @@ export const search_collection = (search_value) => {
     })
   }
 }
+
 
 const handle_point_form_command = (dispatch, collection_index, focused_collection, event) => {
   let sections = focused_collection.app.views.point_form.sections;
@@ -550,19 +513,6 @@ const ACTION_HANDLERS = {
     };
   },
 
-  [NEW_COLLECTION_SEARCH_SUGGESTIONS]: (state, action) => {
-    let index = action.collection_index;
-    return state
-    return {
-      ...state,
-      collections: [
-        ...state.collections.slice(0, index),
-        action.collection,
-        ...state.collections.slice(index + 1),
-      ]
-    };
-  },
-
   [MOVE_NEW_COLLECTION_SEARCH_FOCUS]: (state, action) => {
     let index = action.collection_index;
     let collection = action.collection;
@@ -718,18 +668,6 @@ const ACTION_HANDLERS = {
     };
   },
 
-  [UPDATE_COLLECTION]: (state, action) => {
-    let index = action.collection_index;
-    return {
-      ...state,
-      collections: [
-        ...state.collections.slice(0, index),
-        action.collection,
-        ...state.collections.slice(index + 1),
-      ]
-    };
-  },
-
   [UPDATE_APP_SECTION_STATE]: (state, action) => {
     let index = action.collection_index;
     let new_collections = [
@@ -746,6 +684,43 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       collections: new_collections
+    };
+  },
+
+  [UPDATE_SEARCH_SUGGESTIONS]: (state, action) => {
+    let index = action.collection_index;
+    let collection = state.collections[index];
+
+    if (collection.app.is_new){
+      collection.app.sections.collection_search.search_suggestions = action.suggestions;
+    } else {
+      let tags_search = _.find(collection.app.views.point_form.sections, section => {
+        return section.name === 'tags_search';
+      });
+      if (tags_search.app.in_focus){
+        tags_search.search_suggestions = action.suggestions;
+      }
+    }
+    let new_collections = [
+      ...state.collections.slice(0, index),
+      collection,
+      ...state.collections.slice(index + 1)
+    ];
+    return {
+      ...state,
+      collections: new_collections
+    };
+  },
+
+  [UPDATE_COLLECTION]: (state, action) => {
+    let index = action.collection_index;
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        action.collection,
+        ...state.collections.slice(index + 1),
+      ]
     };
   }
 }

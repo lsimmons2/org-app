@@ -19,7 +19,7 @@ class CollectionSearch extends React.Component {
   handle_value(e){
     let search_value = e.target.value;
     if (this.validate_search_value(search_value)){
-      this.props.search_collection(search_value);
+      this.props.search('collections', search_value);
     }
   }
 

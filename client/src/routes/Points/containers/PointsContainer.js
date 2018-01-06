@@ -2,10 +2,9 @@ import { connect } from 'react-redux'
 import {
   detect_keypress,
   post_collection,
-  search_collection,
   post_point,
   post_tag,
-  search_tag
+  search
 } from '../modules'
 
 import _ from 'underscore'
@@ -75,10 +74,9 @@ const getCategories = (globalState) => {
 const mapDispatchToProps = {
   post_collection,
   detect_keypress,
-  search_collection,
   post_point,
   post_tag,
-  search_tag
+  search
 }
 
 
