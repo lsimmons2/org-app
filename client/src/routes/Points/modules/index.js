@@ -169,12 +169,12 @@ export const post_point = (point_data) => {
 
 
 export const search = (search_type, search_value) => {
-  if (search_value.length < 1){
-    return dispatch({
-      type: IGNORE
-    })
-  }
   return (dispatch, getState) => {
+    if (search_value.length < 1){
+      return dispatch({
+        type: IGNORE
+      })
+    }
     return new Promise((resolve, reject) => {
       let url = base_url + '/' + search_type + '/search/' + search_value;
       fetch(url, {})
@@ -367,12 +367,12 @@ export const detect_keypress = (event) => {
       }
     }
 
-    if (focused_collection.app.views.point_form.in_focus){
+    else if (focused_collection.app.views.point_form.in_focus){
       handle_point_form_command(dispatch, collection_index, focused_collection, event);
     }
 
     //OTHER VIEWS
-    if (event.altKey && key === 'a'){
+    else if (event.altKey && key === 'a'){
       return dispatch({
         type: TOGGLE_POINT_FORM_VISIBILITY,
         collection: focused_collection,
