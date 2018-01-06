@@ -50,6 +50,7 @@ def post_points():
     new_point = Point(**new_point_data['point'])
     try:
         for tag_id in new_point_data['tag_ids']:
+            print 'adding tag with id', id
             tag = session.query(Tag).get(tag_id)
             new_point.tags.append(tag)
     except KeyError:
@@ -140,19 +141,23 @@ def search_collections(value):
 @app.route('/tags', methods=['POST'])
 def post_tag():
     session = Session()
-    new_tag_data = json.loads(request.json)
-    new_tag = Tag(**new_tag_data['tag'])
-    try:
-        collection_id = new_tag_data['collection_id']
-        collection = session.query(Collection).get(collection_id)
-        collection.tags.append(new_tag)
-        session.add(collection)
-    except KeyError as e:
-        session.add(new_tag)
+    tag_data = request.json
+    tag = Tag(**tag_data['tag'])
+    session.add(tag)
     session.commit()
-    added_tag = new_tag.serialize
+    added_tag = tag.serialize
     session.commit()
-    return jsonify(added_tag=added_tag)
+    return jsonify(tag=added_tag)
+
+
+@app.route('/tags/search/<string:value>')
+def search_tags(value):
+    session = Session()
+    suggested_tags = session.query(Tag)\
+        .filter(Tag.name.ilike('%'+value+'%')).all()
+    suggestions = [ { 'tag_id': c.tag_id, 'name': c.name } for c in suggested_tags ]
+    session.commit()
+    return jsonify(suggestions=suggestions)
 
 
 if __name__ == '__main__':

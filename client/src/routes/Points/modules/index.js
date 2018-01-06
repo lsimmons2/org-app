@@ -23,6 +23,8 @@ export const MOVE_POINT_FORM_TAG_FOCUS = 'MOVE_POINT_FORM_TAG_FOCUS'
 export const REMOVE_TAG_FROM_POINT_FORM = 'REMOVE_TAG_FROM_POINT_FORM'
 export const SHOW_TAGS_LIST_FORM = 'SHOW_TAGS_LIST_FORM'
 export const SHOW_TAGS_LIST_SEARCH = 'SHOW_TAGS_LIST_SEARCH'
+export const ADD_TAG_TO_POINT_FORM = 'ADD_TAG_TO_POINT_FORM'
+export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
 
 
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
@@ -75,12 +77,84 @@ export const post_collection = (new_collection_data) => {
   }
 }
 
+export const search_tag = (search_value) => {
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      let url = base_url + '/tags/search/' + search_value;
+      fetch(url, {})
+        .then((response) => {
+          let promise = response.json();
+          promise.then(resp_body => {
+            let suggestions = resp_body.suggestions;
+            _.each(suggestions, function(suggestion){
+              suggestion.app = {in_focus: false};
+            });
+            let collections = getState().points.collections;
+            let collection = get_focused_array_item(collections);
+            let sections = collection.app.views.point_form.sections;
+            let tag_search = _.find(sections, section => {
+              section.search_suggestions = suggestions;
+            })
+            dispatch({
+              type: UPDATE_COLLECTION,
+              collection: collection,
+              collection_index: get_focused_array_index(collections)
+            });
+            resolve();
+          })
+        })
+        .catch((error)=> {
+          console.error('errrrrrrrr');
+          console.error(error)
+          resolve();
+        });
+    })
+  }
+}
+
+
+export const post_tag = (new_tag_data) => {
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      let url = base_url + '/tags';
+      let post_body = JSON.stringify({tag:new_tag_data});
+      let req_options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: post_body
+      };
+      fetch(url, req_options)
+        .then((response) => {
+          let promise = response.json();
+          let collection_index = get_focused_array_index(getState().points.collections);
+          promise.then(resp_body => {
+            let tag = resp_body.tag;
+            tag.app = {'in_focus': false};
+            dispatch({
+              type: ADD_TAG_TO_POINT_FORM,
+              tag: tag,
+              collection_index
+            })
+            resolve();
+          })
+        })
+        .catch((error)=> {
+          console.error('errrrrrrrr');
+          console.error(error)
+          resolve();
+        });
+    })
+  }
+}
+
+
 const get_point_form_tag_ids = (collection) => {
 
   let tags = _.find(collection.app.views.point_form.sections, section => {
   return section.name === 'tags_list'
   }).tags;
-  console.log(tags);
   return _.map(tags, tag => {
     return tag.tag_id
   })
@@ -172,8 +246,7 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
         type: MOVE_POINT_FORM_SECTION_FOCUS,
         collection_index: collection_index,
         collection: focused_collection,
-        direction: 1
-      })
+        direction: 1 })
     } else if (key === 'k'){
       return dispatch({
         type: MOVE_POINT_FORM_SECTION_FOCUS,
@@ -213,19 +286,33 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
         collection: focused_collection,
         tag_index
       })
-    } else if (key === 'a'){
-      return dispatch({
-        type: SHOW_TAGS_LIST_FORM,
-        collection_index: collection_index,
-        collection: focused_collection
-      })
-    } else if (key === '/'){
-      return dispatch({
-        type: SHOW_TAGS_LIST_SEARCH,
-        collection_index: collection_index,
-        collection: focused_collection
-      })
     }
+  } else if (focused_section.name === 'tags_search'){
+    if (event.ctrlKey && key === 'j'){
+      return dispatch({
+        type: MOVE_TAG_SEARCH_FOCUS,
+        direction: 1,
+        collection_index,
+        collection: focused_collection
+      });
+    } else if (event.ctrlKey && key === 'k'){
+      return dispatch({
+        type: MOVE_TAG_SEARCH_FOCUS,
+        direction: -1,
+        collection_index,
+        collection: focused_collection
+      });
+    } else if (key === 'Enter'){
+      let tag = get_focused_array_item(focused_section.search_suggestions);
+      return dispatch({
+        type: ADD_TAG_TO_POINT_FORM,
+        collection_index,
+        tag
+      });
+    }
+    return dispatch({
+      type: IGNORE
+    })
   }
 }
 
@@ -434,6 +521,23 @@ const ACTION_HANDLERS = {
     };
   },
 
+  [ADD_TAG_TO_POINT_FORM]: (state, action) => {
+    let index = action.collection_index;
+    let collection = state.collections[index];
+    let tags_list = _.find(collection.app.views.point_form.sections, section => {
+      return section.name === 'tags_list'
+    });
+    tags_list.tags.push(action.tag);
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        collection,
+        ...state.collections.slice(index + 1),
+      ]
+    };
+  },
+
   [ADD_NEW_COLLECTION]: (state, action) => {
     let new_collections = state.collections.map(collection => {
       collection.app.in_focus = false;
@@ -463,6 +567,24 @@ const ACTION_HANDLERS = {
     let index = action.collection_index;
     let collection = action.collection;
     let suggestions = collection.app.sections.collection_search.search_suggestions
+    suggestions = move_array_focus(suggestions, action.direction);
+    return {
+      ...state,
+      collections: [
+        ...state.collections.slice(0, index),
+        collection,
+        ...state.collections.slice(index + 1),
+      ]
+    };
+  },
+
+  [MOVE_TAG_SEARCH_FOCUS]: (state, action) => {
+    let index = action.collection_index;
+    let collection = action.collection;
+    let sections = collection.app.views.point_form.sections;
+    let suggestions = _.find(sections, section => {
+      return section.name === 'tags_search';
+    }).search_suggestions;
     suggestions = move_array_focus(suggestions, action.direction);
     return {
       ...state,

@@ -3,7 +3,9 @@ import {
   detect_keypress,
   post_collection,
   search_collection,
-  post_point
+  post_point,
+  post_tag,
+  search_tag
 } from '../modules'
 
 import _ from 'underscore'
@@ -74,7 +76,9 @@ const mapDispatchToProps = {
   post_collection,
   detect_keypress,
   search_collection,
-  post_point
+  post_point,
+  post_tag,
+  search_tag
 }
 
 

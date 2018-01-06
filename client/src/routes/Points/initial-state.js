@@ -19,10 +19,10 @@ export const get_new_collection = () => ({
 
 
 export const get_new_tag = () => ({
-  name:'name1',
-  tag_id: 1,
+  name:'name' + i,
+  tag_id: i,
   app: {
-    in_focus: true
+    in_focus: false
   }
 })
 

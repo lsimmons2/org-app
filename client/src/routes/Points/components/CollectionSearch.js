@@ -68,6 +68,7 @@ class CollectionSearch extends React.Component {
           minLength={2}
           debounceTimeout={300}
           onChange={event => this.handle_value(event)}
+          placeholder='Search Collections'
         />
         {suggestions}
       </div>

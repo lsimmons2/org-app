@@ -27,6 +27,8 @@ class Points extends React.Component {
           post_collection={this.props.post_collection}
           search_collection={this.props.search_collection}
           post_point={this.props.post_point}
+          post_tag={this.props.post_tag}
+          search_tag={this.props.search_tag}
         />
       </div>
     )

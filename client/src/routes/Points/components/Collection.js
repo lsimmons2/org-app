@@ -24,6 +24,7 @@ class Collection extends React.Component {
         <PointForm
           app={collection.app.views.point_form}
           post_point={this.props.post_point}
+          search_tag={this.props.search_tag}
         />
       </div>
     )

@@ -33,6 +33,8 @@ class TabView extends React.Component {
       <Collection
         collection={collection}
         post_point={this.props.post_point}
+        post_tag={this.props.post_tag}
+        search_tag={this.props.search_tag}
       />
     )
   }

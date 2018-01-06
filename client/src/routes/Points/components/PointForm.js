@@ -98,22 +98,24 @@ class PointForm extends React.Component {
           <div className={answer_classes}>
             <textarea ref="answer" type="text" id="answer_input" placeholder="Answer"/>
           </div>
-          <TagsList
-            app={tags_list_section}
-            classes={tags_list_classes}
-          />
-          <TagForm
-            app={tag_form_section}
-            classes={tag_form_classes}
-          />
-          <TagSearch
-            app={tag_search_section}
-            classes={tag_search_classes}
-          />
           <div>
             <input type="submit"/>
           </div>
         </form>
+        <TagsList
+          app={tags_list_section}
+          classes={tags_list_classes}
+        />
+        <TagForm
+          app={tag_form_section}
+          classes={tag_form_classes}
+          post_tag={this.props.post_tag}
+        />
+        <TagSearch
+          app={tag_search_section}
+          classes={tag_search_classes}
+          search_tag={this.props.search_tag}
+        />
       </div>
     )
   }
