@@ -18,7 +18,7 @@ const mapStateToProps = (globalState) => {
   return {
     in_focus: tags_search.app.in_focus,
     search_suggestions: tags_search.search_suggestions,
-    search_type: 'collections'
+    search_type: 'tags'
   }
 }
 

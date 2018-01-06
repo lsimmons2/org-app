@@ -48,6 +48,9 @@ class Search extends React.Component {
       'big_section': true,
       'big_section_in_focus': this.props.in_focus
     });
+    let type = this.props.search_type;
+
+    let placeholder = 'Search ' + type.charAt(0).toUpperCase() + type.slice(1);
 
     return (
       <div className={classes}>
@@ -56,7 +59,7 @@ class Search extends React.Component {
           minLength={2}
           debounceTimeout={300}
           onChange={event => this.handle_search(event)}
-          placeholder='Search Collections'
+          placeholder={placeholder}
         />
         {suggestions}
       </div>
