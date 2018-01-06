@@ -16,9 +16,13 @@ class TagsList extends React.Component {
   }
 
   render(){
+    let classes = classNames({
+      'big_section': true,
+      'big_section_in_focus': this.props.in_focus
+    });
     return (
       <div>
-        <div className={this.props.classes}>
+        <div className={classes}>
           {this.get_tag_list()}
         </div>
       </div>

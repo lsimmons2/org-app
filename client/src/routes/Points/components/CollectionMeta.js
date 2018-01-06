@@ -5,7 +5,7 @@ import classNames from 'classnames'
 
 
 
-class NewCollectionView extends React.Component {
+class CollectionMeta extends React.Component {
 
   render(){
     let mode;
@@ -23,4 +23,4 @@ class NewCollectionView extends React.Component {
 }
 
 
-export default NewCollectionView
+export default CollectionMeta

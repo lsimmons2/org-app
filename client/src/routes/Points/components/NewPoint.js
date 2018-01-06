@@ -7,7 +7,7 @@ import TagForm from './TagForm'
 import TagSearchContainer from '../containers/TagSearchContainer'
 
 
-class PointForm extends React.Component {
+class NewPoint extends React.Component {
 
 
   submitPoint(e){
@@ -20,10 +20,10 @@ class PointForm extends React.Component {
   }
 
   componentDidUpdate(e){
-    if (!this.props.app.in_focus){
+    if (!this.props.view.in_focus){
       return;
     }
-    let sections = this.props.app.sections;
+    let sections = this.props.view.sections;
     let question_section = _.find(sections, function(section){
       return section.name === 'point_question_input';
     });
@@ -42,10 +42,10 @@ class PointForm extends React.Component {
 
   render(){
 
-    let app = this.props.app;
-    let sections = app.sections
+    let view = this.props.view;
+    let sections = view.sections
 
-    if (!app.in_focus){
+    if (!view.in_focus){
       return null;
     }
 
@@ -68,17 +68,9 @@ class PointForm extends React.Component {
     let tags_list_section = _.find(sections, function(section){
       return section.name === 'tags_list';
     });
-    let tags_list_classes = classNames({
-      'big_section': true,
-      'big_section_in_focus': tags_list_section.app.in_focus
-    });
 
     let tag_form_section = _.find(sections, function(section){
       return section.name === 'tag_form';
-    });
-    let tag_form_classes = classNames({
-      'big_section': true,
-      'big_section_in_focus': tag_form_section.app.in_focus
     });
 
     return (
@@ -90,14 +82,17 @@ class PointForm extends React.Component {
           <div className={answer_classes}>
             <textarea ref="answer" type="text" id="answer_input" placeholder="Answer"/>
           </div>
+          <div>
+            <input type="submit"/>
+          </div>
         </form>
         <TagsList
           app={tags_list_section}
-          classes={tags_list_classes}
+          in_focus={tags_list_section.app.in_focus}
         />
         <TagForm
           app={tag_form_section}
-          classes={tag_form_classes}
+          in_focus={tag_form_section.app.in_focus}
           post_tag={this.props.post_tag}
         />
         <TagSearchContainer/>
@@ -106,4 +101,4 @@ class PointForm extends React.Component {
   }
 }
 
-export default PointForm
+export default NewPoint

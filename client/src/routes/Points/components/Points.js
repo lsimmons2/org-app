@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import TabBarContainer from '../containers/TabBarContainer'
-import TabView from './TabView'
+import TabViewContainer from '../containers/TabViewContainer'
 import _ from 'underscore'
 
 class Points extends React.Component {
@@ -10,30 +10,15 @@ class Points extends React.Component {
     document.addEventListener('keydown', this.props.detect_keypress)
   }
 
-  get_collection_in_focus(){
-    let collection =  _.find(this.props.collections, function(collection) {
-      return collection.app.in_focus
-    });
-    return collection;
-  }
-
   render(){
-
     return (
       <div id="app-container">
         <TabBarContainer/>
-        <TabView
-          collection={this.get_collection_in_focus()}
-          post_collection={this.props.post_collection}
-          post_point={this.props.post_point}
-          post_tag={this.props.post_tag}
-          search={this.props.search}
-        />
+        <TabViewContainer/>
       </div>
     )
   }
 
 }
-
 
 export default Points

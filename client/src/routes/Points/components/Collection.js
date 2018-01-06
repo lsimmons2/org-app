@@ -1,9 +1,9 @@
 
 import React from 'react'
-
 import PointList from './PointList'
-import PointForm from './PointForm'
-import CollectionMeta from './CollectionMeta'
+import NewPointContainer from '../containers/NewPointContainer'
+import CollectionMetaContainer from '../containers/CollectionMetaContainer'
+import PointListContainer from '../containers/PointListContainer'
 
 
 
@@ -15,17 +15,9 @@ class Collection extends React.Component {
 
     return (
       <div>
-        <CollectionMeta
-          mode={collection.app.mode}
-        />
-        <PointList
-          points={collection.points}
-        />
-        <PointForm
-          app={collection.app.views.point_form}
-          post_point={this.props.post_point}
-          search={this.props.search}
-        />
+        <CollectionMetaContainer/>
+        <PointListContainer/>
+        <NewPointContainer/>
       </div>
     )
   }

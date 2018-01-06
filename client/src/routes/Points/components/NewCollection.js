@@ -8,13 +8,6 @@ import CollectionSearchContainer from '../containers/CollectionSearchContainer'
 class NewCollectionView extends React.Component {
 
   render(){
-
-    let collection = this.props.collection;
-
-    if (!collection){
-      return <div>waiting for new colleccc</div>;
-    }
-
     return (
       <div>
         <CollectionSearchContainer/>
@@ -22,6 +15,7 @@ class NewCollectionView extends React.Component {
       </div>
     )
   }
+
 }
 
 export default NewCollectionView

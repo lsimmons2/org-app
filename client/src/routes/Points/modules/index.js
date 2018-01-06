@@ -22,7 +22,7 @@ export const MOVE_POINT_FORM_TAG_FOCUS = 'MOVE_POINT_FORM_TAG_FOCUS'
 export const REMOVE_TAG_FROM_POINT_FORM = 'REMOVE_TAG_FROM_POINT_FORM'
 export const SHOW_TAGS_LIST_FORM = 'SHOW_TAGS_LIST_FORM'
 export const SHOW_TAGS_LIST_SEARCH = 'SHOW_TAGS_LIST_SEARCH'
-export const ADD_TAG_TO_POINT_FORM = 'ADD_TAG_TO_POINT_FORM'
+export const ADD_TAG_TO_NEW_POINT = 'ADD_TAG_TO_NEW_POINT'
 export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
 export const UPDATE_SEARCH_SUGGESTIONS = 'UPDATE_SEARCH_SUGGESTIONS'
 
@@ -97,7 +97,7 @@ export const post_tag = (new_tag_data) => {
             let tag = resp_body.tag;
             tag.app = {'in_focus': false};
             dispatch({
-              type: ADD_TAG_TO_POINT_FORM,
+              type: ADD_TAG_TO_NEW_POINT,
               tag: tag,
               collection_index
             })
@@ -273,7 +273,7 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
     } else if (key === 'Enter'){
       let tag = get_focused_array_item(focused_section.search_suggestions);
       return dispatch({
-        type: ADD_TAG_TO_POINT_FORM,
+        type: ADD_TAG_TO_NEW_POINT,
         collection_index,
         tag
       });
@@ -286,7 +286,6 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
 
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
-
     let collections = getState().points.collections;
     let collection_index = get_focused_array_index(collections);
     let focused_collection = get_focused_array_item(collections);
@@ -311,6 +310,7 @@ export const detect_keypress = (event) => {
           sections.collection_name_form.in_focus = true;
           sections.collection_search.in_focus = false;
         } else {
+          console.log('NONE 1');
           return dispatch({
             type: IGNORE
           })
@@ -372,7 +372,7 @@ export const detect_keypress = (event) => {
     }
 
     //OTHER VIEWS
-    else if (event.altKey && key === 'a'){
+    if (event.altKey && key === 'a'){
       return dispatch({
         type: TOGGLE_POINT_FORM_VISIBILITY,
         collection: focused_collection,
@@ -489,18 +489,36 @@ const ACTION_HANDLERS = {
     };
   },
 
-  [ADD_TAG_TO_POINT_FORM]: (state, action) => {
+  [ADD_TAG_TO_NEW_POINT]: (state, action) => {
     let index = action.collection_index;
     let collection = state.collections[index];
-    let tags_list = _.find(collection.app.views.point_form.sections, section => {
-      return section.name === 'tags_list'
+    let sections = collection.app.views.point_form.sections;
+    let section_i;
+    let tags_list = _.find(sections, (section, i) => {
+      if (section.name === 'tags_list'){ section_i = i; return true; };
     });
     tags_list.tags.push(action.tag);
     return {
       ...state,
       collections: [
         ...state.collections.slice(0, index),
-        collection,
+        {
+          ...collection,
+          app: {
+            ...collection.app,
+            views: {
+              ...collection.app.views,
+              point_form: {
+                ...collection.app.views.point_form,
+                sections: [
+                  ...collection.app.views.point_form.sections.slice(0,section_i),
+                  tags_list,
+                  ...collection.app.views.point_form.sections.slice(section_i+1),
+                ]
+              }
+            }
+          }
+        },
         ...state.collections.slice(index + 1),
       ]
     };
@@ -563,24 +581,57 @@ const ACTION_HANDLERS = {
       ...state,
       collections: [
         ...state.collections.slice(0, index),
-        collection,
-        ...state.collections.slice(index + 1),
+        {
+          ...collection,
+          app: {
+            ...collection.app,
+            views: {
+              ...collection.app.views,
+              point_form: {
+                ...collection.app.views.point_form,
+                sections: sections
+              }
+            }
+          }
+        },
+        ...state.collections.slice(index + 1)
       ]
     };
   },
 
   [MOVE_POINT_FORM_TAG_FOCUS]: (state, action) => {
     let index = action.collection_index;
-    let collection = action.collection;
-    let tags = _.find(collection.app.views.point_form.sections, section => {
-      return section.app.in_focus;
-    }).tags;
-    tags = move_array_focus(tags, action.direction);
+    let collection = state.collections[index];
+    let sections = collection.app.views.point_form.sections;
+    let section_i;
+    let tags_list = _.find(sections, (section, i) => {
+      if (section.name === 'tags_list'){ section_i = i; return true; };
+    });
+    let tags = move_array_focus(tags_list.tags, action.direction);
     return {
       ...state,
       collections: [
         ...state.collections.slice(0, index),
-        collection,
+        {
+          ...collection,
+          app: {
+            ...collection.app,
+            views: {
+              ...collection.app.views,
+              point_form: {
+                ...collection.app.views.point_form,
+                sections: [
+                  ...collection.app.views.point_form.sections.slice(0,section_i),
+                  {
+                    ...tags_list,
+                    tags: tags
+                  },
+                  ...collection.app.views.point_form.sections.slice(section_i+1),
+                ]
+              }
+            }
+          }
+        },
         ...state.collections.slice(index + 1),
       ]
     };
@@ -664,13 +715,25 @@ const ACTION_HANDLERS = {
 
   [TOGGLE_POINT_FORM_VISIBILITY]: (state, action) => {
     let collection = action.collection;
-    collection.app.views.point_form.in_focus = !collection.app.views.point_form.in_focus;
     let index = action.collection_index;
+    let point_form_in_focus = !collection.app.views.point_form.in_focus;
     return {
       ...state,
       collections: [
         ...state.collections.slice(0, index),
-        action.collection,
+        {
+          ...collection,
+          app: {
+            ...collection.app,
+            views: {
+              ...collection.app.views,
+              point_form: {
+                ...collection.app.views.point_form,
+                in_focus: point_form_in_focus
+              }
+            }
+          }
+        },
         ...state.collections.slice(index + 1),
       ]
     };

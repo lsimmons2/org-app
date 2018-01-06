@@ -29,10 +29,14 @@ class TagForm extends React.Component {
   }
 
   render(){
+    let classes = classNames({
+      'big_section': true,
+      'big_section_in_focus': this.props.in_focus
+    });
     return (
       <div>
         <form onSubmit={this.post_tag.bind(this)}>
-          <div className={this.props.classes}>
+          <div className={classes}>
             <input ref='name' type="text" placeholder="New Tag Name"/>
           </div>
         </form>
