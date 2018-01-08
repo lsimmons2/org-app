@@ -11,7 +11,6 @@ import store from '../../../main'
 
 export const IGNORE = 'IGNORE'
 export const ADD_NEW_COLLECTION = 'ADD_NEW_COLLECTION'
-export const UPDATE_COLLECTION = 'UPDATE_COLLECTION'
 export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
 export const TOGGLE_POINT_FORM_VISIBILITY = 'TOGGLE_POINT_FORM_VISIBILITY'
 export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
@@ -784,19 +783,8 @@ const ACTION_HANDLERS = {
       ...state,
       collections: new_collections
     };
-  },
-
-  [UPDATE_COLLECTION]: (state, action) => {
-    let index = action.collection_index;
-    return {
-      ...state,
-      collections: [
-        ...state.collections.slice(0, index),
-        action.collection,
-        ...state.collections.slice(index + 1),
-      ]
-    };
   }
+
 }
 
 
