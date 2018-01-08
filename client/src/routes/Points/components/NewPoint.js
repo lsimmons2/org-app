@@ -80,11 +80,9 @@ class NewPoint extends React.Component {
             <input ref="question" type="text" id="question_input" placeholder="Question"/>
           </div>
           <div className={answer_classes}>
-            <textarea ref="answer" type="text" id="answer_input" placeholder="Answer"/>
+            <input ref="answer" type="text" id="answer_input" placeholder="Answer"/>
           </div>
-          <div>
-            <input type="submit"/>
-          </div>
+          <input type="submit" style={{visibility:'hidden',height:'0'}}/>
         </form>
         <TagsList
           app={tags_list_section}
