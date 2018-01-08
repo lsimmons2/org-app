@@ -115,7 +115,6 @@ export const post_tag = (new_tag_data) => {
 
 
 const get_point_form_tag_ids = (collection) => {
-
   let tags = _.find(collection.app.views.point_form.sections, section => {
   return section.name === 'tags_list'
   }).tags;
@@ -310,7 +309,6 @@ export const detect_keypress = (event) => {
           sections.collection_name_form.in_focus = true;
           sections.collection_search.in_focus = false;
         } else {
-          console.log('NONE 1');
           return dispatch({
             type: IGNORE
           })
@@ -478,12 +476,17 @@ const ACTION_HANDLERS = {
   [ADD_POINT]: (state, action) => {
     let index = action.collection_index;
     let collection = state.collections[index];
-    collection.points.push(action.point);
     return {
       ...state,
       collections: [
         ...state.collections.slice(0, index),
-        collection,
+        {
+          ...collection,
+          points: [
+            action.point,
+            ...collection.points
+          ]
+        },
         ...state.collections.slice(index + 1),
       ]
     };
