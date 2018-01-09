@@ -1,44 +1,13 @@
 import React from 'react'
-import classNames from 'classnames'
 import _ from 'underscore'
 
 import TagsList from './TagsList'
 import TagForm from './TagForm'
+import PointForm from './PointForm'
 import TagSearchContainer from '../containers/TagSearchContainer'
 
 
 class NewPoint extends React.Component {
-
-
-  submitPoint(e){
-    e.preventDefault();
-    let form_data = {};
-    for (const field in this.refs){
-      form_data[field] = this.refs[field].value;
-    }
-    this.props.post_point(form_data);
-  }
-
-  componentDidUpdate(e){
-    if (!this.props.view.in_focus){
-      return;
-    }
-    let sections = this.props.view.sections;
-    let question_section = _.find(sections, function(section){
-      return section.name === 'point_question_input';
-    });
-    let answer_section = _.find(sections, function(section){
-      return section.name === 'point_answer_input';
-    });
-    if (question_section.in_focus){
-      this.refs['question'].focus();
-    } else if (answer_section.in_focus){
-      this.refs['answer'].focus();
-    } else {
-      this.refs['question'].blur();
-      this.refs['answer'].blur();
-    }
-  }
 
   render(){
 
@@ -52,19 +21,11 @@ class NewPoint extends React.Component {
     let question_section = _.find(sections, function(section){
       return section.name === 'point_question_input';
     });
-    let question_classes = classNames({
-      'big_section': true,
-      'big_section_in_focus': question_section.in_focus
-    });
 
     let answer_section = _.find(sections, function(section){
       return section.name === 'point_answer_input';
     });
-    let answer_classes = classNames({
-      'big_section': true,
-      'big_section_in_focus': answer_section.in_focus
-    });
-    
+
     let tags_list_section = _.find(sections, function(section){
       return section.name === 'tags_list';
     });
@@ -75,15 +36,11 @@ class NewPoint extends React.Component {
 
     return (
       <div>
-        <form onSubmit={this.submitPoint.bind(this)}>
-          <div className={question_classes}>
-            <input ref="question" type="text" id="question_input" placeholder="Question"/>
-          </div>
-          <div className={answer_classes}>
-            <input ref="answer" type="text" id="answer_input" placeholder="Answer"/>
-          </div>
-          <input type="submit" style={{visibility:'hidden',height:'0'}}/>
-        </form>
+        <PointForm
+          post_point={this.props.post_point}
+          question_section_in_focus={question_section.in_focus}
+          answer_section_in_focus={answer_section.in_focus}
+        />
         <TagsList
           tags={tags_list_section.tags}
           in_focus={tags_list_section.in_focus}
