@@ -11,8 +11,11 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (globalState) => {
   let collection = get_focused_array_item(globalState.points.collections);
+  let collection_name_form = _.find(collection.app.sections, section => {
+    return section.name === 'collection_name_form';
+  });
   return {
-    in_focus: collection.app.sections.collection_name_form.in_focus
+    in_focus: collection_name_form.in_focus
   }
 }
 

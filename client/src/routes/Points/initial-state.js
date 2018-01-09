@@ -5,15 +5,17 @@ export const get_new_collection = () => ({
   app: {
     in_focus: true,
     is_new: true,
-    sections: {
-      collection_search: {
+    sections: [
+      {
+        name: 'collection_search',
         in_focus: true,
         search_suggestions: []
       },
-      collection_name_form: {
+      {
+        name: 'collection_name_form',
         in_focus: false
       }
-    }
+    ]
   }
 })
 

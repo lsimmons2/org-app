@@ -376,26 +376,21 @@ export const detect_keypress = (event) => {
     if (focused_collection.app.is_new){
       let sections = focused_collection.app.sections;
       if (event.altKey){
-        if (sections.collection_name_form.in_focus && key == 'k'){
-          sections.collection_name_form.in_focus = false;
-          sections.collection_search.in_focus = true;
-        } else if (sections.collection_search.in_focus && key == 'j'){
-          sections.collection_name_form.in_focus = true;
-          sections.collection_search.in_focus = false;
+        if (key === 'k' || key === 'j'){
+          let direction = key === 'k' ? -1: 1;
+          return dispatch({
+            type: MOVE_SECTION_FOCUS,
+            new_section_state: sections,
+            collection: focused_collection,
+            direction, 
+            collection_index: collection_index
+          })
         } else {
           return dispatch({
             type: IGNORE
           })
         }
-        return dispatch({
-          type: UPDATE_APP_SECTION_STATE,
-          new_section_state: sections,
-          collection_index: collection_index
-        })
-      }
-      //will eventually be ctrl+j/n/k/p when I figure out
-      //how to disable these chrome key shortcuts
-      else if (sections.collection_search.in_focus){
+      } else {
         if (event.ctrlKey && key === 'j'){
           return dispatch({
             type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
@@ -411,9 +406,12 @@ export const detect_keypress = (event) => {
             collection: focused_collection
           });
         } else if (key === 'Enter'){
-          let collection = get_focused_array_item(sections.collection_search.search_suggestions);
+          let search_suggestions = _.find(sections, section => {
+            return section.name === 'collection_search';
+          }).search_suggestions;
+          let collection_to_fetch = get_focused_array_item(search_suggestions);
           return new Promise((resolve, reject) => {
-            let url = base_url + '/collections/' + collection.collection_id
+            let url = base_url + '/collections/' + collection_to_fetch.collection_id
             fetch(url, {})
               .then((response) => {
                 let promise = response.json();
@@ -637,9 +635,12 @@ const ACTION_HANDLERS = {
   [MOVE_NEW_COLLECTION_SEARCH_FOCUS]: (state, action) => {
     let index = action.collection_index;
     let collection = action.collection;
-    let suggestions = collection.app.sections.collection_search.search_suggestions
+    let collection_search = _.find(collection.app.sections, section => {
+      return section.name === 'collection_search';
+    })
+    let suggestions = collection_search.search_suggestions;
     suggestions = move_array_focus(suggestions, action.direction);
-    collection.app.sections.collection_search.search_suggestions = suggestions;
+    collection_search.search_suggestions = suggestions;
     return {
       ...state,
       collections: [
@@ -673,6 +674,23 @@ const ACTION_HANDLERS = {
   [MOVE_SECTION_FOCUS]: (state, action) => {
     let index = action.collection_index;
     let collection = action.collection;
+    if (collection.app.is_new){
+      let sections = move_array_focus(collection.app.sections, action.direction);
+      return {
+        ...state,
+        collections: [
+          ...state.collections.slice(0, index),
+          {
+            ...collection,
+            app: {
+              ...collection.app,
+              sections: sections
+            }
+          },
+          ...state.collections.slice(index + 1)
+        ]
+      };
+    }
     let focused_view = _.find(collection.app.views, view => {
       return view.in_focus;
     });
@@ -918,9 +936,11 @@ const ACTION_HANDLERS = {
   [UPDATE_SEARCH_SUGGESTIONS]: (state, action) => {
     let index = action.collection_index;
     let collection = state.collections[index];
-
     if (collection.app.is_new){
-      collection.app.sections.collection_search.search_suggestions = action.suggestions;
+      let collection_search = _.find(collection.app.sections, section => {
+        return section.name === 'collection_search';
+      });
+      collection_search.search_suggestions = action.suggestions;
     } else {
       let tags_search = _.find(collection.app.views.new_point.sections, section => {
         return section.name === 'tags_search';
