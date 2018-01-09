@@ -1,5 +1,4 @@
 
-
 #tab_bar {
 
   border-width: 0px 0px 2px 0px;
@@ -29,11 +28,9 @@
 
 }
 
-
 .list_item_in_focus {
   border: 1px solid $app_blue;
 }
-
 
 .big_section {
   border: 1px solid $app_purple;
@@ -41,11 +38,9 @@
   margin: 20px;
 }
 
-
 .big_section_in_focus {
   border-width: 6px;
 }
-
 
 .tag {
   border: 1px solid $app_green;
@@ -57,23 +52,6 @@
 .tag_in_focus {
   border: 3px solid $app_green;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .point-in-focus {
   border: solid 1px $app_purple;
@@ -116,39 +94,4 @@ input, textarea {
     margin: 15% auto;
     border: 10px solid $app_green;
     width: 80%;
-}
-
-#point-category-form {
-    margin: 5px auto;
-    border: 4px solid $app_green;
-    width: 80%;
-    .input-container {
-      margin: 6px;
-    }
-}
-
-#point-category-selector {
-    background-color: #272b33;
-    margin: 15% auto;
-    border: 10px solid $app_green;
-    width: 80%;
-}
-
-.category-list {
-  padding: 0;
-}
-
-.category-list-item {
-  //display: inline-block;
-  //margin: 0 5px;
-  list-style-type: none;
-  padding: none;
-}
-
-.point-category-in-focus {
-  border: 1px solid $app_purple;
-}
-
-.point-category-is-selected {
-  color: $app_blue;
 }

@@ -302,56 +302,6 @@ const handle_collection_editor_command  = (dispatch, collection_index, focused_c
       })
     }
   }
-  //let focused_section = _.find(sections, function(section){
-      //return section.app.in_focus;
-  //});
-  //if (focused_section.name === 'tags_list'){
-    //if (key === 'h'){
-      //return dispatch({
-        //type: MOVE_NEW_POINT_TAG_FOCUS,
-        //collection_index: collection_index,
-        //collection: focused_collection,
-        //direction: -1
-      //})
-    //} else if (key === 'l'){
-      //return dispatch({
-        //type: MOVE_NEW_POINT_TAG_FOCUS,
-        //collection_index: collection_index,
-        //collection: focused_collection,
-        //direction: 1
-      //})
-    //} else if (key === 'x'){
-      //let tag_index = get_focused_array_index(focused_section.tags);
-      //return dispatch({
-        //type: REMOVE_TAG_FROM_NEW_POINT,
-        //collection_index: collection_index,
-        //collection: focused_collection,
-        //tag_index
-      //})
-    //}
-  //} else if (focused_section.name === 'tags_search'){
-    //if (event.ctrlKey && key === 'j'){
-      //return dispatch({
-        //type: MOVE_TAG_SEARCH_FOCUS,
-        //direction: 1,
-        //collection_index,
-        //collection: focused_collection
-      //});
-    //} else if (event.ctrlKey && key === 'k'){
-      //return dispatch({
-        //type: MOVE_TAG_SEARCH_FOCUS,
-        //direction: -1,
-        //collection_index,
-        //collection: focused_collection
-      //});
-    //} else if (key === 'Enter'){
-      //let tag = get_focused_array_item(focused_section.search_suggestions);
-      //return dispatch({
-        //type: ADD_TAG_TO_NEW_POINT,
-        //collection_index,
-        //tag
-      //});
-    //}
   return dispatch({
     type: IGNORE
   })
