@@ -886,7 +886,7 @@ const ACTION_HANDLERS = {
       let tags_search = _.find(collection.app.views.new_point.sections, section => {
         return section.name === 'tags_search';
       });
-      if (tags_search.app.in_focus){
+      if (tags_search.in_focus){
         tags_search.search_suggestions = action.suggestions;
       }
     }
