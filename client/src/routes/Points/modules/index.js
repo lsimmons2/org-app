@@ -12,7 +12,6 @@ import store from '../../../main'
 export const IGNORE = 'IGNORE'
 export const ADD_NEW_COLLECTION = 'ADD_NEW_COLLECTION'
 export const ADD_POINT = 'ADD_POINT'
-export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
 export const TOGGLE_VIEW_VISIBILITY = 'TOGGLE_VIEW_VISIBILITY'
 export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
 export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
@@ -21,11 +20,8 @@ export const MOVE_SECTION_FOCUS = 'MOVE_SECTION_FOCUS'
 export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
 export const REMOVE_TAG_FROM_NEW_POINT = 'REMOVE_TAG_FROM_NEW_POINT'
-export const SHOW_TAGS_LIST_FORM = 'SHOW_TAGS_LIST_FORM'
-export const SHOW_TAGS_LIST_SEARCH = 'SHOW_TAGS_LIST_SEARCH'
 export const ADD_TAG_TO_NEW_POINT = 'ADD_TAG_TO_NEW_POINT'
 export const UPDATE_SEARCH_SUGGESTIONS = 'UPDATE_SEARCH_SUGGESTIONS'
-export const CHANGE_COLLECTION_MODE = 'CHANGE_COLLECTION_MODE'
 
 
 
@@ -761,42 +757,6 @@ const ACTION_HANDLERS = {
     };
   },
 
-  [SHOW_TAGS_LIST_FORM]: (state, action) => {
-    let collection = action.collection;
-    let index = action.collection_index;
-    let new_point_sections = collection.app.views.new_point.sections;
-    let tags_list = _.find(new_point_sections, section => {
-      return section.name == 'tags_list';
-    });
-    tags_list.app.show_form = !tags_list.app.show_form;
-    return {
-      ...state,
-      collections: [
-        ...state.collections.slice(0, index),
-        collection,
-        ...state.collections.slice(index + 1),
-      ]
-    };
-  },
-
-  [SHOW_TAGS_LIST_SEARCH]: (state, action) => {
-    let collection = action.collection;
-    let index = action.collection_index;
-    let new_point_sections = collection.app.views.new_point.sections;
-    let tags_list = _.find(new_point_sections, section => {
-      return section.name == 'tags_list';
-    });
-    tags_list.app.show_search = !tags_list.app.show_search;
-    return {
-      ...state,
-      collections: [
-        ...state.collections.slice(0, index),
-        collection,
-        ...state.collections.slice(index + 1),
-      ]
-    };
-  },
-
   [TOGGLE_VIEW_VISIBILITY]: (state, action) => {
     let collection = action.collection;
     let index = action.collection_index;
@@ -853,25 +813,6 @@ const ACTION_HANDLERS = {
         ]
       };
     }
-  },
-
-  [UPDATE_APP_SECTION_STATE]: (state, action) => {
-    let index = action.collection_index;
-    let new_collections = [
-      ...state.collections.slice(0, index),
-      {
-        ...state.collections[index],
-        app: {
-          ...state.collections[index].app,
-          sections: action.new_section_state
-        }
-      },
-      ...state.collections.slice(index + 1)
-    ];
-    return {
-      ...state,
-      collections: new_collections
-    };
   },
 
   [UPDATE_SEARCH_SUGGESTIONS]: (state, action) => {
