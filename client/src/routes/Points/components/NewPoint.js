@@ -85,7 +85,7 @@ class NewPoint extends React.Component {
           <input type="submit" style={{visibility:'hidden',height:'0'}}/>
         </form>
         <TagsList
-          app={tags_list_section}
+          tags={tags_list_section.tags}
           in_focus={tags_list_section.app.in_focus}
         />
         <TagForm

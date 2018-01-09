@@ -665,8 +665,6 @@ const ACTION_HANDLERS = {
       return view.in_focus;
     });
     let sections = focused_view.sections;
-    console.log('passing dess sectss');
-    console.log(sections);
     sections = move_array_focus(sections, action.direction);
     if (action.view_name === 'point_form'){
       return {

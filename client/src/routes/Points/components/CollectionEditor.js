@@ -31,6 +31,7 @@ class CollectionEditor extends React.Component {
         />
         <TagsList
           in_focus={tags_list_section.app.in_focus}
+          tags={this.props.tags}
         />
       </div>
     )

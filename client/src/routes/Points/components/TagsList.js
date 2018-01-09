@@ -1,6 +1,5 @@
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import Tag from './Tag'
 
@@ -9,7 +8,7 @@ import Tag from './Tag'
 class TagsList extends React.Component {
 
   get_tag_list(){
-    let list = this.props.app.tags.map(tag => {
+    let list = this.props.tags.map(tag => {
       return <Tag key={tag.tag_id} tag={tag}/>
     })
     return list
@@ -23,13 +22,12 @@ class TagsList extends React.Component {
     return (
       <div>
         <div className={classes}>
-          tags
+          {this.get_tag_list()}
         </div>
       </div>
     )
   }
 }
 
-          //{this.get_tag_list()}
 
 export default TagsList
