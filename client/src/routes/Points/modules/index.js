@@ -325,33 +325,24 @@ export const detect_keypress = (event) => {
     // NEW COLLECTION
     if (focused_collection.app.is_new){
       let sections = focused_collection.app.sections;
-      if (event.altKey){
-        if (key === 'k' || key === 'j'){
+      let focused_section_name = _.find(sections, section => {
+        return section.in_focus;
+      }).name;
+      if (event.altKey && (key === 'k' || key === 'j')){
+        let direction = key === 'k' ? -1: 1;
+        return dispatch({
+          type: MOVE_SECTION_FOCUS,
+          new_section_state: sections,
+          collection: focused_collection,
+          direction, 
+          collection_index: collection_index
+        })
+      } else if (focused_section_name === 'collection_search'){
+        if (event.ctrlKey && (key === 'j' || key === 'k')){
           let direction = key === 'k' ? -1: 1;
           return dispatch({
-            type: MOVE_SECTION_FOCUS,
-            new_section_state: sections,
-            collection: focused_collection,
-            direction, 
-            collection_index: collection_index
-          })
-        } else {
-          return dispatch({
-            type: IGNORE
-          })
-        }
-      } else {
-        if (event.ctrlKey && key === 'j'){
-          return dispatch({
             type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
-            direction: 1,
-            collection_index,
-            collection: focused_collection
-          });
-        } else if (event.ctrlKey && key === 'k'){
-          return dispatch({
-            type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
-            direction: -1,
+            direction: direction,
             collection_index,
             collection: focused_collection
           });
@@ -381,10 +372,10 @@ export const detect_keypress = (event) => {
               });
           })
         }
-        return dispatch({
-          type: IGNORE
-        })
       }
+      return dispatch({
+        type: IGNORE
+      })
     }
 
     else if (focused_collection.app.views.new_point.in_focus){
