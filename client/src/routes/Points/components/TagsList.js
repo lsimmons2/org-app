@@ -8,6 +8,9 @@ import Tag from './Tag'
 class TagsList extends React.Component {
 
   get_tag_list(){
+    if (!this.props.tags.length){
+      return <p>No tags</p>
+    }
     let list = this.props.tags.map(tag => {
       return <Tag key={tag.tag_id} tag={tag}/>
     })

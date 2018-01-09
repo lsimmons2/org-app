@@ -16,7 +16,7 @@ const mapStateToProps = (globalState) => {
     return section.name === 'tags_search'
   });
   return {
-    in_focus: tags_search.app.in_focus,
+    in_focus: tags_search.in_focus,
     search_suggestions: tags_search.search_suggestions,
     search_type: 'tags'
   }

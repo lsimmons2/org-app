@@ -226,7 +226,7 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
     }
   }
   let focused_section = _.find(sections, function(section){
-      return section.app.in_focus;
+      return section.in_focus;
   });
   if (focused_section.name === 'tags_list'){
     if (key === 'h'){
@@ -492,29 +492,41 @@ export const detect_keypress_global = (dispatch, event) => {
     }
 }
 
+const set_item_focus = (item, focus) => {
+  if (item.hasOwnProperty('app')){
+    item.app.in_focus = focus;
+  } else {
+    item.in_focus = focus;
+  }
+}
 
 const move_array_focus = (arr, direction) => {
   let new_arr = arr.slice();
   let first_time = true;
   for (let i = 0; i < new_arr.length; i++){
-    let item_app = new_arr[i].app;
-    if (item_app.in_focus){
+    let item_in_focus;
+    if (new_arr[i].hasOwnProperty('app')){
+      item_in_focus = new_arr[i].app.in_focus;
+    } else {
+      item_in_focus = new_arr[i].in_focus;
+    }
+    if (item_in_focus){
       first_time = false;
       if (direction === -1 && i !== 0){
-        item_app.in_focus = false;
-        new_arr[i-1].app.in_focus = true;
+        set_item_focus(new_arr[i], false)
+        set_item_focus(new_arr[i-1], true)
         break;
       } else if (direction === 1 && i !== new_arr.length -1){
-        item_app.in_focus = false;
-        new_arr[i+1].app.in_focus = true;
+        set_item_focus(new_arr[i], false)
+        set_item_focus(new_arr[i+1], true)
         break; }
     }
   }
   if (first_time){
     if (direction === -1){
-      new_arr[new_arr.length-1].app.in_focus = true;
+      set_item_focus(new_arr[new_arr.length-1], true)
     } else if (direction === 1){
-      new_arr[0].app.in_focus = true;
+      set_item_focus(new_arr[0], true)
     }
   }
   return new_arr
@@ -522,7 +534,7 @@ const move_array_focus = (arr, direction) => {
 
 const get_focused_array_index = (arr) => {
   for (let i = 0; i < arr.length; i++){
-    if (arr[i].app.in_focus){
+    if (arr[i].app.in_focus || arr[i].in_focus){
       return i;
     }
   }
@@ -531,7 +543,7 @@ const get_focused_array_index = (arr) => {
 
 export const get_focused_array_item = (arr) => {
   for (let i = 0; i < arr.length; i++){
-    if (arr[i].app.in_focus){
+    if (arr[i].app.in_focus || arr[i].in_focus){
       return arr[i]
     }
   }

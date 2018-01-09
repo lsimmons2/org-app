@@ -17,13 +17,13 @@ class TagForm extends React.Component {
   }
 
   componentDidMount(e){
-    if (this.props.app.app.in_focus){
+    if (this.props.section.in_focus){
       this.refs['name'].focus();
     }
   }
 
   componentDidUpdate(e){
-    if (this.props.app.app.in_focus){
+    if (this.props.section.in_focus){
       this.refs['name'].focus();
     }
   }
@@ -37,7 +37,7 @@ class TagForm extends React.Component {
       <div>
         <form onSubmit={this.post_tag.bind(this)}>
           <div className={classes}>
-            <input ref='name' type="text" placeholder="New Tag Name"/>
+            <input ref="name" type="text" placeholder="New Tag Name"/>
           </div>
         </form>
       </div>

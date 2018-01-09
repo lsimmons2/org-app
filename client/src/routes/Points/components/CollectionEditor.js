@@ -26,11 +26,11 @@ class CollectionEditor extends React.Component {
     return (
       <div>
         <CollectionModeEditor
-          in_focus={mode_section.app.in_focus}
+          in_focus={mode_section.in_focus}
           mode={this.props.mode}
         />
         <TagsList
-          in_focus={tags_list_section.app.in_focus}
+          in_focus={tags_list_section.in_focus}
           tags={this.props.tags}
         />
       </div>

@@ -30,9 +30,9 @@ class NewPoint extends React.Component {
     let answer_section = _.find(sections, function(section){
       return section.name === 'point_answer_input';
     });
-    if (question_section.app.in_focus){
+    if (question_section.in_focus){
       this.refs['question'].focus();
-    } else if (answer_section.app.in_focus){
+    } else if (answer_section.in_focus){
       this.refs['answer'].focus();
     } else {
       this.refs['question'].blur();
@@ -54,7 +54,7 @@ class NewPoint extends React.Component {
     });
     let question_classes = classNames({
       'big_section': true,
-      'big_section_in_focus': question_section.app.in_focus
+      'big_section_in_focus': question_section.in_focus
     });
 
     let answer_section = _.find(sections, function(section){
@@ -62,7 +62,7 @@ class NewPoint extends React.Component {
     });
     let answer_classes = classNames({
       'big_section': true,
-      'big_section_in_focus': answer_section.app.in_focus
+      'big_section_in_focus': answer_section.in_focus
     });
     
     let tags_list_section = _.find(sections, function(section){
@@ -86,11 +86,11 @@ class NewPoint extends React.Component {
         </form>
         <TagsList
           tags={tags_list_section.tags}
-          in_focus={tags_list_section.app.in_focus}
+          in_focus={tags_list_section.in_focus}
         />
         <TagForm
-          app={tag_form_section}
-          in_focus={tag_form_section.app.in_focus}
+          section={tag_form_section}
+          in_focus={tag_form_section.in_focus}
           post_tag={this.props.post_tag}
         />
         <TagSearchContainer/>

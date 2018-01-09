@@ -77,35 +77,25 @@ export const get_default_collection = () => ({
         sections: [
           {
             name: 'point_question_input',
-            app: {
-              in_focus: true
-            }
+            in_focus: true
           },
           {
             name: 'point_answer_input',
-            app: {
-              in_focus: false
-            }
+            in_focus: false
           },
           {
             name: 'tags_list',
             tags: [],
-            app: {
-              in_focus: false
-            }
+            in_focus: false
           },
           {
             name: 'tag_form',
-            app: {
-              in_focus: false
-            }
+            in_focus: false
           },
           {
             name: 'tags_search',
             search_suggestions: [],
-            app: {
-              in_focus: false
-            }
+            in_focus: false
           }
         ]
       },
@@ -133,47 +123,32 @@ export const get_default_collection = () => ({
         sections: [
           {
             name: 'mode_form',
-            app: {
-              in_focus: true
-            }
+            in_focus: true
           },
           {
             name: 'tags_list',
-            tags: [],
-            app: {
-              in_focus: false
-            }
+            in_focus: false
           },
           {
             name: 'collection_name_form',
-            app: {
-              in_focus: false
-            }
+            in_focus: false
           },
           {
             name: 'point_answer_input',
-            app: {
-              in_focus: false
-            }
+            in_focus: false
           },
           {
             name: 'tag_form',
-            app: {
-              in_focus: false
-            }
+            in_focus: false
           },
           {
             name: 'tags_search',
             search_suggestions: [],
-            app: {
-              in_focus: false
-            }
+            in_focus: false
           },
           {
             name: 'filter_form',
-            app: {
-              in_focus: false
-            }
+            in_focus: false
           }
         ]
       }
