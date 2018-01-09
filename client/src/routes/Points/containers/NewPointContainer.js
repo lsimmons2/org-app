@@ -12,7 +12,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (globalState) => {
   let collection = get_focused_array_item(globalState.points.collections);
-  let view = collection.app.views.point_form;
+  let view = collection.app.views.new_point;
   return {
     view,
     search,

@@ -71,8 +71,8 @@ export const get_default_collection = () => ({
         in_focus: true
       },
 
-      //VIEW: POINT_FORM
-      point_form: {
+      //VIEW: NEW_POINT
+      new_point: {
         in_focus: false,
         sections: [
           {

@@ -16,11 +16,11 @@ export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
 export const TOGGLE_VIEW_VISIBILITY = 'TOGGLE_VIEW_VISIBILITY'
 export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
 export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
-export const MOVE_POINT_FORM_TAG_FOCUS = 'MOVE_POINT_FORM_TAG_FOCUS'
+export const MOVE_NEW_POINT_TAG_FOCUS = 'MOVE_NEW_POINT_TAG_FOCUS'
 export const MOVE_SECTION_FOCUS = 'MOVE_SECTION_FOCUS'
 export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
-export const REMOVE_TAG_FROM_POINT_FORM = 'REMOVE_TAG_FROM_POINT_FORM'
+export const REMOVE_TAG_FROM_NEW_POINT = 'REMOVE_TAG_FROM_NEW_POINT'
 export const SHOW_TAGS_LIST_FORM = 'SHOW_TAGS_LIST_FORM'
 export const SHOW_TAGS_LIST_SEARCH = 'SHOW_TAGS_LIST_SEARCH'
 export const ADD_TAG_TO_NEW_POINT = 'ADD_TAG_TO_NEW_POINT'
@@ -110,8 +110,8 @@ export const post_tag = (new_tag_data) => {
 }
 
 
-const get_point_form_tag_ids = (collection) => {
-  let tags = _.find(collection.app.views.point_form.sections, section => {
+const get_new_point_tag_ids = (collection) => {
+  let tags = _.find(collection.app.views.new_point.sections, section => {
   return section.name === 'tags_list'
   }).tags;
   return _.map(tags, tag => {
@@ -127,7 +127,7 @@ export const post_point = (point_data) => {
       let focused_collection = get_focused_array_item(collections);
       let tag_ids = [];
       if (focused_collection.app.mode.select_points){
-        tag_ids = get_point_form_tag_ids(focused_collection)
+        tag_ids = get_new_point_tag_ids(focused_collection)
       }
       let post_body = JSON.stringify({point:point_data, tag_ids:tag_ids});
       let req_options = {
@@ -200,8 +200,8 @@ export const search = (search_type, search_value) => {
 }
 
 
-const handle_point_form_command = (dispatch, collection_index, focused_collection, event) => {
-  let sections = focused_collection.app.views.point_form.sections;
+const handle_new_point_command = (dispatch, collection_index, focused_collection, event) => {
+  let sections = focused_collection.app.views.new_point.sections;
   let key = event.key;
   if (event.altKey){
     if (key === 'j'){
@@ -209,14 +209,14 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
         type: MOVE_SECTION_FOCUS,
         collection_index: collection_index,
         collection: focused_collection,
-        view_name: 'point_form',
+        view_name: 'new_point',
         direction: 1 })
     } else if (key === 'k'){
       return dispatch({
         type: MOVE_SECTION_FOCUS,
         collection_index: collection_index,
         collection: focused_collection,
-        view_name: 'point_form',
+        view_name: 'new_point',
         direction: -1
       })
     } else {
@@ -231,14 +231,14 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
   if (focused_section.name === 'tags_list'){
     if (key === 'h'){
       return dispatch({
-        type: MOVE_POINT_FORM_TAG_FOCUS,
+        type: MOVE_NEW_POINT_TAG_FOCUS,
         collection_index: collection_index,
         collection: focused_collection,
         direction: -1
       })
     } else if (key === 'l'){
       return dispatch({
-        type: MOVE_POINT_FORM_TAG_FOCUS,
+        type: MOVE_NEW_POINT_TAG_FOCUS,
         collection_index: collection_index,
         collection: focused_collection,
         direction: 1
@@ -246,7 +246,7 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
     } else if (key === 'x'){
       let tag_index = get_focused_array_index(focused_section.tags);
       return dispatch({
-        type: REMOVE_TAG_FROM_POINT_FORM,
+        type: REMOVE_TAG_FROM_NEW_POINT,
         collection_index: collection_index,
         collection: focused_collection,
         tag_index
@@ -282,7 +282,7 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
 }
 
 const handle_collection_editor_command  = (dispatch, collection_index, focused_collection, event) => {
-  let sections = focused_collection.app.views.point_form.sections;
+  let sections = focused_collection.app.views.new_point.sections;
   let key = event.key;
   if (event.altKey){
     if (key === 'j'){
@@ -308,14 +308,14 @@ const handle_collection_editor_command  = (dispatch, collection_index, focused_c
   //if (focused_section.name === 'tags_list'){
     //if (key === 'h'){
       //return dispatch({
-        //type: MOVE_POINT_FORM_TAG_FOCUS,
+        //type: MOVE_NEW_POINT_TAG_FOCUS,
         //collection_index: collection_index,
         //collection: focused_collection,
         //direction: -1
       //})
     //} else if (key === 'l'){
       //return dispatch({
-        //type: MOVE_POINT_FORM_TAG_FOCUS,
+        //type: MOVE_NEW_POINT_TAG_FOCUS,
         //collection_index: collection_index,
         //collection: focused_collection,
         //direction: 1
@@ -323,7 +323,7 @@ const handle_collection_editor_command  = (dispatch, collection_index, focused_c
     //} else if (key === 'x'){
       //let tag_index = get_focused_array_index(focused_section.tags);
       //return dispatch({
-        //type: REMOVE_TAG_FROM_POINT_FORM,
+        //type: REMOVE_TAG_FROM_NEW_POINT,
         //collection_index: collection_index,
         //collection: focused_collection,
         //tag_index
@@ -439,8 +439,8 @@ export const detect_keypress = (event) => {
       }
     }
 
-    else if (focused_collection.app.views.point_form.in_focus){
-      handle_point_form_command(dispatch, collection_index, focused_collection, event);
+    else if (focused_collection.app.views.new_point.in_focus){
+      handle_new_point_command(dispatch, collection_index, focused_collection, event);
     } else if (focused_collection.app.views.collection_editor.in_focus){
       handle_collection_editor_command(dispatch, collection_index, focused_collection, event);
     }
@@ -450,7 +450,7 @@ export const detect_keypress = (event) => {
       return dispatch({
         type: TOGGLE_VIEW_VISIBILITY,
         collection: focused_collection,
-        view_name: 'point_form',
+        view_name: 'new_point',
         collection_index
       })
     } else if (event.altKey && key === 'c'){
@@ -590,7 +590,7 @@ const ACTION_HANDLERS = {
   [ADD_TAG_TO_NEW_POINT]: (state, action) => {
     let index = action.collection_index;
     let collection = state.collections[index];
-    let sections = collection.app.views.point_form.sections;
+    let sections = collection.app.views.new_point.sections;
     let section_i;
     let tags_list = _.find(sections, (section, i) => {
       if (section.name === 'tags_list'){ section_i = i; return true; };
@@ -606,12 +606,12 @@ const ACTION_HANDLERS = {
             ...collection.app,
             views: {
               ...collection.app.views,
-              point_form: {
-                ...collection.app.views.point_form,
+              new_point: {
+                ...collection.app.views.new_point,
                 sections: [
-                  ...collection.app.views.point_form.sections.slice(0,section_i),
+                  ...collection.app.views.new_point.sections.slice(0,section_i),
                   tags_list,
-                  ...collection.app.views.point_form.sections.slice(section_i+1),
+                  ...collection.app.views.new_point.sections.slice(section_i+1),
                 ]
               }
             }
@@ -653,7 +653,7 @@ const ACTION_HANDLERS = {
   [MOVE_TAG_SEARCH_FOCUS]: (state, action) => {
     let index = action.collection_index;
     let collection = action.collection;
-    let sections = collection.app.views.point_form.sections;
+    let sections = collection.app.views.new_point.sections;
     let tags_search = _.find(sections, section => {
       return section.name === 'tags_search';
     });
@@ -678,7 +678,7 @@ const ACTION_HANDLERS = {
     });
     let sections = focused_view.sections;
     sections = move_array_focus(sections, action.direction);
-    if (action.view_name === 'point_form'){
+    if (action.view_name === 'new_point'){
       return {
         ...state,
         collections: [
@@ -689,8 +689,8 @@ const ACTION_HANDLERS = {
               ...collection.app,
               views: {
                 ...collection.app.views,
-                point_form: {
-                  ...collection.app.views.point_form,
+                new_point: {
+                  ...collection.app.views.new_point,
                   sections: sections
                 }
               }
@@ -724,10 +724,10 @@ const ACTION_HANDLERS = {
 
   },
 
-  [MOVE_POINT_FORM_TAG_FOCUS]: (state, action) => {
+  [MOVE_NEW_POINT_TAG_FOCUS]: (state, action) => {
     let index = action.collection_index;
     let collection = state.collections[index];
-    let sections = collection.app.views.point_form.sections;
+    let sections = collection.app.views.new_point.sections;
     let section_i;
     let tags_list = _.find(sections, (section, i) => {
       if (section.name === 'tags_list'){ section_i = i; return true; };
@@ -743,15 +743,15 @@ const ACTION_HANDLERS = {
             ...collection.app,
             views: {
               ...collection.app.views,
-              point_form: {
-                ...collection.app.views.point_form,
+              new_point: {
+                ...collection.app.views.new_point,
                 sections: [
-                  ...collection.app.views.point_form.sections.slice(0,section_i),
+                  ...collection.app.views.new_point.sections.slice(0,section_i),
                   {
                     ...tags_list,
                     tags: tags
                   },
-                  ...collection.app.views.point_form.sections.slice(section_i+1),
+                  ...collection.app.views.new_point.sections.slice(section_i+1),
                 ]
               }
             }
@@ -762,11 +762,11 @@ const ACTION_HANDLERS = {
     };
   },
 
-  [REMOVE_TAG_FROM_POINT_FORM]: (state, action) => {
+  [REMOVE_TAG_FROM_NEW_POINT]: (state, action) => {
     let collection = action.collection;
     let index = action.collection_index;
     let tag_index = action.tag_index;
-    let tags_list = _.find(collection.app.views.point_form.sections, section => {
+    let tags_list = _.find(collection.app.views.new_point.sections, section => {
       return section.name === 'tags_list';
     }).tags;
     if (tags_list.length > 1){
@@ -805,8 +805,8 @@ const ACTION_HANDLERS = {
   [SHOW_TAGS_LIST_FORM]: (state, action) => {
     let collection = action.collection;
     let index = action.collection_index;
-    let point_form_sections = collection.app.views.point_form.sections;
-    let tags_list = _.find(point_form_sections, section => {
+    let new_point_sections = collection.app.views.new_point.sections;
+    let tags_list = _.find(new_point_sections, section => {
       return section.name == 'tags_list';
     });
     tags_list.app.show_form = !tags_list.app.show_form;
@@ -823,8 +823,8 @@ const ACTION_HANDLERS = {
   [SHOW_TAGS_LIST_SEARCH]: (state, action) => {
     let collection = action.collection;
     let index = action.collection_index;
-    let point_form_sections = collection.app.views.point_form.sections;
-    let tags_list = _.find(point_form_sections, section => {
+    let new_point_sections = collection.app.views.new_point.sections;
+    let tags_list = _.find(new_point_sections, section => {
       return section.name == 'tags_list';
     });
     tags_list.app.show_search = !tags_list.app.show_search;
@@ -841,8 +841,8 @@ const ACTION_HANDLERS = {
   [TOGGLE_VIEW_VISIBILITY]: (state, action) => {
     let collection = action.collection;
     let index = action.collection_index;
-    if (action.view_name === 'point_form'){
-      let view_in_focus = !collection.app.views.point_form.in_focus;
+    if (action.view_name === 'new_point'){
+      let view_in_focus = !collection.app.views.new_point.in_focus;
       let point_list_in_focus = !view_in_focus;
       return {
         ...state,
@@ -854,8 +854,8 @@ const ACTION_HANDLERS = {
               ...collection.app,
               views: {
                 ...collection.app.views,
-                point_form: {
-                  ...collection.app.views.point_form,
+                new_point: {
+                  ...collection.app.views.new_point,
                   in_focus: view_in_focus
                 },
                 point_list: {
@@ -922,7 +922,7 @@ const ACTION_HANDLERS = {
     if (collection.app.is_new){
       collection.app.sections.collection_search.search_suggestions = action.suggestions;
     } else {
-      let tags_search = _.find(collection.app.views.point_form.sections, section => {
+      let tags_search = _.find(collection.app.views.new_point.sections, section => {
         return section.name === 'tags_search';
       });
       if (tags_search.app.in_focus){

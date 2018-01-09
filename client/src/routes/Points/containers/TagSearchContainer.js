@@ -11,7 +11,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (globalState) => {
   let collection = get_focused_array_item(globalState.points.collections);
-  let sections = collection.app.views.point_form.sections;
+  let sections = collection.app.views.new_point.sections;
   let tags_search = _.find(sections, section => {
     return section.name === 'tags_search'
   });
