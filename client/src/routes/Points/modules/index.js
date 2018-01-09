@@ -11,22 +11,23 @@ import store from '../../../main'
 
 export const IGNORE = 'IGNORE'
 export const ADD_NEW_COLLECTION = 'ADD_NEW_COLLECTION'
-export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
-export const TOGGLE_POINT_FORM_VISIBILITY = 'TOGGLE_POINT_FORM_VISIBILITY'
-export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
-export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
-export const MOVE_POINT_FORM_SECTION_FOCUS = 'MOVE_POINT_FORM_SECTION_FOCUS'
 export const ADD_POINT = 'ADD_POINT'
+export const UPDATE_APP_SECTION_STATE = 'UPDATE_APP_SECTION_STATE'
+export const TOGGLE_VIEW_VISIBILITY = 'TOGGLE_VIEW_VISIBILITY'
+export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
+export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
 export const MOVE_POINT_FORM_TAG_FOCUS = 'MOVE_POINT_FORM_TAG_FOCUS'
+export const MOVE_SECTION_FOCUS = 'MOVE_SECTION_FOCUS'
+export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
+export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
 export const REMOVE_TAG_FROM_POINT_FORM = 'REMOVE_TAG_FROM_POINT_FORM'
 export const SHOW_TAGS_LIST_FORM = 'SHOW_TAGS_LIST_FORM'
 export const SHOW_TAGS_LIST_SEARCH = 'SHOW_TAGS_LIST_SEARCH'
 export const ADD_TAG_TO_NEW_POINT = 'ADD_TAG_TO_NEW_POINT'
-export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
 export const UPDATE_SEARCH_SUGGESTIONS = 'UPDATE_SEARCH_SUGGESTIONS'
+export const CHANGE_COLLECTION_MODE = 'CHANGE_COLLECTION_MODE'
 
 
-export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
 
 
 //TODO: this should probs be stored somewhere else
@@ -53,11 +54,7 @@ export const post_collection = (new_collection_data) => {
           promise.then(resp_body => {
             let collection = resp_body.collection;
             collection.app = get_default_collection().app;
-            collection.points = [
-              {point_id: 1, question:'sah?', answer:'sah'},
-              {point_id: 2, question:'sahh?', answer:'sahh'},
-              {point_id: 3, question:'sahhh?', answer:'sahhh'}
-            ];
+            collection.points = [];
             collection.tags = [];
             dispatch({
               type: REPLACE_COLLECTION,
@@ -209,15 +206,17 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
   if (event.altKey){
     if (key === 'j'){
       return dispatch({
-        type: MOVE_POINT_FORM_SECTION_FOCUS,
+        type: MOVE_SECTION_FOCUS,
         collection_index: collection_index,
         collection: focused_collection,
+        view_name: 'point_form',
         direction: 1 })
     } else if (key === 'k'){
       return dispatch({
-        type: MOVE_POINT_FORM_SECTION_FOCUS,
+        type: MOVE_SECTION_FOCUS,
         collection_index: collection_index,
         collection: focused_collection,
+        view_name: 'point_form',
         direction: -1
       })
     } else {
@@ -280,6 +279,82 @@ const handle_point_form_command = (dispatch, collection_index, focused_collectio
       type: IGNORE
     })
   }
+}
+
+const handle_collection_editor_command  = (dispatch, collection_index, focused_collection, event) => {
+  let sections = focused_collection.app.views.point_form.sections;
+  let key = event.key;
+  if (event.altKey){
+    if (key === 'j'){
+      return dispatch({
+        type: MOVE_SECTION_FOCUS,
+        collection_index: collection_index,
+        collection: focused_collection,
+        view_name: 'collection_editor',
+        direction: 1 })
+    } else if (key === 'k'){
+      return dispatch({
+        type: MOVE_SECTION_FOCUS,
+        collection_index: collection_index,
+        collection: focused_collection,
+        view_name: 'collection_editor',
+        direction: -1
+      })
+    }
+  }
+  //let focused_section = _.find(sections, function(section){
+      //return section.app.in_focus;
+  //});
+  //if (focused_section.name === 'tags_list'){
+    //if (key === 'h'){
+      //return dispatch({
+        //type: MOVE_POINT_FORM_TAG_FOCUS,
+        //collection_index: collection_index,
+        //collection: focused_collection,
+        //direction: -1
+      //})
+    //} else if (key === 'l'){
+      //return dispatch({
+        //type: MOVE_POINT_FORM_TAG_FOCUS,
+        //collection_index: collection_index,
+        //collection: focused_collection,
+        //direction: 1
+      //})
+    //} else if (key === 'x'){
+      //let tag_index = get_focused_array_index(focused_section.tags);
+      //return dispatch({
+        //type: REMOVE_TAG_FROM_POINT_FORM,
+        //collection_index: collection_index,
+        //collection: focused_collection,
+        //tag_index
+      //})
+    //}
+  //} else if (focused_section.name === 'tags_search'){
+    //if (event.ctrlKey && key === 'j'){
+      //return dispatch({
+        //type: MOVE_TAG_SEARCH_FOCUS,
+        //direction: 1,
+        //collection_index,
+        //collection: focused_collection
+      //});
+    //} else if (event.ctrlKey && key === 'k'){
+      //return dispatch({
+        //type: MOVE_TAG_SEARCH_FOCUS,
+        //direction: -1,
+        //collection_index,
+        //collection: focused_collection
+      //});
+    //} else if (key === 'Enter'){
+      //let tag = get_focused_array_item(focused_section.search_suggestions);
+      //return dispatch({
+        //type: ADD_TAG_TO_NEW_POINT,
+        //collection_index,
+        //tag
+      //});
+    //}
+  return dispatch({
+    type: IGNORE
+  })
 }
 
 export const detect_keypress = (event) => {
@@ -366,13 +441,23 @@ export const detect_keypress = (event) => {
 
     else if (focused_collection.app.views.point_form.in_focus){
       handle_point_form_command(dispatch, collection_index, focused_collection, event);
+    } else if (focused_collection.app.views.collection_editor.in_focus){
+      handle_collection_editor_command(dispatch, collection_index, focused_collection, event);
     }
 
     //OTHER VIEWS
     if (event.altKey && key === 'a'){
       return dispatch({
-        type: TOGGLE_POINT_FORM_VISIBILITY,
+        type: TOGGLE_VIEW_VISIBILITY,
         collection: focused_collection,
+        view_name: 'point_form',
+        collection_index
+      })
+    } else if (event.altKey && key === 'c'){
+      return dispatch({
+        type: TOGGLE_VIEW_VISIBILITY,
+        collection: focused_collection,
+        view_name: 'collection_editor',
         collection_index
       })
     }
@@ -422,8 +507,7 @@ const move_array_focus = (arr, direction) => {
       } else if (direction === 1 && i !== new_arr.length -1){
         item_app.in_focus = false;
         new_arr[i+1].app.in_focus = true;
-        break;
-      }
+        break; }
     }
   }
   if (first_time){
@@ -574,31 +658,60 @@ const ACTION_HANDLERS = {
     };
   },
 
-  [MOVE_POINT_FORM_SECTION_FOCUS]: (state, action) => {
+  [MOVE_SECTION_FOCUS]: (state, action) => {
     let index = action.collection_index;
     let collection = action.collection;
-    let sections = collection.app.views.point_form.sections;
+    let focused_view = _.find(collection.app.views, view => {
+      return view.in_focus;
+    });
+    let sections = focused_view.sections;
+    console.log('passing dess sectss');
+    console.log(sections);
     sections = move_array_focus(sections, action.direction);
-    return {
-      ...state,
-      collections: [
-        ...state.collections.slice(0, index),
-        {
-          ...collection,
-          app: {
-            ...collection.app,
-            views: {
-              ...collection.app.views,
-              point_form: {
-                ...collection.app.views.point_form,
-                sections: sections
+    if (action.view_name === 'point_form'){
+      return {
+        ...state,
+        collections: [
+          ...state.collections.slice(0, index),
+          {
+            ...collection,
+            app: {
+              ...collection.app,
+              views: {
+                ...collection.app.views,
+                point_form: {
+                  ...collection.app.views.point_form,
+                  sections: sections
+                }
               }
             }
-          }
-        },
-        ...state.collections.slice(index + 1)
-      ]
-    };
+          },
+          ...state.collections.slice(index + 1)
+        ]
+      };
+    } else if (action.view_name === 'collection_editor'){
+      return {
+        ...state,
+        collections: [
+          ...state.collections.slice(0, index),
+          {
+            ...collection,
+            app: {
+              ...collection.app,
+              views: {
+                ...collection.app.views,
+                collection_editor: {
+                  ...collection.app.views.collection_editor,
+                  sections: sections
+                }
+              }
+            }
+          },
+          ...state.collections.slice(index + 1)
+        ]
+      };
+    }
+
   },
 
   [MOVE_POINT_FORM_TAG_FOCUS]: (state, action) => {
@@ -715,30 +828,62 @@ const ACTION_HANDLERS = {
     };
   },
 
-  [TOGGLE_POINT_FORM_VISIBILITY]: (state, action) => {
+  [TOGGLE_VIEW_VISIBILITY]: (state, action) => {
     let collection = action.collection;
     let index = action.collection_index;
-    let point_form_in_focus = !collection.app.views.point_form.in_focus;
-    return {
-      ...state,
-      collections: [
-        ...state.collections.slice(0, index),
-        {
-          ...collection,
-          app: {
-            ...collection.app,
-            views: {
-              ...collection.app.views,
-              point_form: {
-                ...collection.app.views.point_form,
-                in_focus: point_form_in_focus
+    if (action.view_name === 'point_form'){
+      let view_in_focus = !collection.app.views.point_form.in_focus;
+      let point_list_in_focus = !view_in_focus;
+      return {
+        ...state,
+        collections: [
+          ...state.collections.slice(0, index),
+          {
+            ...collection,
+            app: {
+              ...collection.app,
+              views: {
+                ...collection.app.views,
+                point_form: {
+                  ...collection.app.views.point_form,
+                  in_focus: view_in_focus
+                },
+                point_list: {
+                  in_focus: point_list_in_focus
+                }
               }
             }
-          }
-        },
-        ...state.collections.slice(index + 1),
-      ]
-    };
+          },
+          ...state.collections.slice(index + 1),
+        ]
+      };
+    } else if (action.view_name === 'collection_editor'){
+      let view_in_focus = !collection.app.views.collection_editor.in_focus;
+      let point_list_in_focus = !view_in_focus;
+      return {
+        ...state,
+        collections: [
+          ...state.collections.slice(0, index),
+          {
+            ...collection,
+            app: {
+              ...collection.app,
+              views: {
+                ...collection.app.views,
+                collection_editor: {
+                  ...collection.app.views.collection_editor,
+                  in_focus: view_in_focus
+                },
+                point_list: {
+                  in_focus: point_list_in_focus
+                }
+              }
+            }
+          },
+          ...state.collections.slice(index + 1),
+        ]
+      };
+    }
   },
 
   [UPDATE_APP_SECTION_STATE]: (state, action) => {

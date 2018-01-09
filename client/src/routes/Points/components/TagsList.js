@@ -23,12 +23,13 @@ class TagsList extends React.Component {
     return (
       <div>
         <div className={classes}>
-          {this.get_tag_list()}
+          tags
         </div>
       </div>
     )
   }
 }
 
+          //{this.get_tag_list()}
 
 export default TagsList

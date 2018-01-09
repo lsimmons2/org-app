@@ -1,6 +1,5 @@
 import { connect } from 'react-redux'
 import { post_point, post_tag, get_focused_array_item, search } from '../modules'
-import _ from 'underscore'
 import NewPoint from '../components/NewPoint'
 
 

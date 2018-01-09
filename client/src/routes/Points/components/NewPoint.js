@@ -1,7 +1,7 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import _ from 'underscore'
+
 import TagsList from './TagsList'
 import TagForm from './TagForm'
 import TagSearchContainer from '../containers/TagSearchContainer'

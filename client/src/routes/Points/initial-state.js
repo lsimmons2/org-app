@@ -41,6 +41,11 @@ export const get_default_collection = () => ({
   collection_id: 1,
   points: [],
   tags: [],
+  mode: {
+    tags_exclusive: false,
+    tags_inclusive: false,
+    select_points: true
+  },
   app: {
     tags: {
       associated: [],
@@ -48,11 +53,6 @@ export const get_default_collection = () => ({
     },
     is_saved: false,
     in_focus: true,
-    mode: {
-      tags_exclusive: false,
-      tags_inclusive: false,
-      select_points: true
-    },
     filter: {
       success_rate: 0,
       time_added: {
@@ -130,27 +130,52 @@ export const get_default_collection = () => ({
       //VIEW: COLLECTION_EDITOR
       collection_editor: {
         in_focus: false,
-        sections: {
-          collection_name_form: {
-            in_focus: true
+        sections: [
+          {
+            name: 'mode_form',
+            app: {
+              in_focus: true
+            }
           },
-          new_tag_form: {
-            in_focus: false
+          {
+            name: 'tags_list',
+            tags: [],
+            app: {
+              in_focus: false
+            }
           },
-          tag_search: {
-            in_focus: false
+          {
+            name: 'collection_name_form',
+            app: {
+              in_focus: false
+            }
           },
-          tags_list: {
-            in_focus: false,
-            show_search: false
+          {
+            name: 'point_answer_input',
+            app: {
+              in_focus: false
+            }
           },
-          mode_radios: {
-            in_focus: false
+          {
+            name: 'tag_form',
+            app: {
+              in_focus: false
+            }
           },
-          filter_form: {
-            in_focus: false
+          {
+            name: 'tags_search',
+            search_suggestions: [],
+            app: {
+              in_focus: false
+            }
+          },
+          {
+            name: 'filter_form',
+            app: {
+              in_focus: false
+            }
           }
-        }
+        ]
       }
 
     }
