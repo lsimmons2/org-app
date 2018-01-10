@@ -10,12 +10,12 @@ class Tag extends React.Component {
 
     let classes = classNames({
       'tag': true,
-      'tag_in_focus': this.props.tag.app.in_focus
+      'tag_in_focus': this.props.in_focus
     });
 
     return (
       <div className={classes}>
-        {this.props.tag.name}
+        {this.props.name}
       </div>
     )
 

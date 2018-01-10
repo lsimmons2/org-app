@@ -1,5 +1,4 @@
 
-import { combineReducers } from 'redux';
 import _ from 'underscore'
 
 import initialState from '../initial-state'
@@ -7,7 +6,6 @@ import {
   get_default_collection,
   get_new_collection
 } from '../initial-state'
-import store from '../../../main'
 
 export const IGNORE = 'IGNORE'
 export const ADD_NEW_COLLECTION = 'ADD_NEW_COLLECTION'
@@ -85,10 +83,10 @@ export const post_tag = (new_tag_data) => {
           let promise = response.json();
           promise.then(resp_body => {
             let tag = resp_body.tag;
-            tag.app = {'in_focus': false};
+            tag.in_focus = false;
             dispatch({
               type: ADD_TAG_TO_NEW_POINT,
-              tag: tag
+              tag
             })
             resolve();
           })
@@ -119,7 +117,6 @@ export const post_point = (point_data) => {
       let collections = getState().points.collections;
       let focused_collection = get_focused_array_item(collections);
       let tag_ids = [];
-      console.log(focused_collection);
       if (focused_collection.mode.select_points){
         tag_ids = get_new_point_tag_ids(focused_collection)
       }
@@ -189,7 +186,8 @@ export const search = (search_type, search_value) => {
 }
 
 
-const handle_new_point_command = (dispatch, collection_index, focused_collection, event) => {
+const handle_new_point_command = (dispatch, getState, event) => {
+  let focused_collection = get_focused_array_item(getState().points.collections)
   let sections = focused_collection.app.views.new_point.sections;
   let key = event.key;
   if (event.altKey){
@@ -255,7 +253,7 @@ const handle_new_point_command = (dispatch, collection_index, focused_collection
   }
 }
 
-const handle_collection_editor_command  = (dispatch, collection_index, focused_collection, event) => {
+const handle_collection_editor_command  = (dispatch, getState, event) => {
   let key = event.key;
   if (event.altKey){
     if (key === 'j'){
@@ -278,79 +276,23 @@ const handle_collection_editor_command  = (dispatch, collection_index, focused_c
 
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
+
     let collections = getState().points.collections;
-    let collection_index = get_focused_array_index(collections);
     let focused_collection = get_focused_array_item(collections);
     let key = event.key;
 
-    //will probably call different functions from this function when
-    //I know how I'll organize it
-
     let global_tab_keys = ['t', '[', ']'];
     if (event.altKey && global_tab_keys.indexOf(key) > -1){
-      return detect_keypress_global(dispatch, event);
-    }
-
-    // NEW COLLECTION
-    if (focused_collection.app.is_new){
-      let sections = focused_collection.app.sections;
-      let focused_section_name = _.find(sections, section => {
-        return section.in_focus;
-      }).name;
-      if (event.altKey && (key === 'k' || key === 'j')){
-        let direction = key === 'k' ? -1: 1;
-        return dispatch({
-          type: MOVE_SECTION_FOCUS,
-          direction
-        })
-      } else if (focused_section_name === 'collection_search'){
-        if (event.ctrlKey && (key === 'j' || key === 'k')){
-          let direction = key === 'k' ? -1: 1;
-          return dispatch({
-            type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
-            direction: direction
-          });
-        } else if (key === 'Enter'){
-          let search_suggestions = _.find(sections, section => {
-            return section.name === 'collection_search';
-          }).search_suggestions;
-          let collection_to_fetch = get_focused_array_item(search_suggestions);
-          return new Promise((resolve, reject) => {
-            let url = base_url + '/collections/' + collection_to_fetch.collection_id
-            fetch(url, {})
-              .then((response) => {
-                let promise = response.json();
-                promise.then(resp_body => {
-                  let collection = resp_body.collection;
-                  collection.mode = get_default_collection().mode
-                  return dispatch({
-                    type: REPLACE_COLLECTION,
-                    collection_index,
-                    collection: collection
-                  });
-                  resolve();
-                })
-              })
-              .catch((error)=> {
-                console.error('errrrrrrrr');
-                console.error(error)
-                resolve();
-              });
-          })
-        }
-      }
-      return dispatch({
-        type: IGNORE
-      })
-    }
-
-    else if (focused_collection.app.views.new_point.in_focus){
-      handle_new_point_command(dispatch, collection_index, focused_collection, event);
+      handle_global_command(dispatch, getState, event);
+    } else if (focused_collection.app.is_new){
+      handle_new_collection_command(dispatch, getState, event);
+    } else if (focused_collection.app.views.new_point.in_focus){
+      handle_new_point_command(dispatch, getState, event);
     } else if (focused_collection.app.views.collection_editor.in_focus){
-      handle_collection_editor_command(dispatch, collection_index, focused_collection, event);
+      handle_collection_editor_command(dispatch, getState, event);
     }
 
-    //OTHER VIEWS
+    //TOGGLING VIEWS
     if (event.altKey && key === 'a'){
       return dispatch({
         type: TOGGLE_VIEW_VISIBILITY,
@@ -366,31 +308,82 @@ export const detect_keypress = (event) => {
   }
 }
 
-
-export const detect_keypress_global = (dispatch, event) => {
+const handle_new_collection_command = (dispatch, getState, event) => {
   let key = event.key;
-    //TAB ACTIONS
-    if (event.altKey && key == 't'){
-      let new_collection = get_new_collection();
+  let collections = getState().points.collections;
+  let focused_collection = get_focused_array_item(collections);
+  let sections = focused_collection.app.sections;
+  let focused_section_name = _.find(sections, section => {
+    return section.in_focus;
+  }).name;
+  if (event.altKey && (key === 'k' || key === 'j')){
+    let direction = key === 'k' ? -1: 1;
+    return dispatch({
+      type: MOVE_SECTION_FOCUS,
+      direction
+    })
+  } else if (focused_section_name === 'collection_search'){
+    if (event.ctrlKey && (key === 'j' || key === 'k')){
+      let direction = key === 'k' ? -1: 1;
       return dispatch({
-        type: ADD_NEW_COLLECTION,
-        collection: new_collection
+        type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
+        direction: direction
+      });
+    } else if (key === 'Enter'){
+      let collection_index = get_focused_array_index(collections);
+      let search_suggestions = _.find(sections, section => {
+        return section.name === 'collection_search';
+      }).search_suggestions;
+      let collection_to_fetch = get_focused_array_item(search_suggestions);
+      return new Promise((resolve, reject) => {
+        let url = base_url + '/collections/' + collection_to_fetch.collection_id
+        fetch(url, {})
+          .then((response) => {
+            let promise = response.json();
+            promise.then(resp_body => {
+              let collection = resp_body.collection;
+              collection.mode = get_default_collection().mode
+              return dispatch({
+                type: REPLACE_COLLECTION,
+                collection_index,
+                collection: collection
+              });
+              resolve();
+            })
+          })
+          .catch((error)=> {
+            console.error('errrrrrrrr');
+            console.error(error)
+            resolve();
+          });
       })
     }
+  }
+  return dispatch({
+    type: IGNORE
+  })
+}
 
-    if (event.altKey && key == '['){
-      return dispatch({
-        type: MOVE_TAB_FOCUS,
-        direction: -1
-      })
-    }
-
-    if (event.altKey && key == ']'){
-      return dispatch({
-        type: MOVE_TAB_FOCUS,
-        direction: 1
-      })
-    }
+export const handle_global_command = (dispatch, getState, event) => {
+  let key = event.key;
+  //TAB ACTIONS
+  if (key == 't'){
+    let new_collection = get_new_collection();
+    return dispatch({
+      type: ADD_NEW_COLLECTION,
+      collection: new_collection
+    })
+  } else if (key == '['){
+    return dispatch({
+      type: MOVE_TAB_FOCUS,
+      direction: -1
+    })
+  } else if (key == ']'){
+    return dispatch({
+      type: MOVE_TAB_FOCUS,
+      direction: 1
+    })
+  }
 }
 
 const set_item_focus = (item, focus) => {
@@ -435,7 +428,13 @@ const move_array_focus = (arr, direction) => {
 
 const get_focused_array_index = (arr) => {
   for (let i = 0; i < arr.length; i++){
-    if (arr[i].app.in_focus || arr[i].in_focus){
+    let item_in_focus;
+    if (arr[i].hasOwnProperty('app')){
+      item_in_focus = arr[i].app.in_focus;
+    } else {
+      item_in_focus = arr[i].in_focus;
+    }
+    if (item_in_focus){
       return i;
     }
   }
@@ -625,9 +624,9 @@ const FOCUSED_COLLECTION_HANDLERS = {
     let tags = tags_list.tags;
     if (tags.length > 1){
       if (tag_index === 0){
-        tags[1].app.in_focus = true;
+        tags[1].in_focus = true;
       } else {
-        tags[tag_index-1].app.in_focus = true;
+        tags[tag_index-1].in_focus = true;
       }
     }
     tags.splice(action.tag_index, 1);

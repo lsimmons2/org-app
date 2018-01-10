@@ -12,7 +12,11 @@ class TagsList extends React.Component {
       return <p>No tags</p>
     }
     let list = this.props.tags.map(tag => {
-      return <Tag key={tag.tag_id} tag={tag}/>
+      return <Tag
+        key={tag.tag_id}
+        in_focus={tag.in_focus}
+        name={tag.name}
+      />
     })
     return list
   }
