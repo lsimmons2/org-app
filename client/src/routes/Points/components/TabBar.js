@@ -17,13 +17,14 @@ class TabBar extends React.Component {
           this.props.collections.map(collection => {
             let key = collection.collection_id || Math.random();
             return (
-              <li key={key} >
+              <li key={key}>
                 <TabMarker collection={collection}/>
               </li>
             )
           })
         }
-      </ul>)
+      </ul>
+    )
   }
 
   render(){

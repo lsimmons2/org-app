@@ -20,15 +20,6 @@ export const get_new_collection = () => ({
 })
 
 
-export const get_new_tag = () => ({
-  name:'name' + i,
-  tag_id: i,
-  app: {
-    in_focus: false
-  }
-})
-
-
 const initialState = {
   global: {
     most_recent_tags: [],
