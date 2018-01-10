@@ -28,6 +28,9 @@ export const UPDATE_SEARCH_SUGGESTIONS = 'UPDATE_SEARCH_SUGGESTIONS'
 const base_url = 'http://localhost:8000'
 
 
+// ------------------------------------
+// Action Creators
+// ------------------------------------
 
 export const post_collection = (new_collection_data) => {
   return (dispatch, getState) => {
@@ -100,15 +103,6 @@ export const post_tag = (new_tag_data) => {
   }
 }
 
-
-const get_new_point_tag_ids = (collection) => {
-  let tags = _.find(collection.app.views.new_point.sections, section => {
-  return section.name === 'tags_list'
-  }).tags;
-  return _.map(tags, tag => {
-    return tag.tag_id
-  })
-}
 
 export const post_point = (point_data) => {
   return (dispatch, getState) => {
@@ -186,94 +180,6 @@ export const search = (search_type, search_value) => {
 }
 
 
-const handle_new_point_command = (dispatch, getState, event) => {
-  let focused_collection = get_focused_array_item(getState().points.collections)
-  let sections = focused_collection.app.views.new_point.sections;
-  let key = event.key;
-  if (event.altKey){
-    if (key === 'j'){
-      return dispatch({
-        type: MOVE_SECTION_FOCUS,
-        view_name: 'new_point',
-        direction: 1 })
-    } else if (key === 'k'){
-      return dispatch({
-        type: MOVE_SECTION_FOCUS,
-        view_name: 'new_point',
-        direction: -1
-      })
-    } else {
-      return dispatch({
-        type: IGNORE
-      })
-    }
-  }
-  let focused_section = _.find(sections, function(section){
-      return section.in_focus;
-  });
-  if (focused_section.name === 'tags_list'){
-    if (key === 'h'){
-      return dispatch({
-        type: MOVE_NEW_POINT_TAG_FOCUS,
-        direction: -1
-      })
-    } else if (key === 'l'){
-      return dispatch({
-        type: MOVE_NEW_POINT_TAG_FOCUS,
-        direction: 1
-      })
-    } else if (key === 'x'){
-      let tag_index = get_focused_array_index(focused_section.tags);
-      return dispatch({
-        type: REMOVE_TAG_FROM_NEW_POINT,
-        tag_index
-      })
-    }
-  } else if (focused_section.name === 'tags_search'){
-    if (event.ctrlKey && key === 'j'){
-      return dispatch({
-        type: MOVE_TAG_SEARCH_FOCUS,
-        direction: 1
-      });
-    } else if (event.ctrlKey && key === 'k'){
-      return dispatch({
-        type: MOVE_TAG_SEARCH_FOCUS,
-        direction: -1
-      });
-    } else if (key === 'Enter'){
-      let tag = get_focused_array_item(focused_section.search_suggestions);
-      return dispatch({
-        type: ADD_TAG_TO_NEW_POINT,
-        tag
-      });
-    }
-    return dispatch({
-      type: IGNORE
-    })
-  }
-}
-
-const handle_collection_editor_command  = (dispatch, getState, event) => {
-  let key = event.key;
-  if (event.altKey){
-    if (key === 'j'){
-      return dispatch({
-        type: MOVE_SECTION_FOCUS,
-        view_name: 'collection_editor',
-        direction: 1 })
-    } else if (key === 'k'){
-      return dispatch({
-        type: MOVE_SECTION_FOCUS,
-        view_name: 'collection_editor',
-        direction: -1
-      })
-    }
-  }
-  return dispatch({
-    type: IGNORE
-  })
-}
-
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
 
@@ -294,19 +200,43 @@ export const detect_keypress = (event) => {
 
     //TOGGLING VIEWS
     if (event.altKey && key === 'a'){
-      return dispatch({
+      dispatch({
         type: TOGGLE_VIEW_VISIBILITY,
         view_name: 'new_point'
       })
     } else if (event.altKey && key === 'c'){
-      return dispatch({
+      dispatch({
         type: TOGGLE_VIEW_VISIBILITY,
         view_name: 'collection_editor'
+      })
+    } else {
+      dispatch({
+        type: IGNORE
       })
     }
 
   }
 }
+
+
+export const handle_global_command = (dispatch, getState, event) => {
+  let key = event.key;
+  //TAB ACTIONS
+  if (key === 't'){
+    let new_collection = get_new_collection();
+    return dispatch({
+      type: ADD_NEW_COLLECTION,
+      collection: new_collection
+    })
+  } else if (key === '[' || key === ']'){
+    let direction = get_direction_from_key(key);
+    return dispatch({
+      type: MOVE_TAB_FOCUS,
+      direction
+    })
+  }
+}
+
 
 const handle_new_collection_command = (dispatch, getState, event) => {
   let key = event.key;
@@ -317,17 +247,19 @@ const handle_new_collection_command = (dispatch, getState, event) => {
     return section.in_focus;
   }).name;
   if (event.altKey && (key === 'k' || key === 'j')){
-    let direction = key === 'k' ? -1: 1;
+    let direction = get_direction_from_key(key);
+    let baddirection = get_direction_from_key('a');
+    console.log(baddirection);
     return dispatch({
       type: MOVE_SECTION_FOCUS,
       direction
     })
   } else if (focused_section_name === 'collection_search'){
     if (event.ctrlKey && (key === 'j' || key === 'k')){
-      let direction = key === 'k' ? -1: 1;
+      let direction = get_direction_from_key(key);
       return dispatch({
         type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
-        direction: direction
+        direction
       });
     } else if (key === 'Enter'){
       let collection_index = get_focused_array_index(collections);
@@ -359,32 +291,74 @@ const handle_new_collection_command = (dispatch, getState, event) => {
       })
     }
   }
-  return dispatch({
-    type: IGNORE
-  })
 }
 
-export const handle_global_command = (dispatch, getState, event) => {
+
+const handle_new_point_command = (dispatch, getState, event) => {
+  let focused_collection = get_focused_array_item(getState().points.collections)
+  let sections = focused_collection.app.views.new_point.sections;
   let key = event.key;
-  //TAB ACTIONS
-  if (key == 't'){
-    let new_collection = get_new_collection();
+  if (event.altKey && (key === 'j' || key === 'k')){
+    let direction = get_direction_from_key(key);
     return dispatch({
-      type: ADD_NEW_COLLECTION,
-      collection: new_collection
+      type: MOVE_SECTION_FOCUS,
+      view_name: 'new_point',
+      direction
     })
-  } else if (key == '['){
+  }
+  let focused_section = _.find(sections, function(section){
+      return section.in_focus;
+  });
+  if (focused_section.name === 'tags_list'){
+    if (key === 'h' || key === 'l'){
+      let direction = get_direction_from_key(key);
+      return dispatch({
+        type: MOVE_NEW_POINT_TAG_FOCUS,
+        direction: -1
+      })
+    } else if (key === 'x'){
+      let tag_index = get_focused_array_index(focused_section.tags);
+      return dispatch({
+        type: REMOVE_TAG_FROM_NEW_POINT,
+        tag_index
+      })
+    }
+  } else if (focused_section.name === 'tags_search'){
+    if (event.ctrlKey && (key === 'j' || key === 'k')){
+      let direction = get_direction_from_key(key);
+      return dispatch({
+        type: MOVE_TAG_SEARCH_FOCUS,
+        direction
+      });
+    } else if (key === 'Enter'){
+      let tag = get_focused_array_item(focused_section.search_suggestions);
+      return dispatch({
+        type: ADD_TAG_TO_NEW_POINT,
+        tag
+      });
+    }
+  }
+}
+
+
+const handle_collection_editor_command  = (dispatch, getState, event) => {
+  let key = event.key;
+  if (event.altKey && (key === 'j' || key === 'k')){
+    let direction = get_direction_from_key(key);
     return dispatch({
-      type: MOVE_TAB_FOCUS,
-      direction: -1
-    })
-  } else if (key == ']'){
-    return dispatch({
-      type: MOVE_TAB_FOCUS,
-      direction: 1
+      type: MOVE_SECTION_FOCUS,
+      view_name: 'collection_editor',
+      direction
     })
   }
 }
+
+
+
+// ------------------------------------
+// Utility Functions
+// ------------------------------------
+
 
 const set_item_focus = (item, focus) => {
   if (item.hasOwnProperty('app')){
@@ -393,6 +367,17 @@ const set_item_focus = (item, focus) => {
     item.in_focus = focus;
   }
 }
+
+
+const get_new_point_tag_ids = (collection) => {
+  let tags = _.find(collection.app.views.new_point.sections, section => {
+    return section.name === 'tags_list'
+  }).tags;
+  return _.map(tags, tag => {
+    return tag.tag_id
+  })
+}
+
 
 const move_array_focus = (arr, direction) => {
   let new_arr = arr.slice();
@@ -426,6 +411,7 @@ const move_array_focus = (arr, direction) => {
   return new_arr
 }
 
+
 const get_focused_array_index = (arr) => {
   for (let i = 0; i < arr.length; i++){
     let item_in_focus;
@@ -441,11 +427,28 @@ const get_focused_array_index = (arr) => {
   return -1;
 }
 
+
 export const get_focused_array_item = (arr) => {
   for (let i = 0; i < arr.length; i++){
     if (arr[i].app.in_focus || arr[i].in_focus){
       return arr[i]
     }
+  }
+  return null;
+}
+
+
+const get_direction_from_key = (key) => {
+  let key_direction_mapping = {
+    'j': 1,
+    'k': -1,
+    'l': 1,
+    'h': -1,
+    '[': -1,
+    ']': 1
+  }
+  if (key in key_direction_mapping){
+    return key_direction_mapping[key];
   }
   return null;
 }
