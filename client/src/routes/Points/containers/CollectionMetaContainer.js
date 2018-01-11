@@ -6,7 +6,7 @@ import CollectionMeta from '../components/CollectionMeta'
 
 
 const mapStateToProps = (globalState) => {
-  let collection = get_focused_array_item(globalState.points.collections);
+  let collection = get_focused_array_item(globalState.points.tabs);
   let mode = collection.app.mode
   return {
     mode

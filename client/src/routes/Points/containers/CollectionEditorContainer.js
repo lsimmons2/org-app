@@ -9,7 +9,7 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (globalState) => {
-  let collection = get_focused_array_item(globalState.points.collections);
+  let collection = get_focused_array_item(globalState.points.tabs);
   let view = collection.app.views.collection_editor;
   let mode = collection.app.mode;
   let tags = collection.tags;

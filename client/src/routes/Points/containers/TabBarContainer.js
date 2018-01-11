@@ -5,7 +5,7 @@ import TabBar from '../components/TabBar'
 
 const mapStateToProps = (globalState) => {
   return {
-    collections: globalState.points.collections
+    collections: globalState.points.tabs
   }
 }
 

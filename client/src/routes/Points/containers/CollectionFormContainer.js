@@ -10,7 +10,7 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (globalState) => {
-  let collection = get_focused_array_item(globalState.points.collections);
+  let collection = get_focused_array_item(globalState.points.tabs);
   let collection_name_form = _.find(collection.app.sections, section => {
     return section.name === 'collection_name_form';
   });

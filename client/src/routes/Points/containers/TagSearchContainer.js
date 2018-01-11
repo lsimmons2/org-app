@@ -10,7 +10,7 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (globalState) => {
-  let collection = get_focused_array_item(globalState.points.collections);
+  let collection = get_focused_array_item(globalState.points.tabs);
   let sections = collection.app.views.new_point.sections;
   let tags_search = _.find(sections, section => {
     return section.name === 'tags_search'

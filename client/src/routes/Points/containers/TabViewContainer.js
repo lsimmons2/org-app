@@ -5,7 +5,7 @@ import TabView from '../components/TabView'
 
 
 const mapStateToProps = (globalState) => {
-  let collection = get_focused_array_item(globalState.points.collections);
+  let collection = get_focused_array_item(globalState.points.tabs);
   return {
     collection
   }

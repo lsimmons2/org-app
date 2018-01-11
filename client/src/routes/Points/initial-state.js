@@ -23,7 +23,7 @@ const initialState = {
     most_recent_tags: [],
     most_recent_collections: []
   },
-  collections: [get_blank_tab()]
+  tabs: [get_blank_tab()]
 }
 
 export const get_default_collection = () => ({

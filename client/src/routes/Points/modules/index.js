@@ -108,7 +108,7 @@ export const post_point = (point_data) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
       let url = base_url + '/points';
-      let collections = getState().points.collections;
+      let collections = getState().points.tabs;
       let focused_collection = get_focused_array_item(collections);
       let tag_ids = [];
       if (focused_collection.mode.select_points){
@@ -183,7 +183,7 @@ export const search = (search_type, search_value) => {
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
 
-    let collections = getState().points.collections;
+    let collections = getState().points.tabs;
     let focused_collection = get_focused_array_item(collections);
     let key = event.key;
 
@@ -240,7 +240,7 @@ export const handle_global_command = (dispatch, getState, event) => {
 
 const handle_new_collection_command = (dispatch, getState, event) => {
   let key = event.key;
-  let collections = getState().points.collections;
+  let collections = getState().points.tabs;
   let focused_collection = get_focused_array_item(collections);
   let sections = focused_collection.app.sections;
   let focused_section_name = _.find(sections, section => {
@@ -293,7 +293,7 @@ const handle_new_collection_command = (dispatch, getState, event) => {
 
 
 const handle_new_point_command = (dispatch, getState, event) => {
-  let focused_collection = get_focused_array_item(getState().points.collections)
+  let focused_collection = get_focused_array_item(getState().points.tabs)
   let sections = focused_collection.app.views.new_point.sections;
   let key = event.key;
   if (event.altKey && (key === 'j' || key === 'k')){
@@ -460,7 +460,7 @@ const GLOBAL_ACTION_HANDLERS = {
   [IGNORE]: (state, action) => state,
 
   [ADD_TAB]: (state, action) => {
-    let new_collections = state.collections.map(collection => {
+    let new_collections = state.tabs.map(collection => {
       collection.app.in_focus = false;
       return collection
     })
@@ -474,7 +474,7 @@ const GLOBAL_ACTION_HANDLERS = {
   [MOVE_TAB_FOCUS]: (state, action) => {
     return {
       ...state,
-      collections: move_array_focus(state.collections, action.direction)
+      collections: move_array_focus(state.tabs, action.direction)
     };
   }
 
@@ -731,14 +731,14 @@ const FOCUSED_COLLECTION_HANDLERS = {
 const reducer = (state = initialState, action) => {
   if (action.type in FOCUSED_COLLECTION_HANDLERS){
     let handler = FOCUSED_COLLECTION_HANDLERS[action.type];
-    let focused_collection = get_focused_array_item(state.collections);
-    let focused_collection_index = get_focused_array_index(state.collections);
+    let focused_collection = get_focused_array_item(state.tabs);
+    let focused_collection_index = get_focused_array_index(state.tabs);
     return {
       ...state,
-      collections: [
-        ...state.collections.slice(0, focused_collection_index),
+      tabs: [
+        ...state.tabs.slice(0, focused_collection_index),
         handler(focused_collection, action),
-        ...state.collections.slice(focused_collection_index + 1),
+        ...state.tabs.slice(focused_collection_index + 1),
       ]
     };
   } else if (action.type in GLOBAL_ACTION_HANDLERS) {
