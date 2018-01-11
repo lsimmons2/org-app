@@ -1,10 +1,9 @@
 
-
-export const get_new_collection = () => ({
-  name: 'new_collection',
+export const get_blank_tab = () => ({
+  name: 'blank tab',
   app: {
     in_focus: true,
-    is_new: true,
+    is_blank: true,
     sections: [
       {
         name: 'collection_search',
@@ -19,15 +18,13 @@ export const get_new_collection = () => ({
   }
 })
 
-
 const initialState = {
   global: {
     most_recent_tags: [],
     most_recent_collections: []
   },
-  collections: [get_new_collection()]
+  collections: [get_blank_tab()]
 }
-
 
 export const get_default_collection = () => ({
   name: 'new_collection',

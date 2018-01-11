@@ -4,14 +4,14 @@ import _ from 'underscore'
 import initialState from '../initial-state'
 import { 
   get_default_collection,
-  get_new_collection
+  get_blank_tab
 } from '../initial-state'
 
 export const IGNORE = 'IGNORE'
-export const ADD_NEW_COLLECTION = 'ADD_NEW_COLLECTION'
+export const ADD_TAB = 'ADD_TAB'
 export const ADD_POINT = 'ADD_POINT'
 export const TOGGLE_VIEW_VISIBILITY = 'TOGGLE_VIEW_VISIBILITY'
-export const REPLACE_COLLECTION = 'REPLACE_COLLECTION'
+export const FILL_BLANK_TAB_WITH_COLLECTION = 'FILL_BLANK_TAB_WITH_COLLECTION'
 export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
 export const MOVE_NEW_POINT_TAG_FOCUS = 'MOVE_NEW_POINT_TAG_FOCUS'
 export const MOVE_SECTION_FOCUS = 'MOVE_SECTION_FOCUS'
@@ -54,7 +54,7 @@ export const post_collection = (new_collection_data) => {
             collection.points = [];
             collection.tags = [];
             dispatch({
-              type: REPLACE_COLLECTION,
+              type: FILL_BLANK_TAB_WITH_COLLECTION,
               collection
             })
             resolve();
@@ -190,7 +190,7 @@ export const detect_keypress = (event) => {
     let global_tab_keys = ['t', '[', ']'];
     if (event.altKey && global_tab_keys.indexOf(key) > -1){
       handle_global_command(dispatch, getState, event);
-    } else if (focused_collection.app.is_new){
+    } else if (focused_collection.app.is_blank){
       handle_new_collection_command(dispatch, getState, event);
     } else if (focused_collection.app.views.new_point.in_focus){
       handle_new_point_command(dispatch, getState, event);
@@ -223,10 +223,10 @@ export const handle_global_command = (dispatch, getState, event) => {
   let key = event.key;
   //TAB ACTIONS
   if (key === 't'){
-    let new_collection = get_new_collection();
+    let tab = get_blank_tab();
     return dispatch({
-      type: ADD_NEW_COLLECTION,
-      collection: new_collection
+      type: ADD_TAB,
+      tab
     })
   } else if (key === '[' || key === ']'){
     let direction = get_direction_from_key(key);
@@ -248,8 +248,6 @@ const handle_new_collection_command = (dispatch, getState, event) => {
   }).name;
   if (event.altKey && (key === 'k' || key === 'j')){
     let direction = get_direction_from_key(key);
-    let baddirection = get_direction_from_key('a');
-    console.log(baddirection);
     return dispatch({
       type: MOVE_SECTION_FOCUS,
       direction
@@ -276,7 +274,7 @@ const handle_new_collection_command = (dispatch, getState, event) => {
               let collection = resp_body.collection;
               collection.mode = get_default_collection().mode
               return dispatch({
-                type: REPLACE_COLLECTION,
+                type: FILL_BLANK_TAB_WITH_COLLECTION,
                 collection_index,
                 collection: collection
               });
@@ -461,12 +459,12 @@ const GLOBAL_ACTION_HANDLERS = {
 
   [IGNORE]: (state, action) => state,
 
-  [ADD_NEW_COLLECTION]: (state, action) => {
+  [ADD_TAB]: (state, action) => {
     let new_collections = state.collections.map(collection => {
       collection.app.in_focus = false;
       return collection
     })
-    new_collections.push(action.collection);
+    new_collections.push(action.tab);
     return {
       ...state,
       collections: new_collections
@@ -560,7 +558,7 @@ const FOCUSED_COLLECTION_HANDLERS = {
   },
 
   [MOVE_SECTION_FOCUS]: (collection, action) => {
-    if (collection.app.is_new){
+    if (collection.app.is_blank){
       let sections = move_array_focus(collection.app.sections, action.direction);
       return {
         ...collection,
@@ -657,7 +655,7 @@ const FOCUSED_COLLECTION_HANDLERS = {
     }
   },
 
-  [REPLACE_COLLECTION]: (collection, action) => {
+  [FILL_BLANK_TAB_WITH_COLLECTION]: (collection, action) => {
     let new_collection = action.collection;
     new_collection.app = get_default_collection().app;
     new_collection.app.in_focus = true;
@@ -665,7 +663,7 @@ const FOCUSED_COLLECTION_HANDLERS = {
   },
 
   [UPDATE_SEARCH_SUGGESTIONS]: (collection, action) => {
-    if (collection.app.is_new){
+    if (collection.app.is_blank){
       let collection_search = _.find(collection.app.sections, section => {
         return section.name === 'collection_search';
       });

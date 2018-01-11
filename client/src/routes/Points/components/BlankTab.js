@@ -5,7 +5,7 @@ import CollectionSearchContainer from '../containers/CollectionSearchContainer'
 
 
 
-class NewCollectionView extends React.Component {
+class BlankTab extends React.Component {
 
   render(){
     return (
@@ -18,4 +18,4 @@ class NewCollectionView extends React.Component {
 
 }
 
-export default NewCollectionView
+export default BlankTab
