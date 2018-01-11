@@ -95,3 +95,12 @@ input, textarea {
     border: 10px solid $app_green;
     width: 80%;
 }
+
+.alert {
+  color: $app_green;
+  border: 10px solid $app_green !important;
+  z-index: 1;
+  top: 20%;
+  left: 45%;
+  position: fixed;
+}

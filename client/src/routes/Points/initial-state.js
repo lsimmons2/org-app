@@ -1,4 +1,41 @@
 
+export const get_just_add_points = () => ({
+  name: 'just add points',
+  app: {
+    in_focus: true,
+    is_just_add_points: true,
+    views: {
+      new_point: {
+        in_focus: true,
+        sections: [
+          {
+            name: 'point_question_input',
+            in_focus: true
+          },
+          {
+            name: 'point_answer_input',
+            in_focus: false
+          },
+          {
+            name: 'tags_list',
+            tags: [],
+            in_focus: false
+          },
+          {
+            name: 'tag_form',
+            in_focus: false
+          },
+          {
+            name: 'tags_search',
+            search_suggestions: [],
+            in_focus: false
+          }
+        ]
+      }
+    }
+  }
+})
+
 export const get_blank_tab = () => ({
   name: 'blank tab',
   app: {
@@ -13,6 +50,10 @@ export const get_blank_tab = () => ({
       {
         name: 'collection_name_form',
         in_focus: false
+      },
+      {
+        name: 'just_add_points_button',
+        in_focus: false
       }
     ]
   }
@@ -20,6 +61,7 @@ export const get_blank_tab = () => ({
 
 const initialState = {
   global: {
+    alert: '',
     most_recent_tags: [],
     most_recent_collections: []
   },

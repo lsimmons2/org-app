@@ -4,21 +4,24 @@ import _ from 'underscore'
 import initialState from '../initial-state'
 import { 
   get_default_collection,
-  get_blank_tab
+  get_blank_tab,
+  get_just_add_points
 } from '../initial-state'
 
 export const IGNORE = 'IGNORE'
 export const ADD_TAB = 'ADD_TAB'
+export const ADD_TAG_TO_NEW_POINT = 'ADD_TAG_TO_NEW_POINT'
 export const ADD_POINT = 'ADD_POINT'
 export const TOGGLE_VIEW_VISIBILITY = 'TOGGLE_VIEW_VISIBILITY'
 export const FILL_BLANK_TAB_WITH_COLLECTION = 'FILL_BLANK_TAB_WITH_COLLECTION'
+export const FILL_BLANK_TAB_WITH_JUST_ADD_POINTS = 'FILL_BLANK_TAB_WITH_JUST_ADD_POINTS'
 export const MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS = 'MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS'
 export const MOVE_NEW_POINT_TAG_FOCUS = 'MOVE_NEW_POINT_TAG_FOCUS'
 export const MOVE_SECTION_FOCUS = 'MOVE_SECTION_FOCUS'
 export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
+export const POST_POINT_SUCCESS = 'POST_POINT_SUCCESS'
 export const REMOVE_TAG_FROM_NEW_POINT = 'REMOVE_TAG_FROM_NEW_POINT'
-export const ADD_TAG_TO_NEW_POINT = 'ADD_TAG_TO_NEW_POINT'
 export const UPDATE_SEARCH_SUGGESTIONS = 'UPDATE_SEARCH_SUGGESTIONS'
 
 
@@ -111,8 +114,8 @@ export const post_point = (point_data) => {
       let tabs = getState().points.tabs;
       let focused_tab = get_focused_array_item(tabs);
       let tag_ids = [];
-      if (focused_tab.mode.select_points){
-        tag_ids = get_new_point_tag_ids(focused_tab)
+      if (focused_tab.app.is_just_add_points || focused_tab.mode.select_points){
+        tag_ids = get_new_point_tag_ids(focused_tab);
       }
       let post_body = JSON.stringify({point:point_data, tag_ids:tag_ids});
       let req_options = {
@@ -126,11 +129,19 @@ export const post_point = (point_data) => {
         .then((response) => {
           let promise = response.json();
           promise.then(resp_body => {
-            let point = resp_body.point;
-            dispatch({
-              type: ADD_POINT,
-              point: point
-            })
+            if (focused_tab.app.is_just_add_points){
+              let alert = 'Point ' + resp_body.point.point_id + ' saved succesfully'
+              dispatch({
+                type: POST_POINT_SUCCESS,
+                alert
+              })
+            } else if (focused_tab.mode.select_points){
+              let point = resp_body.point;
+              dispatch({
+                type: ADD_POINT,
+                point
+              })
+            }
             document.getElementById('question_input').value = '';
             document.getElementById('answer_input').value = '';
             resolve();
@@ -287,6 +298,12 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
           });
       })
     }
+  } else if (focused_section_name === 'just_add_points_button'){
+    let just_add_points = get_just_add_points()
+    return dispatch({
+      type: FILL_BLANK_TAB_WITH_JUST_ADD_POINTS,
+      just_add_points
+    });
   }
 }
 
@@ -475,6 +492,16 @@ const GLOBAL_ACTION_HANDLERS = {
       ...state,
       tabs: move_array_focus(state.tabs, action.direction)
     };
+  },
+
+  [POST_POINT_SUCCESS]: (state, action) => {
+    return {
+      ...state,
+      global: {
+        ...state.global,
+        alert: action.alert
+      }
+    }
   }
 
 }
@@ -515,6 +542,17 @@ const FOCUSED_TAB_HANDLERS = {
         }
       }
     }
+  },
+
+  [FILL_BLANK_TAB_WITH_COLLECTION]: (tab, action) => {
+    let new_collection = action.collection;
+    new_collection.app = get_default_collection().app;
+    new_collection.app.in_focus = true;
+    return new_collection
+  },
+
+  [FILL_BLANK_TAB_WITH_JUST_ADD_POINTS]: (tab, action) => {
+    return action.just_add_points
   },
 
   [MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS]: (tab, action) => {
@@ -652,13 +690,6 @@ const FOCUSED_TAB_HANDLERS = {
         }
       }
     }
-  },
-
-  [FILL_BLANK_TAB_WITH_COLLECTION]: (tab, action) => {
-    let new_collection = action.collection;
-    new_collection.app = get_default_collection().app;
-    new_collection.app.in_focus = true;
-    return new_collection
   },
 
   [UPDATE_SEARCH_SUGGESTIONS]: (collection, action) => {

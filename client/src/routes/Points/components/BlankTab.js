@@ -2,6 +2,7 @@
 import React from 'react'
 import CollectionFormContainer from '../containers/CollectionFormContainer'
 import CollectionSearchContainer from '../containers/CollectionSearchContainer'
+import JustAddPointsButtonContainer from '../containers/JustAddPointsButtonContainer'
 
 
 
@@ -12,6 +13,7 @@ class BlankTab extends React.Component {
       <div>
         <CollectionSearchContainer/>
         <CollectionFormContainer/>
+        <JustAddPointsButtonContainer/>
       </div>
     )
   }
