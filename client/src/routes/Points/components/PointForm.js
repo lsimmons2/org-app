@@ -6,7 +6,7 @@ import Point from './Point'
 
 class PointForm extends React.Component {
 
-  componentDidUpdate(e){
+  handle_focusing(){
     if (this.props.question_section_in_focus){
       this.refs['question'].focus();
     } else if (this.props.answer_section_in_focus){
@@ -15,6 +15,14 @@ class PointForm extends React.Component {
       this.refs['question'].blur();
       this.refs['answer'].blur();
     }
+  }
+
+  componentDidMount(e){
+    this.handle_focusing()
+  }
+
+  componentDidUpdate(e){
+    this.handle_focusing()
   }
 
   submitPoint(e){

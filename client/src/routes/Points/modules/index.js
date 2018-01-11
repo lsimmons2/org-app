@@ -142,8 +142,7 @@ export const post_point = (point_data) => {
                 point
               })
             }
-            document.getElementById('question_input').value = '';
-            document.getElementById('answer_input').value = '';
+            clear_input_fields();
             resolve();
           })
         })
@@ -373,6 +372,11 @@ const handle_collection_editor_command  = (dispatch, getState, event) => {
 // Utility Functions
 // ------------------------------------
 
+
+const clear_input_fields = () => {
+  document.getElementById('question_input').value = '';
+  document.getElementById('answer_input').value = '';
+}
 
 const set_item_focus = (item, focus) => {
   if (item.hasOwnProperty('app')){

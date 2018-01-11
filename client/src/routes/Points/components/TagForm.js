@@ -16,16 +16,18 @@ class TagForm extends React.Component {
     this.props.post_tag(form_data);
   }
 
-  componentDidMount(e){
+  handle_focusing(){
     if (this.props.section.in_focus){
       this.refs['name'].focus();
     }
   }
 
+  componentDidMount(e){
+    this.handle_focusing();
+  }
+
   componentDidUpdate(e){
-    if (this.props.section.in_focus){
-      this.refs['name'].focus();
-    }
+    this.handle_focusing();
   }
 
   render(){
