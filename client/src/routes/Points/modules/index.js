@@ -12,7 +12,7 @@ export const ADD_TAB = 'ADD_TAB'
 export const ADD_POINT = 'ADD_POINT'
 export const TOGGLE_VIEW_VISIBILITY = 'TOGGLE_VIEW_VISIBILITY'
 export const FILL_BLANK_TAB_WITH_COLLECTION = 'FILL_BLANK_TAB_WITH_COLLECTION'
-export const MOVE_NEW_COLLECTION_SEARCH_FOCUS = 'MOVE_NEW_COLLECTION_SEARCH_FOCUS'
+export const MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS = 'MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS'
 export const MOVE_NEW_POINT_TAG_FOCUS = 'MOVE_NEW_POINT_TAG_FOCUS'
 export const MOVE_SECTION_FOCUS = 'MOVE_SECTION_FOCUS'
 export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
@@ -108,11 +108,11 @@ export const post_point = (point_data) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
       let url = base_url + '/points';
-      let collections = getState().points.tabs;
-      let focused_collection = get_focused_array_item(collections);
+      let tabs = getState().points.tabs;
+      let focused_tab = get_focused_array_item(tabs);
       let tag_ids = [];
-      if (focused_collection.mode.select_points){
-        tag_ids = get_new_point_tag_ids(focused_collection)
+      if (focused_tab.mode.select_points){
+        tag_ids = get_new_point_tag_ids(focused_tab)
       }
       let post_body = JSON.stringify({point:point_data, tag_ids:tag_ids});
       let req_options = {
@@ -183,18 +183,18 @@ export const search = (search_type, search_value) => {
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
 
-    let collections = getState().points.tabs;
-    let focused_collection = get_focused_array_item(collections);
+    let tabs = getState().points.tabs;
+    let focused_tab = get_focused_array_item(tabs);
     let key = event.key;
 
     let global_tab_keys = ['t', '[', ']'];
     if (event.altKey && global_tab_keys.indexOf(key) > -1){
       handle_global_command(dispatch, getState, event);
-    } else if (focused_collection.app.is_blank){
-      handle_new_collection_command(dispatch, getState, event);
-    } else if (focused_collection.app.views.new_point.in_focus){
+    } else if (focused_tab.app.is_blank){
+      handle_blank_tab_command(dispatch, getState, event);
+    } else if (focused_tab.app.views.new_point.in_focus){
       handle_new_point_command(dispatch, getState, event);
-    } else if (focused_collection.app.views.collection_editor.in_focus){
+    } else if (focused_tab.app.views.collection_editor.in_focus){
       handle_collection_editor_command(dispatch, getState, event);
     }
 
@@ -238,11 +238,11 @@ export const handle_global_command = (dispatch, getState, event) => {
 }
 
 
-const handle_new_collection_command = (dispatch, getState, event) => {
+const handle_blank_tab_command = (dispatch, getState, event) => {
   let key = event.key;
-  let collections = getState().points.tabs;
-  let focused_collection = get_focused_array_item(collections);
-  let sections = focused_collection.app.sections;
+  let tabs = getState().points.tabs;
+  let focused_tab = get_focused_array_item(tabs);
+  let sections = focused_tab.app.sections;
   let focused_section_name = _.find(sections, section => {
     return section.in_focus;
   }).name;
@@ -256,11 +256,11 @@ const handle_new_collection_command = (dispatch, getState, event) => {
     if (event.ctrlKey && (key === 'j' || key === 'k')){
       let direction = get_direction_from_key(key);
       return dispatch({
-        type: MOVE_NEW_COLLECTION_SEARCH_FOCUS,
+        type: MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS,
         direction
       });
     } else if (key === 'Enter'){
-      let collection_index = get_focused_array_index(collections);
+      let tab_index = get_focused_array_index(tabs);
       let search_suggestions = _.find(sections, section => {
         return section.name === 'collection_search';
       }).search_suggestions;
@@ -275,8 +275,7 @@ const handle_new_collection_command = (dispatch, getState, event) => {
               collection.mode = get_default_collection().mode
               return dispatch({
                 type: FILL_BLANK_TAB_WITH_COLLECTION,
-                collection_index,
-                collection: collection
+                collection
               });
               resolve();
             })
@@ -293,8 +292,8 @@ const handle_new_collection_command = (dispatch, getState, event) => {
 
 
 const handle_new_point_command = (dispatch, getState, event) => {
-  let focused_collection = get_focused_array_item(getState().points.tabs)
-  let sections = focused_collection.app.views.new_point.sections;
+  let focused_tab = get_focused_array_item(getState().points.tabs)
+  let sections = focused_tab.app.views.new_point.sections;
   let key = event.key;
   if (event.altKey && (key === 'j' || key === 'k')){
     let direction = get_direction_from_key(key);
@@ -367,8 +366,8 @@ const set_item_focus = (item, focus) => {
 }
 
 
-const get_new_point_tag_ids = (collection) => {
-  let tags = _.find(collection.app.views.new_point.sections, section => {
+const get_new_point_tag_ids = (tab) => {
+  let tags = _.find(tab.app.views.new_point.sections, section => {
     return section.name === 'tags_list'
   }).tags;
   return _.map(tags, tag => {
@@ -460,27 +459,27 @@ const GLOBAL_ACTION_HANDLERS = {
   [IGNORE]: (state, action) => state,
 
   [ADD_TAB]: (state, action) => {
-    let new_collections = state.tabs.map(collection => {
-      collection.app.in_focus = false;
-      return collection
+    let new_tabs = state.tabs.map(tab => {
+      tab.app.in_focus = false;
+      return tab
     })
-    new_collections.push(action.tab);
+    new_tabs.push(action.tab);
     return {
       ...state,
-      collections: new_collections
+      tabs: new_tabs
     };
   },
 
   [MOVE_TAB_FOCUS]: (state, action) => {
     return {
       ...state,
-      collections: move_array_focus(state.tabs, action.direction)
+      tabs: move_array_focus(state.tabs, action.direction)
     };
   }
 
 }
 
-const FOCUSED_COLLECTION_HANDLERS = {
+const FOCUSED_TAB_HANDLERS = {
 
   [ADD_POINT]: (collection, action) => {
     return {
@@ -518,14 +517,14 @@ const FOCUSED_COLLECTION_HANDLERS = {
     }
   },
 
-  [MOVE_NEW_COLLECTION_SEARCH_FOCUS]: (collection, action) => {
-    let collection_search = _.find(collection.app.sections, section => {
+  [MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS]: (tab, action) => {
+    let collection_search = _.find(tab.app.sections, section => {
       return section.name === 'collection_search';
     })
     let suggestions = collection_search.search_suggestions;
     suggestions = move_array_focus(suggestions, action.direction);
     collection_search.search_suggestions = suggestions;
-    return collection
+    return tab
   },
 
   [MOVE_NEW_POINT_TAG_FOCUS]: (collection, action) => {
@@ -557,18 +556,18 @@ const FOCUSED_COLLECTION_HANDLERS = {
     }
   },
 
-  [MOVE_SECTION_FOCUS]: (collection, action) => {
-    if (collection.app.is_blank){
-      let sections = move_array_focus(collection.app.sections, action.direction);
+  [MOVE_SECTION_FOCUS]: (tab, action) => {
+    if (tab.app.is_blank){
+      let sections = move_array_focus(tab.app.sections, action.direction);
       return {
-        ...collection,
+        ...tab,
         app: {
-          ...collection.app,
+          ...tab.app,
           section: sections
         }
       }
     }
-    let focused_view = _.find(collection.app.views, view => {
+    let focused_view = _.find(tab.app.views, view => {
       return view.in_focus;
     });
     //TODO: join these two lines
@@ -576,13 +575,13 @@ const FOCUSED_COLLECTION_HANDLERS = {
     sections = move_array_focus(sections, action.direction);
     if (action.view_name === 'new_point'){
       return {
-        ...collection,
+        ...tab,
         app: {
-          ...collection.app,
+          ...tab.app,
           views: {
-            ...collection.app.views,
+            ...tab.app.views,
             new_point: {
-              ...collection.app.views.new_point,
+              ...tab.app.views.new_point,
               sections: sections
             }
           }
@@ -590,13 +589,13 @@ const FOCUSED_COLLECTION_HANDLERS = {
       }
     } else if (action.view_name === 'collection_editor'){
       return {
-        ...collection,
+        ...tab,
         app: {
-          ...collection.app,
+          ...tab.app,
           views: {
-            ...collection.app.views,
+            ...tab.app.views,
             collection_editor: {
-              ...collection.app.views.collection_editor,
+              ...tab.app.views.collection_editor,
               sections: sections
             }
           }
@@ -655,7 +654,7 @@ const FOCUSED_COLLECTION_HANDLERS = {
     }
   },
 
-  [FILL_BLANK_TAB_WITH_COLLECTION]: (collection, action) => {
+  [FILL_BLANK_TAB_WITH_COLLECTION]: (tab, action) => {
     let new_collection = action.collection;
     new_collection.app = get_default_collection().app;
     new_collection.app.in_focus = true;
@@ -729,16 +728,16 @@ const FOCUSED_COLLECTION_HANDLERS = {
 // ------------------------------------
 
 const reducer = (state = initialState, action) => {
-  if (action.type in FOCUSED_COLLECTION_HANDLERS){
-    let handler = FOCUSED_COLLECTION_HANDLERS[action.type];
-    let focused_collection = get_focused_array_item(state.tabs);
-    let focused_collection_index = get_focused_array_index(state.tabs);
+  if (action.type in FOCUSED_TAB_HANDLERS){
+    let handler = FOCUSED_TAB_HANDLERS[action.type];
+    let focused_tab = get_focused_array_item(state.tabs);
+    let focused_tab_index = get_focused_array_index(state.tabs);
     return {
       ...state,
       tabs: [
-        ...state.tabs.slice(0, focused_collection_index),
-        handler(focused_collection, action),
-        ...state.tabs.slice(focused_collection_index + 1),
+        ...state.tabs.slice(0, focused_tab_index),
+        handler(focused_tab, action),
+        ...state.tabs.slice(focused_tab_index + 1),
       ]
     };
   } else if (action.type in GLOBAL_ACTION_HANDLERS) {
