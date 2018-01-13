@@ -17,8 +17,10 @@ class TagForm extends React.Component {
   }
 
   handle_focusing(){
-    if (this.props.section.in_focus){
+    if (this.props.in_focus){
       this.refs['name'].focus();
+    } else {
+      this.refs['name'].blur();
     }
   }
 

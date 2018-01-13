@@ -171,7 +171,7 @@ export const search = (search_type, search_value) => {
           promise.then(resp_body => {
             let suggestions = resp_body.suggestions;
             _.each(suggestions, function(suggestion){
-              suggestion.app = {in_focus: false};
+              suggestion.in_focus = false;
             });
             dispatch({
               type: UPDATE_SEARCH_SUGGESTIONS,
@@ -298,11 +298,13 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
       })
     }
   } else if (focused_section_name === 'just_add_points_button'){
-    let just_add_points = get_just_add_points()
-    return dispatch({
-      type: FILL_BLANK_TAB_WITH_JUST_ADD_POINTS,
-      just_add_points
-    });
+    if (event.ctrlKey && key === ' '){
+      let just_add_points = get_just_add_points();
+      return dispatch({
+        type: FILL_BLANK_TAB_WITH_JUST_ADD_POINTS,
+        just_add_points
+      });
+    }
   }
 }
 
@@ -327,7 +329,7 @@ const handle_new_point_command = (dispatch, getState, event) => {
       let direction = get_direction_from_key(key);
       return dispatch({
         type: MOVE_NEW_POINT_TAG_FOCUS,
-        direction: -1
+        direction
       })
     } else if (key === 'x'){
       let tag_index = get_focused_array_index(focused_section.tags);
@@ -448,8 +450,14 @@ const get_focused_array_index = (arr) => {
 
 export const get_focused_array_item = (arr) => {
   for (let i = 0; i < arr.length; i++){
-    if (arr[i].app.in_focus || arr[i].in_focus){
-      return arr[i]
+    let item_in_focus;
+    if (arr[i].hasOwnProperty('app')){
+      item_in_focus = arr[i].app.in_focus;
+    } else {
+      item_in_focus = arr[i].in_focus;
+    }
+    if (item_in_focus){
+      return arr[i];
     }
   }
   return null;
@@ -528,6 +536,9 @@ const FOCUSED_TAB_HANDLERS = {
     let tags_list = _.find(sections, (section, i) => {
       if (section.name === 'tags_list'){ section_i = i; return true; };
     });
+    if (get_focused_array_index(tags_list.tags) < 0){
+      action.tag.in_focus = true;
+    }
     tags_list.tags.push(action.tag);
     return {
       ...collection,
@@ -671,7 +682,6 @@ const FOCUSED_TAB_HANDLERS = {
         tags[tag_index-1].in_focus = true;
       }
     }
-    tags.splice(action.tag_index, 1);
     //returning collection doesn't work here
     //return collection 
     return {

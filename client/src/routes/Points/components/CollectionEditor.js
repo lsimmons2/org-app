@@ -4,6 +4,8 @@ import classNames from 'classnames'
 
 import CollectionModeEditor from './CollectionModeEditor'
 import TagsList from './TagsList'
+import TagForm from './TagForm'
+import Search from './Search'
 
 
 class CollectionEditor extends React.Component {
@@ -23,6 +25,14 @@ class CollectionEditor extends React.Component {
       return section.name === 'tags_list';
     });
 
+    let tag_form_section = _.find(sections, function(section){
+      return section.name === 'tag_form';
+    });
+
+    let tags_search_section = _.find(sections, function(section){
+      return section.name === 'tags_search';
+    });
+
     return (
       <div>
         <CollectionModeEditor
@@ -32,6 +42,16 @@ class CollectionEditor extends React.Component {
         <TagsList
           in_focus={tags_list_section.in_focus}
           tags={this.props.tags}
+        />
+        <TagForm
+          in_focus={tag_form_section.in_focus}
+          post_tag={this.props.post_tag}
+        />
+        <Search
+          search={this.props.search}
+          in_focus={tags_search_section.in_focus}
+          search_suggestions={tags_search_section.search_suggestions}
+          search_type='tags'
         />
       </div>
     )

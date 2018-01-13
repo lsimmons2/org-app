@@ -18,7 +18,7 @@ class Search extends React.Component {
         <SearchSuggestion
           key={i}
           name={suggestion.name}
-          in_focus={suggestion.app.in_focus}
+          in_focus={suggestion.in_focus}
         />
       )
     })
@@ -29,16 +29,20 @@ class Search extends React.Component {
     this.props.search(this.props.search_type, search_value);
   }
 
-  componentDidMount(e){
+  handle_focusing(){
     if (this.props.in_focus){
       document.getElementById('tag_search').focus();
+    } else {
+      document.getElementById('tag_search').blur();
     }
   }
 
+  componentDidMount(e){
+    this.handle_focusing()
+  }
+
   componentDidUpdate(e){
-    if (this.props.in_focus){
-      document.getElementById('tag_search').focus();
-    }
+    this.handle_focusing()
   }
 
   render(){

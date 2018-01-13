@@ -15,16 +15,20 @@ class CollectionForm extends React.Component {
     }
   }
 
-  componentDidMount(e){
+  handle_focusing(){
     if (this.props.in_focus){
       this.refs['name'].focus();
+    } else {
+      this.refs['name'].blur();
     }
   }
 
+  componentDidMount(e){
+    this.handle_focusing();
+  }
+
   componentDidUpdate(e){
-    if (this.props.in_focus){
-      this.refs['name'].focus();
-    }
+    this.handle_focusing();
   }
 
   render(){

@@ -1,11 +1,12 @@
 import { connect } from 'react-redux'
-import { post_collection, get_focused_array_item } from '../modules'
+import { post_collection, search, get_focused_array_item } from '../modules'
 import CollectionEditor from '../components/CollectionEditor'
 
 
 
 const mapDispatchToProps = {
-  post_collection
+  post_collection,
+  search
 }
 
 const mapStateToProps = (globalState) => {

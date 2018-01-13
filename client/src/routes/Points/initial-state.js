@@ -75,8 +75,8 @@ export const get_default_collection = () => ({
   tags: [],
   mode: {
     tags_exclusive: false,
-    tags_inclusive: false,
-    select_points: true
+    tags_inclusive: true,
+    select_points: false
   },
   app: {
     tags: {
@@ -162,14 +162,6 @@ export const get_default_collection = () => ({
             in_focus: false
           },
           {
-            name: 'collection_name_form',
-            in_focus: false
-          },
-          {
-            name: 'point_answer_input',
-            in_focus: false
-          },
-          {
             name: 'tag_form',
             in_focus: false
           },
@@ -177,11 +169,19 @@ export const get_default_collection = () => ({
             name: 'tags_search',
             search_suggestions: [],
             in_focus: false
-          },
-          {
-            name: 'filter_form',
-            in_focus: false
-          }
+          }//,
+          //{
+            //name: 'collection_name_form',
+            //in_focus: false
+          //},
+          //{
+            //name: 'point_answer_input',
+            //in_focus: false
+          //},
+          //{
+            //name: 'filter_form',
+            //in_focus: false
+          //}
         ]
       }
 

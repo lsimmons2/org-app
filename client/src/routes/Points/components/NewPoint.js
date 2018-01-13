@@ -46,7 +46,6 @@ class NewPoint extends React.Component {
           in_focus={tags_list_section.in_focus}
         />
         <TagForm
-          section={tag_form_section}
           in_focus={tag_form_section.in_focus}
           post_tag={this.props.post_tag}
         />
@@ -55,5 +54,6 @@ class NewPoint extends React.Component {
     )
   }
 }
+
 
 export default NewPoint
