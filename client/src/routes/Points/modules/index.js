@@ -45,43 +45,6 @@ const base_url = 'http://localhost:8000'
 // Action Creators
 // ------------------------------------
 
-export const post_collection = (new_collection_data) => {
-  return (dispatch, getState) => {
-    return new Promise((resolve, reject) => {
-      let url = base_url + '/collections';
-      let post_body = JSON.stringify({collection:new_collection_data});
-      let req_options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: post_body
-      };
-      fetch(url, req_options)
-        .then((response) => {
-          let promise = response.json();
-          promise.then(resp_body => {
-            let collection = resp_body.collection;
-            collection.app = get_default_collection().app;
-            collection.mode = get_default_collection().mode;
-            collection.points = [];
-            collection.tags = [];
-            dispatch({
-              type: FILL_BLANK_TAB_WITH_COLLECTION,
-              collection
-            })
-            resolve();
-          })
-        })
-        .catch((error)=> {
-          console.error('errrrrrrrr');
-          console.error(error)
-          resolve();
-        });
-    })
-  }
-}
-
 export const post_tag = (new_tag_data) => {
   return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
@@ -117,8 +80,8 @@ export const post_tag = (new_tag_data) => {
 }
 
 
-export const post_point = (point_data) => {
-  return (dispatch, getState) => {
+export const post_point = (dispatch, getState, point_data, input_ids) => {
+  //return (dispatch, getState) => {
     return new Promise((resolve, reject) => {
       let url = base_url + '/points';
       let tabs = getState().points.tabs;
@@ -152,7 +115,9 @@ export const post_point = (point_data) => {
                 point
               })
             }
-            clear_input_fields();
+            _.each(input_ids, id => {
+              document.getElementById(id).value = '';
+            });
             resolve();
           })
         })
@@ -162,7 +127,7 @@ export const post_point = (point_data) => {
           resolve();
         });
     })
-  }
+  //}
 }
 
 
@@ -215,6 +180,41 @@ export const search = (search_type, search_value) => {
         });
     })
   }
+}
+
+export const post_collection = (dispatch, new_collection_data) => {
+  return new Promise((resolve, reject) => {
+    let url = base_url + '/collections';
+    let post_body = JSON.stringify({collection:new_collection_data});
+    let req_options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: post_body
+    };
+    fetch(url, req_options)
+      .then((response) => {
+        let promise = response.json();
+        promise.then(resp_body => {
+          let collection = resp_body.collection;
+          collection.app = get_default_collection().app;
+          collection.mode = get_default_collection().mode;
+          collection.points = [];
+          collection.tags = [];
+          dispatch({
+            type: FILL_BLANK_TAB_WITH_COLLECTION,
+            collection
+          })
+          resolve();
+        })
+      })
+      .catch((error)=> {
+        console.error('errrrrrrrr');
+        console.error(error)
+        resolve();
+      });
+  })
 }
 
 
@@ -279,16 +279,21 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
   let tabs = getState().points.tabs;
   let focused_tab = get_focused_array_item(tabs);
   let sections = focused_tab.app.sections;
-  let focused_section_name = _.find(sections, section => {
+  let focused_section = _.find(sections, section => {
     return section.in_focus;
-  }).name;
+  });
   if (event.altKey && (key === 'k' || key === 'j')){
     let direction = get_direction_from_key(key);
     return dispatch({
       type: MOVE_SECTION_FOCUS,
       direction
     })
-  } else if (focused_section_name === 'collection_search'){
+  } else if (focused_section.name === 'collection_name_form'){
+    if (key === 'Enter'){
+      let collection_name = document.getElementById(focused_section.input_id).value;
+      post_collection(dispatch, {name:collection_name})
+    }
+  } else if (focused_section.name === 'collection_search'){
     if (event.ctrlKey && (key === 'j' || key === 'k')){
       let direction = get_direction_from_key(key);
       return dispatch({
@@ -302,7 +307,7 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
       }).search_suggestions;
       let collection_to_fetch = get_focused_array_item(search_suggestions);
       return new Promise((resolve, reject) => {
-        let url = base_url + '/collections/' + collection_to_fetch.collection_id
+        let url = base_url + '/collections/' + collection_to_fetch.collection_id;
         fetch(url, {})
           .then((response) => {
             let promise = response.json();
@@ -323,7 +328,7 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
           });
       })
     }
-  } else if (focused_section_name === 'just_add_points_button'){
+  } else if (focused_section.name === 'just_add_points_button'){
     if (event.ctrlKey && key === ' '){
       let just_add_points = get_just_add_points();
       return dispatch({
@@ -362,6 +367,18 @@ const handle_new_point_command = (dispatch, getState, event) => {
         type: NEW_POINT_REMOVE_TAG,
         tag_index
       })
+    }
+  } else if (focused_section.name === 'point_question_input' || focused_section.name === 'point_answer_input'){
+    if (key === 'Enter'){
+      let question_input_id = _.find(sections, section => {
+        return section.name === 'point_question_input';
+      }).input_id;
+      let answer_input_id = _.find(sections, section => {
+        return section.name === 'point_answer_input';
+      }).input_id;
+      let point_question = document.getElementById(question_input_id).value;
+      let point_answer = document.getElementById(answer_input_id).value;
+      post_point(dispatch, getState, {question:point_question, answer:point_answer}, [question_input_id, answer_input_id]);
     }
   } else if (focused_section.name === 'tags_search'){
     if (event.ctrlKey && (key === 'j' || key === 'k')){
@@ -415,11 +432,6 @@ const handle_collection_editor_command  = (dispatch, getState, event) => {
 // Utility Functions
 // ------------------------------------
 
-
-const clear_input_fields = () => {
-  document.getElementById('question_input').value = '';
-  document.getElementById('answer_input').value = '';
-}
 
 const set_item_focus = (item, focus) => {
   if (item.hasOwnProperty('app')){
@@ -513,7 +525,7 @@ const get_direction_from_key = (key) => {
     'h': -1,
     '[': -1,
     ']': 1
-  }
+  };
   if (key in key_direction_mapping){
     return key_direction_mapping[key];
   }
@@ -596,7 +608,7 @@ const COLLECTION_EDITOR_HANDLERS = {
   [COLLECTION_EDITOR_MOVE_TAG_SEARCH_FOCUS]: (collection_editor, action) => {
     let sections = collection_editor.sections;
     let section_i;
-    let tags_search = _.find(sections, (sections, i) => {
+    let tags_search = _.find(sections, (section, i) => {
       if (section.name === 'tags_search'){ section_i = i; return true; };
     });
     let new_suggestions = move_array_focus(tags_search.search_suggestions, action.direction);
@@ -605,7 +617,7 @@ const COLLECTION_EDITOR_HANDLERS = {
       sections: [
         ...collection_editor.sections.slice(0,section_i),
         {
-          tags_search,
+          ...tags_search,
           search_suggestions: new_suggestions
         },
         ...collection_editor.sections.slice(section_i+1)
@@ -619,7 +631,6 @@ const COLLECTION_EDITOR_HANDLERS = {
       in_focus: !collection_editor.in_focus
     }
   }
-
 
 }
 
@@ -768,31 +779,15 @@ const FOCUSED_TAB_HANDLERS = {
   },
 
   [ADD_TAG_TO_COLLECTION]: (collection, action) => {
-    let sections = collection.app.views.collection_editor.sections;
-    let section_i;
-    let tags_list = _.find(sections, (section, i) => {
-      if (section.name === 'tags_list'){ section_i = i; return true; };
-    });
-    if (get_focused_array_index(tags_list.tags) < 0){
+    if (get_focused_array_index(collection.tags) < 0){
       action.tag.in_focus = true;
     }
-    tags_list.tags.push(action.tag);
     return {
       ...collection,
-      app: {
-        ...collection.app,
-        views: {
-          ...collection.app.views,
-          collection_editor: {
-            ...collection.app.views.collection_editor,
-            sections: [
-              ...collection.app.views.collection_editor.sections.slice(0,section_i),
-              tags_list,
-              ...collection.app.views.collection_editor.sections.slice(section_i+1),
-            ]
-          }
-        }
-      }
+      tags: [
+        ...collection.tags,
+        action.tag
+      ]
     }
   },
 

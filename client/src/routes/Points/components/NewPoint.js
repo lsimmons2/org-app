@@ -37,9 +37,10 @@ class NewPoint extends React.Component {
     return (
       <div>
         <PointForm
-          post_point={this.props.post_point}
           question_section_in_focus={question_section.in_focus}
           answer_section_in_focus={answer_section.in_focus}
+          question_input_id={question_section.input_id}
+          answer_input_id={answer_section.input_id}
         />
         <TagsList
           tags={tags_list_section.tags}

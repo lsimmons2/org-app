@@ -1,12 +1,11 @@
 import { connect } from 'react-redux'
-import { post_point, post_tag, get_focused_array_item, search } from '../modules'
+import { post_tag, get_focused_array_item, search } from '../modules'
 import NewPoint from '../components/NewPoint'
 
 
 
 const mapDispatchToProps = {
   search,
-  post_point,
   post_tag
 }
 
@@ -15,7 +14,7 @@ const mapStateToProps = (globalState) => {
   let view = collection.app.views.new_point;
   return {
     view,
-    search,
+    search
   }
 }
 

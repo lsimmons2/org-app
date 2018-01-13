@@ -1,14 +1,18 @@
+import uuid from 'uuid/v4'
+
 
 const get_new_point_view = () => ({
-  in_focus: true,
+  in_focus: false,
   sections: [
     {
       name: 'point_question_input',
-      in_focus: true
+      in_focus: true,
+      input_id: uuid()
     },
     {
       name: 'point_answer_input',
-      in_focus: false
+      in_focus: false,
+      input_id: uuid()
     },
     {
       name: 'tags_list',
@@ -17,7 +21,8 @@ const get_new_point_view = () => ({
     },
     {
       name: 'tag_form',
-      in_focus: false
+      in_focus: false,
+      input_id: uuid()
     },
     {
       name: 'tags_search',
@@ -51,7 +56,8 @@ export const get_blank_tab = () => ({
       },
       {
         name: 'collection_name_form',
-        in_focus: false
+        in_focus: false,
+        input_id: uuid()
       },
       {
         name: 'just_add_points_button',
@@ -116,11 +122,11 @@ export const get_default_collection = () => ({
             name: 'mode_form',
             in_focus: true
           },
-          {
-            name: 'tags_list',
-            tags: [],
-            in_focus: false
-          },
+          //{
+            //name: 'tags_list',
+            //tags: [],
+            //in_focus: false
+          //},
           {
             name: 'tag_form',
             in_focus: false

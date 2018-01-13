@@ -1,7 +1,6 @@
 import React from 'react'
 import classNames from 'classnames'
 
-import Point from './Point'
 
 
 class PointForm extends React.Component {
@@ -25,15 +24,6 @@ class PointForm extends React.Component {
     this.handle_focusing()
   }
 
-  submitPoint(e){
-    e.preventDefault();
-    let form_data = {};
-    for (const field in this.refs){
-      form_data[field] = this.refs[field].value;
-    }
-    this.props.post_point(form_data);
-  }
-
   render() {
 
     let question_classes = classNames({
@@ -47,12 +37,12 @@ class PointForm extends React.Component {
     });
 
     return (
-      <form onSubmit={this.submitPoint.bind(this)}>
+      <form onSubmit={e => e.preventDefault()}>
         <div className={question_classes}>
-          <input ref="question" type="text" id="question_input" placeholder="Question"/>
+          <input id={this.props.question_input_id} ref="question" type="text" placeholder="Question"/>
         </div>
         <div className={answer_classes}>
-          <input ref="answer" type="text" id="answer_input" placeholder="Answer"/>
+          <input id={this.props.answer_input_id} ref="answer" type="text" placeholder="Answer"/>
         </div>
         <input type="submit" style={{visibility:'hidden',height:'0'}}/>
       </form>
