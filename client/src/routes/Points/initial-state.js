@@ -1,37 +1,39 @@
 
+const get_new_point_view = () => ({
+  in_focus: true,
+  sections: [
+    {
+      name: 'point_question_input',
+      in_focus: true
+    },
+    {
+      name: 'point_answer_input',
+      in_focus: false
+    },
+    {
+      name: 'tags_list',
+      tags: [],
+      in_focus: false
+    },
+    {
+      name: 'tag_form',
+      in_focus: false
+    },
+    {
+      name: 'tags_search',
+      search_suggestions: [],
+      in_focus: false
+    }
+  ]
+})
+
 export const get_just_add_points = () => ({
   name: 'just add points',
   app: {
     in_focus: true,
     is_just_add_points: true,
     views: {
-      new_point: {
-        in_focus: true,
-        sections: [
-          {
-            name: 'point_question_input',
-            in_focus: true
-          },
-          {
-            name: 'point_answer_input',
-            in_focus: false
-          },
-          {
-            name: 'tags_list',
-            tags: [],
-            in_focus: false
-          },
-          {
-            name: 'tag_form',
-            in_focus: false
-          },
-          {
-            name: 'tags_search',
-            search_suggestions: [],
-            in_focus: false
-          }
-        ]
-      }
+      new_point: get_new_point_view()
     }
   }
 })
@@ -99,38 +101,12 @@ export const get_default_collection = () => ({
     views: {
 
       //VIEW: POINT_LIST
-      point_list: {
-        in_focus: true
-      },
+      //point_list: {
+        //in_focus: true
+      //},
 
       //VIEW: NEW_POINT
-      new_point: {
-        in_focus: false,
-        sections: [
-          {
-            name: 'point_question_input',
-            in_focus: true
-          },
-          {
-            name: 'point_answer_input',
-            in_focus: false
-          },
-          {
-            name: 'tags_list',
-            tags: [],
-            in_focus: false
-          },
-          {
-            name: 'tag_form',
-            in_focus: false
-          },
-          {
-            name: 'tags_search',
-            search_suggestions: [],
-            in_focus: false
-          }
-        ]
-      },
+      new_point: get_new_point_view(),
 
       //VIEW: COLLECTION_EDITOR
       collection_editor: {
