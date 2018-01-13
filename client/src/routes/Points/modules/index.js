@@ -45,38 +45,36 @@ const base_url = 'http://localhost:8000'
 // Action Creators
 // ------------------------------------
 
-export const post_tag = (new_tag_data) => {
-  return (dispatch, getState) => {
-    return new Promise((resolve, reject) => {
-      let url = base_url + '/tags';
-      let post_body = JSON.stringify({tag:new_tag_data});
-      let req_options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: post_body
-      };
-      fetch(url, req_options)
-        .then((response) => {
-          let promise = response.json();
-          promise.then(resp_body => {
-            let tag = resp_body.tag;
-            tag.in_focus = false;
-            dispatch({
-              type: NEW_POINT_ADD_TAG,
-              tag
-            })
-            resolve();
+export const post_tag = (dispatch, new_tag_data) => {
+  return new Promise((resolve, reject) => {
+    let url = base_url + '/tags';
+    let post_body = JSON.stringify({tag:new_tag_data});
+    let req_options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: post_body
+    };
+    fetch(url, req_options)
+      .then((response) => {
+        let promise = response.json();
+        promise.then(resp_body => {
+          let tag = resp_body.tag;
+          tag.in_focus = false;
+          dispatch({
+            type: NEW_POINT_ADD_TAG,
+            tag
           })
-        })
-        .catch((error)=> {
-          console.error('errrrrrrrr');
-          console.error(error)
           resolve();
-        });
-    })
-  }
+        })
+      })
+      .catch((error)=> {
+        console.error('errrrrrrrr');
+        console.error(error)
+        resolve();
+      });
+  })
 }
 
 
@@ -379,6 +377,14 @@ const handle_new_point_command = (dispatch, getState, event) => {
       let point_question = document.getElementById(question_input_id).value;
       let point_answer = document.getElementById(answer_input_id).value;
       post_point(dispatch, getState, {question:point_question, answer:point_answer}, [question_input_id, answer_input_id]);
+    }
+  } else if (focused_section.name === 'tag_form'){
+    if (key === 'Enter'){
+      let tag_input_id = _.find(sections, section => {
+        return section.name === 'tag_form';
+      }).input_id;
+      let tag_name = document.getElementById(tag_input_id).value;
+      return post_tag(dispatch, {name: tag_name});
     }
   } else if (focused_section.name === 'tags_search'){
     if (event.ctrlKey && (key === 'j' || key === 'k')){

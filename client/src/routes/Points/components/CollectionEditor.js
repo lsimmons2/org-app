@@ -45,7 +45,6 @@ class CollectionEditor extends React.Component {
         />
         <TagForm
           in_focus={tag_form_section.in_focus}
-          post_tag={this.props.post_tag}
         />
         <Search
           search={this.props.search}

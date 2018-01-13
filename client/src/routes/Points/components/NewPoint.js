@@ -48,7 +48,7 @@ class NewPoint extends React.Component {
         />
         <TagForm
           in_focus={tag_form_section.in_focus}
-          post_tag={this.props.post_tag}
+          tag_input_id={tag_form_section.input_id}
         />
         <TagSearchContainer/>
       </div>

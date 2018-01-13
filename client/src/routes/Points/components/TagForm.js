@@ -6,16 +6,6 @@ import classNames from 'classnames'
 
 class TagForm extends React.Component {
 
-
-  post_tag(e){
-    e.preventDefault();
-    let form_data = {};
-    for (const field in this.refs){
-      form_data[field] = this.refs[field].value;
-    }
-    this.props.post_tag(form_data);
-  }
-
   handle_focusing(){
     if (this.props.in_focus){
       this.refs['name'].focus();
@@ -39,9 +29,9 @@ class TagForm extends React.Component {
     });
     return (
       <div>
-        <form onSubmit={this.post_tag.bind(this)}>
+        <form onSubmit={e => e.preventDefault()}>
           <div className={classes}>
-            <input ref="name" type="text" placeholder="New Tag Name"/>
+            <input id={this.props.tag_input_id} ref="name" type="text" placeholder="New Tag Name"/>
           </div>
         </form>
       </div>

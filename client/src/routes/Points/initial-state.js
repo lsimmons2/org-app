@@ -122,11 +122,11 @@ export const get_default_collection = () => ({
             name: 'mode_form',
             in_focus: true
           },
-          //{
-            //name: 'tags_list',
-            //tags: [],
-            //in_focus: false
-          //},
+          {
+            name: 'tags_list',
+            tags: [],
+            in_focus: false
+          },
           {
             name: 'tag_form',
             in_focus: false
