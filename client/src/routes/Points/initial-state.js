@@ -132,23 +132,6 @@ export const get_default_collection = () => ({
         ]
       },
 
-      //VIEW: POINT_EDITOR
-      point_editor: {
-        in_focus: false,
-        sections: {
-          point_question_input: {
-            in_focus: true
-          },
-          point_answer_input: {
-            in_focus: false
-          },
-          tags_list: {
-            in_focus: false,
-            show_search: false
-          }
-        }
-      },
-
       //VIEW: COLLECTION_EDITOR
       collection_editor: {
         in_focus: false,
@@ -159,6 +142,7 @@ export const get_default_collection = () => ({
           },
           {
             name: 'tags_list',
+            tags: [],
             in_focus: false
           },
           {
@@ -183,6 +167,23 @@ export const get_default_collection = () => ({
             //in_focus: false
           //}
         ]
+      },
+
+      //VIEW: POINT_EDITOR
+      point_editor: {
+        in_focus: false,
+        sections: {
+          point_question_input: {
+            in_focus: true
+          },
+          point_answer_input: {
+            in_focus: false
+          },
+          tags_list: {
+            in_focus: false,
+            show_search: false
+          }
+        }
       }
 
     }

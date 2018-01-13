@@ -34,6 +34,7 @@ class TagsList extends React.Component {
       </div>
     )
   }
+
 }
 
 

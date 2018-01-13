@@ -13,7 +13,6 @@ class Collection extends React.Component {
     return (
       <div>
         <CollectionMetaContainer/>
-        <PointListContainer/>
         <NewPointContainer/>
         <CollectionEditorContainer/>
       </div>
@@ -21,6 +20,7 @@ class Collection extends React.Component {
   }
 
 }
+        //<PointListContainer/>
 
 
 export default Collection
