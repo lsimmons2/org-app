@@ -15,10 +15,12 @@ const mapStateToProps = (globalState) => {
   let tags_search = _.find(sections, section => {
     return section.name === 'tags_search'
   });
+  let input_id = tags_search.input_id
   return {
     in_focus: tags_search.in_focus,
     search_suggestions: tags_search.search_suggestions,
-    search_type: 'tags'
+    search_type: 'tags',
+    input_id
   }
 }
 

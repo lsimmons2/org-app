@@ -31,9 +31,9 @@ class Search extends React.Component {
 
   handle_focusing(){
     if (this.props.in_focus){
-      document.getElementById('tag_search').focus();
+      this.refs['name'].focus();
     } else {
-      document.getElementById('tag_search').blur();
+      this.refs['name'].blur();
     }
   }
 
@@ -52,19 +52,13 @@ class Search extends React.Component {
       'big_section': true,
       'big_section_in_focus': this.props.in_focus
     });
-    let type = this.props.search_type;
 
+    let type = this.props.search_type;
     let placeholder = 'Search ' + type.charAt(0).toUpperCase() + type.slice(1);
 
     return (
       <div className={classes}>
-        <DebounceInput
-          id='tag_search'
-          minLength={2}
-          debounceTimeout={300}
-          onChange={event => this.handle_search(event)}
-          placeholder={placeholder}
-        />
+        <input id={this.props.input_id} ref='name' type='text' placeholder={placeholder}/>
         {suggestions}
       </div>
     )

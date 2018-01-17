@@ -27,7 +27,8 @@ const get_new_point_view = () => ({
     {
       name: 'tags_search',
       search_suggestions: [],
-      in_focus: false
+      in_focus: false,
+      input_id: uuid()
     }
   ]
 })
@@ -52,7 +53,8 @@ export const get_blank_tab = () => ({
       {
         name: 'collection_search',
         in_focus: true,
-        search_suggestions: []
+        search_suggestions: [],
+        input_id: uuid()
       },
       {
         name: 'collection_name_form',
@@ -134,6 +136,11 @@ export const get_default_collection = () => ({
           {
             name: 'tags_search',
             search_suggestions: [],
+            in_focus: false,
+            input_id: uuid()
+          },
+          {
+            name: 'collection_save',
             in_focus: false
           }//,
           //{

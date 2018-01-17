@@ -13,14 +13,15 @@ export const ADD_TAB = 'ADD_TAB'
 export const ADD_TAG_TO_COLLECTION = 'ADD_TAG_TO_COLLECTION'
 export const ADD_POINT = 'ADD_POINT'
 export const TOGGLE_VIEW_VISIBILITY = 'TOGGLE_VIEW_VISIBILITY'
-export const FILL_BLANK_TAB_WITH_COLLECTION = 'FILL_BLANK_TAB_WITH_COLLECTION'
-export const FILL_BLANK_TAB_WITH_JUST_ADD_POINTS = 'FILL_BLANK_TAB_WITH_JUST_ADD_POINTS'
-export const MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS = 'MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS'
 export const MOVE_SECTION_FOCUS = 'MOVE_SECTION_FOCUS'
 export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
 export const POST_POINT_SUCCESS = 'POST_POINT_SUCCESS'
-export const UPDATE_SEARCH_SUGGESTIONS = 'UPDATE_SEARCH_SUGGESTIONS'
+
+export const BLANK_TAB_FILL_WITH_COLLECTION = 'BLANK_TAB_FILL_WITH_COLLECTION'
+export const BLANK_TAB_FILL_WITH_JUST_ADD_POINTS = 'BLANK_TAB_FILL_WITH_JUST_ADD_POINTS'
+export const BLANK_TAB_MOVE_COLLECTION_SEARCH_FOCUS = 'BLANK_TAB_MOVE_COLLECTION_SEARCH_FOCUS'
+export const BLANK_TAB_UPDATE_COLLECTION_SEARCH_SUGGESTIONS = 'BLANK_TAB_UPDATE_COLLECTION_SEARCH_SUGGESTIONS'
 
 export const COLLECTION_EDITOR_MOVE_SECTION_FOCUS = 'COLLECTION_EDITOR_MOVE_SECTION_FOCUS'
 export const COLLECTION_EDITOR_MOVE_TAG_SEARCH_FOCUS = 'COLLECTION_EDITOR_MOVE_TAG_SEARCH_FOCUS'
@@ -129,56 +130,59 @@ export const post_point = (dispatch, getState, point_data, input_ids) => {
 }
 
 
-export const search = (search_type, search_value) => {
-  return (dispatch, getState) => {
-    if (search_value.length < 1){
-      return dispatch({
-        type: IGNORE
-      })
-    }
-    return new Promise((resolve, reject) => {
-      let url = base_url + '/' + search_type + '/search/' + search_value;
-      fetch(url, {})
-        .then((response) => {
-          let promise = response.json();
-          promise.then(resp_body => {
-            let suggestions = resp_body.suggestions;
-            _.each(suggestions, function(suggestion){
-              suggestion.in_focus = false;
-            });
-            let tab = get_focused_array_item(getState().points.tabs);
-            if (tab.app.views){
-              if (tab.app.views.new_point.in_focus){
-                dispatch({
-                  type: NEW_POINT_UPDATE_SEARCH_SUGGESTIONS,
-                  suggestions
-                });
-                resolve();
-                return;
-              } else if (tab.app.views.collection_editor.in_focus){
-                dispatch({
-                  type: COLLECTION_EDITOR_UPDATE_SEARCH_SUGGESTIONS,
-                  suggestions
-                });
-                resolve();
-                return;
-              }
+export const immediate_search = (dispatch, getState, search_type, search_value) => {
+  if (search_value.length < 1){
+    return dispatch({
+      type: IGNORE
+    })
+  }
+  return new Promise((resolve, reject) => {
+    let url = base_url + '/' + search_type + '/search/' + search_value;
+    fetch(url, {})
+      .then((response) => {
+        let promise = response.json();
+        promise.then(resp_body => {
+          let suggestions = resp_body.suggestions;
+          _.each(suggestions, function(suggestion){
+            suggestion.in_focus = false;
+          });
+          let tab = get_focused_array_item(getState().points.tabs);
+          if (tab.app.views){
+            if (tab.app.views.new_point.in_focus){
+              dispatch({
+                type: NEW_POINT_UPDATE_SEARCH_SUGGESTIONS,
+                suggestions
+              });
+              resolve();
+              return;
+            } else if (tab.app.views.collection_editor.in_focus){
+              dispatch({
+                type: COLLECTION_EDITOR_UPDATE_SEARCH_SUGGESTIONS,
+                suggestions
+              });
+              resolve();
+              return;
             }
+          } else if (tab.app.is_blank){
             dispatch({
-              type: UPDATE_SEARCH_SUGGESTIONS,
+              type: BLANK_TAB_UPDATE_COLLECTION_SEARCH_SUGGESTIONS,
               suggestions
             });
             resolve();
-          })
+          }
         })
-        .catch((error)=> {
-          console.error('errrrrrrrr');
-          console.error(error)
-          resolve();
-        });
-    })
-  }
+      })
+      .catch((error)=> {
+        console.error('errrrrrrrr');
+        console.error(error)
+        resolve();
+      });
+  })
 }
+
+
+export const search = _.debounce(immediate_search, 500); 
+
 
 export const post_collection = (dispatch, new_collection_data) => {
   return new Promise((resolve, reject) => {
@@ -201,7 +205,7 @@ export const post_collection = (dispatch, new_collection_data) => {
           collection.points = [];
           collection.tags = [];
           dispatch({
-            type: FILL_BLANK_TAB_WITH_COLLECTION,
+            type: BLANK_TAB_FILL_WITH_COLLECTION,
             collection
           })
           resolve();
@@ -295,7 +299,7 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
     if (event.ctrlKey && (key === 'j' || key === 'k')){
       let direction = get_direction_from_key(key);
       return dispatch({
-        type: MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS,
+        type: BLANK_TAB_MOVE_COLLECTION_SEARCH_FOCUS,
         direction
       });
     } else if (key === 'Enter'){
@@ -313,7 +317,7 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
               let collection = resp_body.collection;
               collection.mode = get_default_collection().mode
               return dispatch({
-                type: FILL_BLANK_TAB_WITH_COLLECTION,
+                type: BLANK_TAB_FILL_WITH_COLLECTION,
                 collection
               });
               resolve();
@@ -325,18 +329,20 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
             resolve();
           });
       })
+    } else if (!event.altKey && !event.ctrlKey){
+      let search_value = document.getElementById(focused_section.input_id).value;
+      search(dispatch, getState, 'collections', search_value);
     }
   } else if (focused_section.name === 'just_add_points_button'){
     if (event.ctrlKey && key === ' '){
       let just_add_points = get_just_add_points();
       return dispatch({
-        type: FILL_BLANK_TAB_WITH_JUST_ADD_POINTS,
+        type: BLANK_TAB_FILL_WITH_JUST_ADD_POINTS,
         just_add_points
       });
     }
   }
 }
-
 
 const handle_new_point_command = (dispatch, getState, event) => {
   let focused_tab = get_focused_array_item(getState().points.tabs)
@@ -399,6 +405,12 @@ const handle_new_point_command = (dispatch, getState, event) => {
         type: NEW_POINT_ADD_TAG,
         tag
       });
+    } else if (!event.altKey && !event.ctrlKey){
+      let tags_search = _.find(sections, section => {
+        return section.name === 'tags_search';
+      });
+      let search_value = document.getElementById(tags_search.input_id).value;
+      search(dispatch, getState, 'tags', search_value);
     }
   }
 }
@@ -429,6 +441,13 @@ const handle_collection_editor_command  = (dispatch, getState, event) => {
       type: ADD_TAG_TO_COLLECTION,
       tag
     })
+  } else if (!event.altKey && !event.ctrlKey){
+    let sections = get_focused_array_item(getState().points.tabs).app.views.collection_editor.sections;
+    let tags_search = _.find(sections, section => {
+      return section.name === 'tags_search';
+    });
+    let search_value = document.getElementById(tags_search.input_id).value;
+    search(dispatch, getState, 'tags', search_value);
   }
 }
 
@@ -797,18 +816,18 @@ const FOCUSED_TAB_HANDLERS = {
     }
   },
 
-  [FILL_BLANK_TAB_WITH_COLLECTION]: (tab, action) => {
+  [BLANK_TAB_FILL_WITH_COLLECTION]: (tab, action) => {
     let new_collection = action.collection;
     new_collection.app = get_default_collection().app;
     new_collection.app.in_focus = true;
     return new_collection
   },
 
-  [FILL_BLANK_TAB_WITH_JUST_ADD_POINTS]: (tab, action) => {
+  [BLANK_TAB_FILL_WITH_JUST_ADD_POINTS]: (tab, action) => {
     return action.just_add_points
   },
 
-  [MOVE_BLANK_TAB_COLLECTION_SEARCH_FOCUS]: (tab, action) => {
+  [BLANK_TAB_MOVE_COLLECTION_SEARCH_FOCUS]: (tab, action) => {
     let collection_search = _.find(tab.app.sections, section => {
       return section.name === 'collection_search';
     })
@@ -816,6 +835,40 @@ const FOCUSED_TAB_HANDLERS = {
     suggestions = move_array_focus(suggestions, action.direction);
     collection_search.search_suggestions = suggestions;
     return tab
+  },
+
+  [BLANK_TAB_UPDATE_COLLECTION_SEARCH_SUGGESTIONS]: (collection, action) => {
+    if (collection.app.is_blank){
+      let sections = collection.app.sections;
+      let section_i;
+      let collection_search = _.find(sections, (section, i) => {
+        if (section.name === 'collection_search'){ section_i = i; return true; };
+      });
+      return {
+        ...collection,
+        app: {
+          ...collection.app,
+          sections: [
+            ...sections.slice(0, section_i),
+            {
+              ...collection_search,
+              search_suggestions: action.suggestions
+            },
+            ...sections.slice(section_i+1)
+          ]
+        }
+      }
+    } else if (collection.app.is_just_add_points){
+      if (collection.app.views.new_point.in_focus){
+        let tags_search = _.find(collection.app.views.new_point.sections, section => {
+          return section.name === 'tags_search';
+        });
+        if (tags_search.in_focus){
+          tags_search.search_suggestions = action.suggestions;
+        }
+      }
+    }
+    return collection
   },
 
   [MOVE_SECTION_FOCUS]: (tab, action) => {
@@ -829,25 +882,6 @@ const FOCUSED_TAB_HANDLERS = {
         }
       }
     }
-  },
-
-  [UPDATE_SEARCH_SUGGESTIONS]: (collection, action) => {
-    if (collection.app.is_blank){
-      let collection_search = _.find(collection.app.sections, section => {
-        return section.name === 'collection_search';
-      });
-      collection_search.search_suggestions = action.suggestions;
-    } else if (collection.app.is_just_add_points){
-      if (collection.app.views.new_point.in_focus){
-        let tags_search = _.find(collection.app.views.new_point.sections, section => {
-          return section.name === 'tags_search';
-        });
-        if (tags_search.in_focus){
-          tags_search.search_suggestions = action.suggestions;
-        }
-      }
-    }
-    return collection
   }
 
 }

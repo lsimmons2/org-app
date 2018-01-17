@@ -51,6 +51,7 @@ class CollectionEditor extends React.Component {
           in_focus={tags_search_section.in_focus}
           search_suggestions={tags_search_section.search_suggestions}
           search_type='tags'
+          input_id={this.props.tags_search_input_id}
         />
       </div>
     )
