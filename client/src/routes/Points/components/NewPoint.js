@@ -4,7 +4,7 @@ import _ from 'underscore'
 import TagsList from './TagsList'
 import TagForm from './TagForm'
 import PointForm from './PointForm'
-import TagSearchContainer from '../containers/TagSearchContainer'
+import Search from './Search'
 
 
 class NewPoint extends React.Component {
@@ -34,6 +34,10 @@ class NewPoint extends React.Component {
       return section.name === 'tag_form';
     });
 
+    let tags_search_section = _.find(sections, function(section){
+      return section.name === 'tags_search';
+    });
+
     return (
       <div>
         <PointForm
@@ -50,7 +54,12 @@ class NewPoint extends React.Component {
           in_focus={tag_form_section.in_focus}
           tag_input_id={tag_form_section.input_id}
         />
-        <TagSearchContainer/>
+        <Search
+          in_focus={tags_search_section.in_focus}
+          search_suggestions={tags_search_section.search_suggestions}
+          search_type='tags'
+          input_id={tags_search_section.input_id}
+        />
       </div>
     )
   }

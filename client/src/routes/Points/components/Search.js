@@ -24,11 +24,6 @@ class Search extends React.Component {
     })
   }
 
-  handle_search(e){
-    let search_value = e.target.value;
-    this.props.search(this.props.search_type, search_value);
-  }
-
   handle_focusing(){
     if (this.props.in_focus){
       this.refs['name'].focus();
