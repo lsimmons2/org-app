@@ -9,18 +9,19 @@ import {
 } from '../initial-state'
 
 export const IGNORE = 'IGNORE'
+
 export const ADD_TAB = 'ADD_TAB'
-export const ADD_TAG_TO_COLLECTION = 'ADD_TAG_TO_COLLECTION'
-export const ADD_POINT = 'ADD_POINT'
-export const TOGGLE_VIEW_VISIBILITY = 'TOGGLE_VIEW_VISIBILITY'
-export const MOVE_SECTION_FOCUS = 'MOVE_SECTION_FOCUS'
-export const MOVE_TAG_SEARCH_FOCUS = 'MOVE_TAG_SEARCH_FOCUS'
 export const MOVE_TAB_FOCUS = 'MOVE_TAB_FOCUS'
-export const POST_POINT_SUCCESS = 'POST_POINT_SUCCESS'
+
+export const ADD_TAG_TO_COLLECTION = 'ADD_TAG_TO_COLLECTION'
+export const ADD_POINT_TO_COLLECTION = 'ADD_POINT_TO_COLLECTION'
+export const SHOW_ALERT = 'SHOW_ALERT'
+export const TOGGLE_VIEW_VISIBILITY = 'TOGGLE_VIEW_VISIBILITY'
 
 export const BLANK_TAB_FILL_WITH_COLLECTION = 'BLANK_TAB_FILL_WITH_COLLECTION'
 export const BLANK_TAB_FILL_WITH_JUST_ADD_POINTS = 'BLANK_TAB_FILL_WITH_JUST_ADD_POINTS'
 export const BLANK_TAB_MOVE_COLLECTION_SEARCH_FOCUS = 'BLANK_TAB_MOVE_COLLECTION_SEARCH_FOCUS'
+export const BLANK_TAB_MOVE_SECTION_FOCUS = 'BLANK_TAB_MOVE_SECTION_FOCUS'
 export const BLANK_TAB_UPDATE_COLLECTION_SEARCH_SUGGESTIONS = 'BLANK_TAB_UPDATE_COLLECTION_SEARCH_SUGGESTIONS'
 
 export const COLLECTION_EDITOR_MOVE_SECTION_FOCUS = 'COLLECTION_EDITOR_MOVE_SECTION_FOCUS'
@@ -104,13 +105,13 @@ export const post_point = (dispatch, getState, point_data, input_ids) => {
             if (focused_tab.app.is_just_add_points){
               let alert = 'Point ' + resp_body.point.point_id + ' saved succesfully'
               dispatch({
-                type: POST_POINT_SUCCESS,
+                type: SHOW_ALERT,
                 alert
               })
             } else if (focused_tab.mode.select_points){
               let point = resp_body.point;
               dispatch({
-                type: ADD_POINT,
+                type: ADD_POINT_TO_COLLECTION,
                 point
               })
             }
@@ -143,7 +144,7 @@ export const immediate_search = (dispatch, getState, search_type, search_value) 
         let promise = response.json();
         promise.then(resp_body => {
           let suggestions = resp_body.suggestions;
-          _.each(suggestions, function(suggestion){
+          _.each(suggestions, suggestion => {
             suggestion.in_focus = false;
           });
           let tab = get_focused_array_item(getState().points.tabs);
@@ -234,7 +235,7 @@ export const detect_keypress = (event) => {
       handle_blank_tab_command(dispatch, getState, event);
     } else if (focused_tab.app.views.new_point.in_focus){
       handle_new_point_command(dispatch, getState, event);
-    } else if (focused_tab.app.views.collection_editor.in_focus){
+    } else if (!focused_tab.app.is_just_add_points && focused_tab.app.views.collection_editor.in_focus){
       handle_collection_editor_command(dispatch, getState, event);
     }
 
@@ -287,7 +288,7 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
   if (event.altKey && (key === 'k' || key === 'j')){
     let direction = get_direction_from_key(key);
     return dispatch({
-      type: MOVE_SECTION_FOCUS,
+      type: BLANK_TAB_MOVE_SECTION_FOCUS,
       direction
     })
   } else if (focused_section.name === 'collection_name_form'){
@@ -355,7 +356,7 @@ const handle_new_point_command = (dispatch, getState, event) => {
       direction
     })
   }
-  let focused_section = _.find(sections, function(section){
+  let focused_section = _.find(sections, section => {
       return section.in_focus;
   });
   if (focused_section.name === 'tags_list'){
@@ -543,7 +544,7 @@ export const get_focused_array_item = (arr) => {
 
 
 const get_direction_from_key = (key) => {
-  let key_direction_mapping = {
+  let key_direction_map = {
     'j': 1,
     'k': -1,
     'l': 1,
@@ -551,11 +552,12 @@ const get_direction_from_key = (key) => {
     '[': -1,
     ']': 1
   };
-  if (key in key_direction_mapping){
-    return key_direction_mapping[key];
+  if (key in key_direction_map){
+    return key_direction_map[key];
   }
   return null;
 }
+
 
 
 // ------------------------------------
@@ -584,7 +586,7 @@ const GLOBAL_ACTION_HANDLERS = {
     };
   },
 
-  [POST_POINT_SUCCESS]: (state, action) => {
+  [SHOW_ALERT]: (state, action) => {
     return {
       ...state,
       global: {
@@ -793,7 +795,7 @@ const NEW_POINT_HANDLERS = {
 
 const FOCUSED_TAB_HANDLERS = {
 
-  [ADD_POINT]: (collection, action) => {
+  [ADD_POINT_TO_COLLECTION]: (collection, action) => {
     return {
       ...collection,
       points: [
@@ -871,7 +873,7 @@ const FOCUSED_TAB_HANDLERS = {
     return collection
   },
 
-  [MOVE_SECTION_FOCUS]: (tab, action) => {
+  [BLANK_TAB_MOVE_SECTION_FOCUS]: (tab, action) => {
     if (tab.app.is_blank){
       let sections = move_array_focus(tab.app.sections, action.direction);
       return {
