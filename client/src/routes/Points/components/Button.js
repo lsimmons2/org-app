@@ -4,7 +4,7 @@ import classNames from 'classnames'
 
 
 
-class JustAddPointsButton extends React.Component {
+class Button extends React.Component {
 
   render() {
     let classes = classNames({
@@ -14,7 +14,7 @@ class JustAddPointsButton extends React.Component {
 
     return (
       <div className={classes}>
-        <p>Just Add Points</p>
+        <p>{this.props.text}</p>
       </div>
     )
   }
@@ -22,4 +22,4 @@ class JustAddPointsButton extends React.Component {
 }
 
 
-export default JustAddPointsButton
+export default Button

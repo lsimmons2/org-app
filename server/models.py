@@ -75,5 +75,5 @@ class Collection(Base):
         return {
             'collection_id': self.collection_id,
             'name': self.name,
-            'tags': self.tags
+            'tags': [ {'name':t.name, 'tag_id':t.tag_id} for t in self.tags ]
         }

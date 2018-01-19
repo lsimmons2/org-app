@@ -222,6 +222,45 @@ export const post_collection = (dispatch, new_collection_data) => {
 }
 
 
+export const save_collection = (dispatch, getState) => {
+  return new Promise((resolve, reject) => {
+    let collection = get_focused_array_item(getState().points.tabs);
+    let url = base_url + '/collections/' + collection.collection_id;
+    collection.tag_ids = _.map(collection.tags, tag => {
+      return tag.tag_id;
+    });
+    delete collection.tags;
+    delete collection.app;
+    let put_body = JSON.stringify({collection});
+    let req_options = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: put_body
+    };
+    fetch(url, req_options)
+      .then(response => {
+        let promise = response.json();
+        promise.then(resp_body => {
+          console.log(resp_body);
+          let alert = 'Collection ' + collection.collection_id + ' saved successfully';
+          return dispatch({
+            type: SHOW_ALERT,
+            alert
+          })
+          resolve();
+        })
+      })
+      .catch((error)=> {
+        console.error('errrrrrrrr');
+        console.error(error)
+        resolve();
+      });
+  })
+}
+
+
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
 
@@ -420,46 +459,61 @@ const handle_new_point_command = (dispatch, getState, event) => {
 
 const handle_collection_editor_command  = (dispatch, getState, event) => {
   let key = event.key;
-  let tag_search_in_focus = _.find(get_focused_array_item(getState().points.tabs).app.views.collection_editor.sections, section => {
+  let sections = get_focused_array_item(getState().points.tabs).app.views.collection_editor.sections;
+  let mode_form = _.find(sections, section => {
+    return section.name === 'mode_form';
+  });
+  let tags_search = _.find(sections, section => {
     return section.name === 'tags_search';
-  }).in_focus;
+  });
+  let save_button = _.find(sections, section => {
+    return section.name === 'save_button';
+  });
+  let tag_form = _.find(sections, section => {
+    return section.name === 'tag_form';
+  });
+
   if (event.altKey && (key === 'j' || key === 'k')){
     let direction = get_direction_from_key(key);
     return dispatch({
       type: COLLECTION_EDITOR_MOVE_SECTION_FOCUS,
       direction
     })
-  } else if (event.ctrlKey && (key === 'j' || key === 'k')){
-    let direction = get_direction_from_key(key);
-    return dispatch({
-      type: COLLECTION_EDITOR_MOVE_TAG_SEARCH_FOCUS,
-      direction
-    })
-  } else if (key === 'Enter'){
-    let tab = get_focused_array_item(getState().points.tabs);
-    let tags_search = _.find(tab.app.views.collection_editor.sections, section => {
-      return section.name === 'tags_search';
-    });
-    let tag_suggestions = tags_search.search_suggestions;
-    let tag = get_focused_array_item(tag_suggestions);
-    return dispatch({
-      type: ADD_TAG_TO_COLLECTION,
-      tag
-    })
-  } else if (!event.altKey && !event.ctrlKey && tag_search_in_focus){
-    let sections = get_focused_array_item(getState().points.tabs).app.views.collection_editor.sections;
-    let tags_search = _.find(sections, section => {
-      return section.name === 'tags_search';
-    });
-    let search_value = document.getElementById(tags_search.input_id).value;
-    search(dispatch, getState, 'tags', search_value);
-  } else if (key === 'h' || key === 'l'){
-    let direction = get_direction_from_key(key);
-    dispatch({
-      type: CHANGE_COLLECTION_MODE,
-      direction
-    })
+  } else if (tags_search.in_focus){
+    if (event.ctrlKey && (key === 'j' || key === 'k')){
+      let direction = get_direction_from_key(key);
+      return dispatch({
+        type: COLLECTION_EDITOR_MOVE_TAG_SEARCH_FOCUS,
+        direction
+      })
+    } else if (key === 'Enter'){
+      let tag_suggestions = tags_search.search_suggestions;
+      let tag = get_focused_array_item(tag_suggestions);
+      return dispatch({
+        type: ADD_TAG_TO_COLLECTION,
+        tag
+      })
+    } else if (!event.altKey && !event.ctrlKey){
+      let sections = sections;
+      let search_value = document.getElementById(tags_search.input_id).value;
+      search(dispatch, getState, 'tags', search_value);
+    }
+  } else if (mode_form.in_focus){
+    if (key === 'h' || key === 'l'){
+      let direction = get_direction_from_key(key);
+      return dispatch({
+        type: CHANGE_COLLECTION_MODE,
+        direction
+      })
+    }
+  } else if (tag_form.in_focus){
+    //TODO: add new tag
+  } else if (save_button.in_focus){
+    if (key === ' ' && event.ctrlKey){
+      save_collection(dispatch, getState);
+    }
   }
+
 }
 
 

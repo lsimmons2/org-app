@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { get_focused_array_item } from '../modules'
 import _ from 'underscore'
-import JustAddPointsButton from '../components/JustAddPointsButton'
+import Button from '../components/Button'
 
 
 
@@ -11,8 +11,9 @@ const mapStateToProps = (globalState) => {
     return section.name === 'just_add_points_button';
   });
   return {
-    in_focus: just_add_points_button.in_focus
+    in_focus: just_add_points_button.in_focus,
+    text: 'Just add points'
   }
 }
 
-export default connect(mapStateToProps)(JustAddPointsButton)
+export default connect(mapStateToProps)(Button)

@@ -50,7 +50,6 @@ def post_points():
     new_point = Point(**new_point_data['point'])
     try:
         for tag_id in new_point_data['tag_ids']:
-            print 'adding tag with id', id
             tag = session.query(Tag).get(tag_id)
             new_point.tags.append(tag)
     except KeyError:
@@ -105,8 +104,16 @@ def update_collection(collection_id):
     if collection is None:
         return 'Collection not found', 404
     put_data = request.json
-    for field in put_data:
-        setattr(collection, field, put_data[field])
+    for field in put_data['collection']:
+        if field == 'mode':
+            pass
+        elif field == 'tag_ids':
+            tags = session.query(Tag)\
+                .filter(Tag.tag_id.in_(put_data['collection']['tag_ids']))\
+                .all()
+            collection.tags = collection.tags + tags
+        else:
+            setattr(collection, field, put_data['collection'][field])
     session.add(collection)
     session.flush()
     updated_collection = collection.serialize

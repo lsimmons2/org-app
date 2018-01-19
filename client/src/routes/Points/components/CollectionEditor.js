@@ -6,6 +6,7 @@ import CollectionModeEditor from './CollectionModeEditor'
 import TagsList from './TagsList'
 import TagForm from './TagForm'
 import Search from './Search'
+import Button from './Button'
 
 
 class CollectionEditor extends React.Component {
@@ -33,6 +34,10 @@ class CollectionEditor extends React.Component {
       return section.name === 'tags_search';
     });
 
+    let save_button_section = _.find(sections, function(section){
+      return section.name === 'save_button';
+    });
+
     return (
       <div>
         <CollectionModeEditor
@@ -52,6 +57,10 @@ class CollectionEditor extends React.Component {
           search_suggestions={tags_search_section.search_suggestions}
           search_type='tags'
           input_id={this.props.tags_search_input_id}
+        />
+        <Button
+          in_focus={save_button_section.in_focus}
+          text={'Save collection'}
         />
       </div>
     )

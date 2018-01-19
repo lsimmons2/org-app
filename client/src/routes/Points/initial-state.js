@@ -122,11 +122,11 @@ export const get_default_collection = () => ({
         sections: [
           {
             name: 'mode_form',
+            selected_mode: '',
             in_focus: true
           },
           {
             name: 'tags_list',
-            tags: [],
             in_focus: false
           },
           {
@@ -140,9 +140,13 @@ export const get_default_collection = () => ({
             input_id: uuid()
           },
           {
-            name: 'collection_save',
+            name: 'save_button',
             in_focus: false
           }//,
+          //{
+            //name: 'collection_name_form',
+            //in_focus: false
+          //},
           //{
             //name: 'collection_name_form',
             //in_focus: false
