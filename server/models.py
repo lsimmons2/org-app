@@ -70,6 +70,9 @@ class Collection(Base):
     tags = relationship('Tag', secondary=tag_collection_association_table)
     time_added = Column(TIMESTAMP, default=func.now(), server_default=text("CURRENT_TIMESTAMP"))
     time_updated = Column(TIMESTAMP, default=func.now(), onupdate=func.now(), server_default=text("CURRENT_TIMESTAMP"))
+    is_tags_exclusive = Column(Boolean, default=False, server_default="0")
+    is_tags_inclusive = Column(Boolean, default=False, server_default="0")
+    is_select_points = Column(Boolean, default=False, server_default="0")
     @property
     def serialize(self):
         return {
