@@ -17,7 +17,7 @@ class CollectionEditor extends React.Component {
 
     let sections = this.props.view.sections;
 
-    let mode_section = _.find(sections, function(section){
+    let mode_form_section = _.find(sections, function(section){
       return section.name === 'mode_form';
     });
 
@@ -36,7 +36,7 @@ class CollectionEditor extends React.Component {
     return (
       <div>
         <CollectionModeEditor
-          in_focus={mode_section.in_focus}
+          in_focus={mode_form_section.in_focus}
           mode={this.props.mode}
         />
         <TagsList

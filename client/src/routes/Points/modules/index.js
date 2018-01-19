@@ -28,6 +28,7 @@ export const COLLECTION_EDITOR_MOVE_SECTION_FOCUS = 'COLLECTION_EDITOR_MOVE_SECT
 export const COLLECTION_EDITOR_MOVE_TAG_SEARCH_FOCUS = 'COLLECTION_EDITOR_MOVE_TAG_SEARCH_FOCUS'
 export const COLLECTION_EDITOR_UPDATE_SEARCH_SUGGESTIONS = 'COLLECTION_EDITOR_UPDATE_SEARCH_SUGGESTIONS'
 export const COLLECTION_EDITOR_TOGGLE_VIEW_VISIBILITY = 'COLLECTION_EDITOR_TOGGLE_VIEW_VISIBILITY'
+export const CHANGE_COLLECTION_MODE = 'CHANGE_COLLECTION_MODE'
 
 export const NEW_POINT_ADD_TAG = 'NEW_POINT_ADD_TAG'
 export const NEW_POINT_TOGGLE_VIEW_VISIBILITY = 'NEW_POINT_TOGGLE_VIEW_VISIBILITY'
@@ -419,6 +420,9 @@ const handle_new_point_command = (dispatch, getState, event) => {
 
 const handle_collection_editor_command  = (dispatch, getState, event) => {
   let key = event.key;
+  let tag_search_in_focus = _.find(get_focused_array_item(getState().points.tabs).app.views.collection_editor.sections, section => {
+    return section.name === 'tags_search';
+  }).in_focus;
   if (event.altKey && (key === 'j' || key === 'k')){
     let direction = get_direction_from_key(key);
     return dispatch({
@@ -442,13 +446,19 @@ const handle_collection_editor_command  = (dispatch, getState, event) => {
       type: ADD_TAG_TO_COLLECTION,
       tag
     })
-  } else if (!event.altKey && !event.ctrlKey){
+  } else if (!event.altKey && !event.ctrlKey && tag_search_in_focus){
     let sections = get_focused_array_item(getState().points.tabs).app.views.collection_editor.sections;
     let tags_search = _.find(sections, section => {
       return section.name === 'tags_search';
     });
     let search_value = document.getElementById(tags_search.input_id).value;
     search(dispatch, getState, 'tags', search_value);
+  } else if (key === 'h' || key === 'l'){
+    let direction = get_direction_from_key(key);
+    dispatch({
+      type: CHANGE_COLLECTION_MODE,
+      direction
+    })
   }
 }
 
@@ -883,6 +893,36 @@ const FOCUSED_TAB_HANDLERS = {
           section: sections
         }
       }
+    }
+  },
+
+  [CHANGE_COLLECTION_MODE]: (tab, action) => {
+    let mode_dict = tab.mode;
+    let new_mode_dict = get_default_collection().mode;
+    for (let k in new_mode_dict){
+      new_mode_dict[k] = false;
+    }
+    let direction = action.direction;
+    if (direction === 1){
+      if (mode_dict.tags_exclusive){
+        new_mode_dict.tags_inclusive = true;
+      } else if (mode_dict.tags_inclusive){
+        new_mode_dict.select_points = true;
+      } else {
+        new_mode_dict.select_points = true;
+      }
+    } else if (direction === -1){
+      if (mode_dict.select_points){
+        new_mode_dict.tags_inclusive = true;
+      } else if (mode_dict.tags_inclusive){
+        new_mode_dict.tags_exclusive = true;
+      } else {
+        new_mode_dict.tags_exclusive = true;
+      }
+    }
+    return {
+      ...tab,
+      mode: new_mode_dict
     }
   }
 
