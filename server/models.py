@@ -78,5 +78,10 @@ class Collection(Base):
         return {
             'collection_id': self.collection_id,
             'name': self.name,
-            'tags': [ {'name':t.name, 'tag_id':t.tag_id} for t in self.tags ]
+            'tags': [ {'name':t.name, 'tag_id':t.tag_id} for t in self.tags ],
+            'mode': {
+                'is_select_points':self.is_select_points,
+                'is_tags_exclusive':self.is_tags_exclusive,
+                'is_tags_inclusive':self.is_tags_inclusive
+            }
         }

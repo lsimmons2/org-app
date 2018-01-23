@@ -355,7 +355,6 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
             let promise = response.json();
             promise.then(resp_body => {
               let collection = resp_body.collection;
-              collection.mode = get_default_collection().mode
               return dispatch({
                 type: BLANK_TAB_FILL_WITH_COLLECTION,
                 collection
