@@ -83,53 +83,51 @@ export const post_tag = (dispatch, new_tag_data) => {
 
 
 export const post_point = (dispatch, getState, point_data, input_ids) => {
-  //return (dispatch, getState) => {
-    return new Promise((resolve, reject) => {
-      let url = base_url + '/points';
-      let tabs = getState().points.tabs;
-      let focused_tab = get_focused_array_item(tabs);
-      let tag_ids = [];
-      if (focused_tab.app.is_just_add_points || focused_tab.mode.is_select_points){
-        tag_ids = get_new_point_tag_ids(focused_tab);
-      }
-      let post_body = JSON.stringify({point:point_data, tag_ids:tag_ids});
-      let req_options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: post_body
-      };
-      fetch(url, req_options)
-        .then((response) => {
-          let promise = response.json();
-          promise.then(resp_body => {
-            if (focused_tab.app.is_just_add_points){
-              let alert = 'Point ' + resp_body.point.point_id + ' saved succesfully'
-              dispatch({
-                type: SHOW_ALERT,
-                alert
-              })
-            } else if (focused_tab.mode.is_select_points){
-              let point = resp_body.point;
-              dispatch({
-                type: ADD_POINT_TO_COLLECTION,
-                point
-              })
-            }
-            _.each(input_ids, id => {
-              document.getElementById(id).value = '';
-            });
-            resolve();
-          })
-        })
-        .catch((error)=> {
-          console.error('errrrrrrrr');
-          console.error(error)
+  return new Promise((resolve, reject) => {
+    let url = base_url + '/points';
+    let tabs = getState().points.tabs;
+    let focused_tab = get_focused_array_item(tabs);
+    let tag_ids = [];
+    if (focused_tab.app.is_just_add_points || focused_tab.mode.is_select_points){
+      tag_ids = get_new_point_tag_ids(focused_tab);
+    }
+    let post_body = JSON.stringify({point:point_data, tag_ids:tag_ids});
+    let req_options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: post_body
+    };
+    fetch(url, req_options)
+      .then((response) => {
+        let promise = response.json();
+        promise.then(resp_body => {
+          if (focused_tab.app.is_just_add_points){
+            let alert = 'Point ' + resp_body.point.point_id + ' saved succesfully'
+            dispatch({
+              type: SHOW_ALERT,
+              alert
+            })
+          } else if (focused_tab.mode.is_select_points){
+            let point = resp_body.point;
+            dispatch({
+              type: ADD_POINT_TO_COLLECTION,
+              point
+            })
+          }
+          _.each(input_ids, id => {
+            document.getElementById(id).value = '';
+          });
           resolve();
-        });
-    })
-  //}
+        })
+      })
+      .catch((error)=> {
+        console.error('errrrrrrrr');
+        console.error(error)
+        resolve();
+      });
+  })
 }
 
 
@@ -227,12 +225,13 @@ export const save_collection = (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     let collection = get_focused_array_item(getState().points.tabs);
     let url = base_url + '/collections/' + collection.collection_id;
-    collection.tag_ids = _.map(collection.tags, tag => {
+    let put_collection = Object.assign({},collection);
+    put_collection.tag_ids = _.map(put_collection.tags, tag => {
       return tag.tag_id;
     });
-    delete collection.tags;
-    delete collection.app;
-    let put_body = JSON.stringify({collection});
+    delete put_collection.tags;
+    delete put_collection.app;
+    let put_body = JSON.stringify({collection:put_collection});
     let req_options = {
       method: 'PUT',
       headers: {
@@ -244,7 +243,7 @@ export const save_collection = (dispatch, getState) => {
       .then(response => {
         let promise = response.json();
         promise.then(resp_body => {
-          let alert = 'Collection ' + collection.collection_id + ' saved successfully';
+          let alert = 'Collection ' + put_collection.collection_id + ' saved successfully';
           return dispatch({
             type: SHOW_ALERT,
             alert
@@ -630,7 +629,6 @@ const get_direction_from_key = (key) => {
 const GLOBAL_ACTION_HANDLERS = {
 
   [IGNORE]: (state, action) => {
-    console.log('in ignore returning', state);
     return state
   },
 
@@ -670,12 +668,10 @@ const COLLECTION_EDITOR_HANDLERS = {
   [COLLECTION_EDITOR_MOVE_SECTION_FOCUS]: (collection_editor, action) => {
     let sections = collection_editor.sections;
     let new_sections = move_array_focus(sections, action.direction);
-    let newc = {
+    return {
       ...collection_editor,
       sections: new_sections
     }
-    console.log('that newwwwwwwwwww', newc);
-    return newc
   },
 
   [COLLECTION_EDITOR_UPDATE_SEARCH_SUGGESTIONS]: (collection_editor, action) => {
