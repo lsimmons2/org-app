@@ -25,6 +25,7 @@ export const BLANK_TAB_MOVE_SECTION_FOCUS = 'BLANK_TAB_MOVE_SECTION_FOCUS'
 export const BLANK_TAB_UPDATE_COLLECTION_SEARCH_SUGGESTIONS = 'BLANK_TAB_UPDATE_COLLECTION_SEARCH_SUGGESTIONS'
 
 export const COLLECTION_EDITOR_MOVE_SECTION_FOCUS = 'COLLECTION_EDITOR_MOVE_SECTION_FOCUS'
+export const COLLECTION_EDITOR_MOVE_MODE_FOCUS = 'COLLECTION_EDITOR_MOVE_MODE_FOCUS'
 export const COLLECTION_EDITOR_MOVE_TAG_SEARCH_FOCUS = 'COLLECTION_EDITOR_MOVE_TAG_SEARCH_FOCUS'
 export const COLLECTION_EDITOR_UPDATE_SEARCH_SUGGESTIONS = 'COLLECTION_EDITOR_UPDATE_SEARCH_SUGGESTIONS'
 export const COLLECTION_EDITOR_TOGGLE_VIEW_VISIBILITY = 'COLLECTION_EDITOR_TOGGLE_VIEW_VISIBILITY'
@@ -88,7 +89,7 @@ export const post_point = (dispatch, getState, point_data, input_ids) => {
       let tabs = getState().points.tabs;
       let focused_tab = get_focused_array_item(tabs);
       let tag_ids = [];
-      if (focused_tab.app.is_just_add_points || focused_tab.mode.select_points){
+      if (focused_tab.app.is_just_add_points || focused_tab.mode.is_select_points){
         tag_ids = get_new_point_tag_ids(focused_tab);
       }
       let post_body = JSON.stringify({point:point_data, tag_ids:tag_ids});
@@ -109,7 +110,7 @@ export const post_point = (dispatch, getState, point_data, input_ids) => {
                 type: SHOW_ALERT,
                 alert
               })
-            } else if (focused_tab.mode.select_points){
+            } else if (focused_tab.mode.is_select_points){
               let point = resp_body.point;
               dispatch({
                 type: ADD_POINT_TO_COLLECTION,
@@ -243,7 +244,6 @@ export const save_collection = (dispatch, getState) => {
       .then(response => {
         let promise = response.json();
         promise.then(resp_body => {
-          console.log(resp_body);
           let alert = 'Collection ' + collection.collection_id + ' saved successfully';
           return dispatch({
             type: SHOW_ALERT,
@@ -629,7 +629,10 @@ const get_direction_from_key = (key) => {
 // ------------------------------------
 const GLOBAL_ACTION_HANDLERS = {
 
-  [IGNORE]: (state, action) => state,
+  [IGNORE]: (state, action) => {
+    console.log('in ignore returning', state);
+    return state
+  },
 
   [ADD_TAB]: (state, action) => {
     let new_tabs = state.tabs.map(tab => {
@@ -666,15 +669,13 @@ const COLLECTION_EDITOR_HANDLERS = {
 
   [COLLECTION_EDITOR_MOVE_SECTION_FOCUS]: (collection_editor, action) => {
     let sections = collection_editor.sections;
-    let section_i;
-    let tags_list = _.find(sections, (section, i) => {
-      if (section.name === 'tags_list'){ section_i = i; return true; };
-    });
     let new_sections = move_array_focus(sections, action.direction);
-    return {
+    let newc = {
       ...collection_editor,
       sections: new_sections
     }
+    console.log('that newwwwwwwwwww', newc);
+    return newc
   },
 
   [COLLECTION_EDITOR_UPDATE_SEARCH_SUGGESTIONS]: (collection_editor, action) => {
@@ -958,20 +959,20 @@ const FOCUSED_TAB_HANDLERS = {
     }
     let direction = action.direction;
     if (direction === 1){
-      if (mode_dict.tags_exclusive){
-        new_mode_dict.tags_inclusive = true;
-      } else if (mode_dict.tags_inclusive){
-        new_mode_dict.select_points = true;
+      if (mode_dict.is_tags_exclusive){
+        new_mode_dict.is_tags_inclusive = true;
+      } else if (mode_dict.is_tags_inclusive){
+        new_mode_dict.is_select_points = true;
       } else {
-        new_mode_dict.select_points = true;
+        new_mode_dict.is_select_points = true;
       }
     } else if (direction === -1){
-      if (mode_dict.select_points){
-        new_mode_dict.tags_inclusive = true;
-      } else if (mode_dict.tags_inclusive){
-        new_mode_dict.tags_exclusive = true;
+      if (mode_dict.is_select_points){
+        new_mode_dict.is_tags_inclusive = true;
+      } else if (mode_dict.is_tags_inclusive){
+        new_mode_dict.is_tags_exclusive = true;
       } else {
-        new_mode_dict.tags_exclusive = true;
+        new_mode_dict.is_tags_exclusive = true;
       }
     }
     return {

@@ -106,7 +106,11 @@ def update_collection(collection_id):
     put_data = request.json
     for field in put_data['collection']:
         if field == 'mode':
-            pass
+            for mode_name in ['is_tags_inclusive','is_tags_exclusive','is_select_points']:
+                if put_data['collection']['mode'][mode_name]:
+                    setattr(collection, mode_name, True)
+                else:
+                    setattr(collection, mode_name, False)
         elif field == 'tag_ids':
             tags = session.query(Tag)\
                 .filter(Tag.tag_id.in_(put_data['collection']['tag_ids']))\

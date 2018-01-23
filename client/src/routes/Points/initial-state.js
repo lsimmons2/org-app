@@ -84,9 +84,9 @@ export const get_default_collection = () => ({
   points: [],
   tags: [],
   mode: {
-    tags_exclusive: false,
-    tags_inclusive: true,
-    select_points: false
+    is_tags_exclusive: false,
+    is_tags_inclusive: true,
+    is_select_points: false
   },
   app: {
     tags: {
