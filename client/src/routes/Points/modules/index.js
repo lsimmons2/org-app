@@ -345,7 +345,7 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
       direction
     })
   } else if (focused_section.name === 'collection_name_form'){
-    if (key === 'Enter'){
+    if (is_enter(event)){
       let collection_name = document.getElementById(focused_section.input_id).value;
       post_collection(dispatch, {name:collection_name})
     }
@@ -356,7 +356,7 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
         type: BLANK_TAB_MOVE_COLLECTION_SEARCH_FOCUS,
         direction
       });
-    } else if (key === 'Enter'){
+    } else if (is_enter(event)){
       let tab_index = get_focused_array_index(tabs);
       let search_suggestions = _.find(sections, section => {
         return section.name === 'collection_search';
@@ -436,7 +436,7 @@ const handle_new_point_command = (dispatch, getState, event) => {
       })
     }
   } else if (focused_section.name === 'point_question_input' || focused_section.name === 'point_answer_input'){
-    if (key === 'Enter'){
+    if (is_enter(event)){
       let question_input_id = _.find(sections, section => {
         return section.name === 'point_question_input';
       }).input_id;
@@ -448,7 +448,7 @@ const handle_new_point_command = (dispatch, getState, event) => {
       post_point(dispatch, getState, {question:point_question, answer:point_answer}, [question_input_id, answer_input_id]);
     }
   } else if (focused_section.name === 'tag_form'){
-    if (key === 'Enter'){
+    if (is_enter(event)){
       let tag_input_id = _.find(sections, section => {
         return section.name === 'tag_form';
       }).input_id;
@@ -462,7 +462,7 @@ const handle_new_point_command = (dispatch, getState, event) => {
         type: NEW_POINT_MOVE_TAG_SEARCH_FOCUS,
         direction
       });
-    } else if (key === 'Enter'){
+    } else if (is_enter(event)){
       let tag = get_focused_array_item(focused_section.search_suggestions);
       return dispatch({
         type: NEW_POINT_ADD_TAG,
@@ -524,7 +524,7 @@ const handle_collection_editor_command  = (dispatch, getState, event) => {
         type: COLLECTION_EDITOR_MOVE_TAG_SEARCH_FOCUS,
         direction
       })
-    } else if (key === 'Enter'){
+    } else if (is_enter(event)){
       let tag_suggestions = tags_search.search_suggestions;
       let tag = get_focused_array_item(tag_suggestions);
       return dispatch({
@@ -658,6 +658,10 @@ const get_direction_from_key = (key) => {
     return key_direction_map[key];
   }
   return null;
+}
+
+const is_enter = (event) => {
+  return event.key === ' ' && event.ctrlKey;
 }
 
 
