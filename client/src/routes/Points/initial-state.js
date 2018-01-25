@@ -33,16 +33,20 @@ const get_new_point_view = () => ({
   ]
 })
 
-export const get_just_add_points = () => ({
-  name: 'just add points',
-  app: {
-    in_focus: true,
-    is_just_add_points: true,
-    views: {
-      new_point: get_new_point_view()
+export const get_just_add_points = () => {
+  let new_point = get_new_point_view();
+  new_point.in_focus = true;
+  return {
+    name: 'just add points',
+    app: {
+      in_focus: true,
+      is_just_add_points: true,
+      views: {
+        new_point
+      }
     }
   }
-})
+}
 
 export const get_blank_tab = () => ({
   name: 'blank tab',
@@ -89,6 +93,7 @@ export const get_default_collection = () => ({
     is_select_points: false
   },
   app: {
+    is_collection: true,
     tags: {
       associated: [],
       most_recent: [],
@@ -143,41 +148,8 @@ export const get_default_collection = () => ({
           {
             name: 'save_button',
             in_focus: false
-          }//,
-          //{
-            //name: 'collection_name_form',
-            //in_focus: false
-          //},
-          //{
-            //name: 'collection_name_form',
-            //in_focus: false
-          //},
-          //{
-            //name: 'point_answer_input',
-            //in_focus: false
-          //},
-          //{
-            //name: 'filter_form',
-            //in_focus: false
-          //}
-        ]
-      },
-
-      //VIEW: POINT_EDITOR
-      point_editor: {
-        in_focus: false,
-        sections: {
-          point_question_input: {
-            in_focus: true
-          },
-          point_answer_input: {
-            in_focus: false
-          },
-          tags_list: {
-            in_focus: false,
-            show_search: false
           }
-        }
+        ]
       }
 
     }

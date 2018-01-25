@@ -268,39 +268,45 @@ export const detect_keypress = (event) => {
     let tabs = getState().points.tabs;
     let focused_tab = get_focused_array_item(tabs);
     let key = event.key;
-
     let global_tab_keys = ['t', '[', ']'];
     if (event.altKey && global_tab_keys.indexOf(key) > -1){
       handle_global_command(dispatch, getState, event);
     } else if (focused_tab.app.is_blank){
       handle_blank_tab_command(dispatch, getState, event);
-    } else if (focused_tab.app.views.new_point.in_focus){
-      handle_new_point_command(dispatch, getState, event);
-    } else if (!focused_tab.app.is_just_add_points && focused_tab.app.views.collection_editor.in_focus){
-      handle_collection_editor_command(dispatch, getState, event);
-    } else if (!focused_tab.app.is_just_add_points && focused_tab.app.views.point_list.in_focus){
-      handle_point_list_command(dispatch, getState, event);
-    }
+    } else if (focused_tab.app.is_just_add_points){
+      handle_just_add_points_command(dispatch, getState, event);
+    } else if (focused_tab.app.is_collection){
+      handle_collection_command(dispatch, getState, event);
+    }    
+  }
+}
 
-    //TOGGLING VIEWS
-    if (event.altKey && key === 'a'){
-      dispatch({
-        type: NEW_POINT_TOGGLE_VIEW_VISIBILITY
-      })
-    } else if (event.altKey && key === 'c'){
-      dispatch({
-        type: COLLECTION_EDITOR_TOGGLE_VIEW_VISIBILITY
-      })
-    } else if (event.ctrlKey && key === 'p'){
-      dispatch({
-        type: POINT_LIST_TOGGLE_VIEW_VISIBILITY
-      })
-    } else {
-      dispatch({
-        type: IGNORE
-      })
-    }
+const handle_just_add_points_command = (dispatch, getState, event) => {
+  handle_new_point_command(dispatch, getState, event);
+}
 
+const handle_collection_command = (dispatch, getState, event) => {
+  let tabs = getState().points.tabs;
+  let focused_tab = get_focused_array_item(tabs);
+  let key = event.key;
+  if (event.altKey && key === 'a'){
+    dispatch({
+      type: NEW_POINT_TOGGLE_VIEW_VISIBILITY
+    })
+  } else if (event.altKey && key === 'c'){
+    dispatch({
+      type: COLLECTION_EDITOR_TOGGLE_VIEW_VISIBILITY
+    })
+  } else if (event.ctrlKey && key === 'p'){
+    dispatch({
+      type: POINT_LIST_TOGGLE_VIEW_VISIBILITY
+    })
+  } else if (focused_tab.app.views.new_point.in_focus){
+    handle_new_point_command(dispatch, getState, event);
+  } else if (focused_tab.app.views.collection_editor.in_focus){
+    handle_collection_editor_command(dispatch, getState, event);
+  } else if (focused_tab.app.views.point_list.in_focus){
+    handle_point_list_command(dispatch, getState, event);
   }
 }
 
