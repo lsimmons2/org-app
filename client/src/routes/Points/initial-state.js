@@ -109,9 +109,10 @@ export const get_default_collection = () => ({
     views: {
 
       //VIEW: POINT_LIST
-      //point_list: {
-        //in_focus: true
-      //},
+      point_list: {
+        in_focus: false,
+        points: []
+      },
 
       //VIEW: NEW_POINT
       new_point: get_new_point_view(),

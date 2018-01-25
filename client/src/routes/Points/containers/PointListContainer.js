@@ -7,8 +7,10 @@ import PointList from '../components/PointList'
 
 const mapStateToProps = (globalState) => {
   let collection = get_focused_array_item(globalState.points.tabs);
-  let points = collection.points
+  let view = collection.app.views.point_list;
+  let points = collection.points;
   return {
+    view,
     points
   }
 }

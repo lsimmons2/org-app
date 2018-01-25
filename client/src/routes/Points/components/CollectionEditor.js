@@ -12,6 +12,7 @@ import Button from './Button'
 class CollectionEditor extends React.Component {
 
   render() {
+
     if (!this.props.view.in_focus){
       return null;
     }

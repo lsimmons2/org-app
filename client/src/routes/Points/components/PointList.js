@@ -5,16 +5,18 @@ import Point from './Point'
 class PointList extends React.Component {
 
   render() {
-    let pointElements = this.props.points.map(point => {
+    if (!this.props.view.in_focus){
+      return null;
+    }
+    let point_elements = this.props.points.map(point => {
       return <Point
         key={point.point_id}
         point={point}
-        toggleAnswerVisibility={this.props.toggleAnswerVisibility}
       />
     });
     return (
       <div>
-        {pointElements}
+        {point_elements}
       </div>
     )
   }

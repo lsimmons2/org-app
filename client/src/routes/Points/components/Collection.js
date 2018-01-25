@@ -15,12 +15,12 @@ class Collection extends React.Component {
         <CollectionMetaContainer/>
         <NewPointContainer/>
         <CollectionEditorContainer/>
+        <PointListContainer/>
       </div>
     )
   }
 
 }
-        //<PointListContainer/>
 
 
 export default Collection

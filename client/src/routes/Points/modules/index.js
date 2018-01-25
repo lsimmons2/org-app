@@ -39,6 +39,9 @@ export const NEW_POINT_REMOVE_TAG = 'NEW_POINT_REMOVE_TAG'
 export const NEW_POINT_UPDATE_SEARCH_SUGGESTIONS = 'NEW_POINT_UPDATE_SEARCH_SUGGESTIONS'
 export const NEW_POINT_MOVE_TAG_SEARCH_FOCUS = 'NEW_POINT_MOVE_TAG_SEARCH_FOCUS'
 
+export const POINT_LIST_MOVE_POINT_FOCUS = 'POINT_LIST_MOVE_POINT_FOCUS'
+export const POINT_LIST_TOGGLE_VIEW_VISIBILITY = 'POINT_LIST_TOGGLE_VIEW_VISIBILITY'
+export const POINT_LIST_TOGGLE_POINT_OPEN = 'POINT_LIST_TOGGLE_POINT_OPEN'
 
 
 //TODO: this should probs be stored somewhere else
@@ -262,7 +265,6 @@ export const save_collection = (dispatch, getState) => {
 
 export const detect_keypress = (event) => {
   return (dispatch, getState) => {
-
     let tabs = getState().points.tabs;
     let focused_tab = get_focused_array_item(tabs);
     let key = event.key;
@@ -276,6 +278,8 @@ export const detect_keypress = (event) => {
       handle_new_point_command(dispatch, getState, event);
     } else if (!focused_tab.app.is_just_add_points && focused_tab.app.views.collection_editor.in_focus){
       handle_collection_editor_command(dispatch, getState, event);
+    } else if (!focused_tab.app.is_just_add_points && focused_tab.app.views.point_list.in_focus){
+      handle_point_list_command(dispatch, getState, event);
     }
 
     //TOGGLING VIEWS
@@ -286,6 +290,10 @@ export const detect_keypress = (event) => {
     } else if (event.altKey && key === 'c'){
       dispatch({
         type: COLLECTION_EDITOR_TOGGLE_VIEW_VISIBILITY
+      })
+    } else if (event.ctrlKey && key === 'p'){
+      dispatch({
+        type: POINT_LIST_TOGGLE_VIEW_VISIBILITY
       })
     } else {
       dispatch({
@@ -355,6 +363,16 @@ const handle_blank_tab_command = (dispatch, getState, event) => {
             let promise = response.json();
             promise.then(resp_body => {
               let collection = resp_body.collection;
+              collection.points = _.map(collection.points, (point, i) => {
+                point.app = {
+                  is_open: false,
+                  in_focus: false
+                };
+                if (i === 0){
+                  point.app.in_focus = true;
+                }
+                return point;
+              })
               return dispatch({
                 type: BLANK_TAB_FILL_WITH_COLLECTION,
                 collection
@@ -455,6 +473,22 @@ const handle_new_point_command = (dispatch, getState, event) => {
 }
 
 
+const handle_point_list_command  = (dispatch, getState, event) => {
+  let key = event.key;
+  let points = get_focused_array_item(getState().points.tabs).points;
+  let point_index = get_focused_array_index(points);
+  if (key === 'j' || key === 'k'){
+    let direction = get_direction_from_key(key);
+    return dispatch({
+      type: POINT_LIST_MOVE_POINT_FOCUS,
+      direction
+    });
+  } else if (key === ' '){
+    return dispatch({
+      type: POINT_LIST_TOGGLE_POINT_OPEN
+    });
+  }
+}
 const handle_collection_editor_command  = (dispatch, getState, event) => {
   let key = event.key;
   let sections = get_focused_array_item(getState().points.tabs).app.views.collection_editor.sections;
@@ -852,6 +886,17 @@ const NEW_POINT_HANDLERS = {
 
 }
 
+const POINT_LIST_HANDLERS = {
+
+  [POINT_LIST_TOGGLE_VIEW_VISIBILITY]: (point_list, action) => {
+    return {
+      ...point_list,
+      in_focus: !point_list.in_focus
+    }
+  }
+
+}
+
 
 const FOCUSED_TAB_HANDLERS = {
 
@@ -974,6 +1019,32 @@ const FOCUSED_TAB_HANDLERS = {
       ...tab,
       mode: new_mode_dict
     }
+  },
+
+  [POINT_LIST_MOVE_POINT_FOCUS]: (tab, action) => {
+    let points = move_array_focus(tab.points, action.direction);
+    return {
+      ...tab,
+      points: points
+    }
+  },
+
+  [POINT_LIST_TOGGLE_POINT_OPEN]: (tab, action) => {
+    let focused_point_index = get_focused_array_index(tab.points);
+    return {
+      ...tab,
+      points: [
+        ...tab.points.slice(0,focused_point_index),
+        {
+          ...tab.points[focused_point_index],
+          app: {
+            ...tab.points[focused_point_index].app,
+            is_open: !tab.points[focused_point_index].app.is_open
+          }
+        },
+        ...tab.points.slice(focused_point_index+1)
+      ]
+    }
   }
 
 }
@@ -1025,6 +1096,26 @@ const reducer = (state = initialState, action) => {
             views: {
               ...state.tabs[focused_tab_index].app.views,
               collection_editor: collection_editor
+            }
+          }
+        },
+        ...state.tabs.slice(focused_tab_index + 1)
+      ]
+    };
+  } else if (action.type in POINT_LIST_HANDLERS){
+    let handler = POINT_LIST_HANDLERS[action.type];
+    let point_list = handler(state.tabs[focused_tab_index].app.views.point_list, action);
+    return {
+      ...state,
+      tabs: [
+        ...state.tabs.slice(0, focused_tab_index),
+        {
+          ...state.tabs[focused_tab_index],
+          app: {
+            ...state.tabs[focused_tab_index].app,
+            views: {
+              ...state.tabs[focused_tab_index].app.views,
+              point_list: point_list
             }
           }
         },
